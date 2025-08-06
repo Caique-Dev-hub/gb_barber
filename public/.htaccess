@@ -1,0 +1,20 @@
+# Ativar o mecanismo de reescrita do Apache
+RewriteEngine On 
+
+# Definir o caminho base da aplicação
+# Isso é necessário para garantir que as regras de reescrita sejam aplicadas corretamente
+# em relação ao diretório onde o .htaccess está localizado.
+RewriteBase /gb-barber/public/
+
+# Se a URL requisitada não for um arquivo existente
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# ...e se a URL requisitada não for um diretório existente
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Então redirecione todas as requisições para index.php, passando o parâmetro "url"
+# O trecho `^(.*)$` captura toda a URL requisitada e a anexa como parâmetro "url" na query string.
+# O modificador [QSA,L] significa:
+# - QSA (Query String Append): mantém qualquer parâmetro GET que já esteja na URL original.
+# - L (Last Rule): impede que outras regras sejam processadas depois dessa.
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
