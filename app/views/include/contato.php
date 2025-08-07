@@ -52,9 +52,9 @@
                         <label class="" style="margin-left: 10px;width: 50px;color: white;" for="inputGroupSelect01">Serviços</label>
                         <select class="" id="inputGroupSelect01" style="width: 320px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;">
                             <option selected></option>
-                            <option value="1">Corte Social R$35,00</option>
-                            <option value="2">Barba R$25,00</option>
-                            <option value="3">Sobrancelha R$15,00</option>
+                            <?php foreach ($servicos as $atributo) : ?>
+                                <option value="<?= isset($atributo['id_servico']) ? $atributo['id_servico'] : $atributo['id_combo'] + 3?>"><?= isset($atributo['nome_servico']) ? $atributo['nome_servico'] .' R$'.$atributo['valor_servico'] : $atributo['nome_combo'] . ' R$'. $atributo['valor_combo'] ?></option>
+                            <?php endforeach ?>
                         </select>
                     </div>
                     <div class="container-menu" style="display: flex;flex-direction: column; ">
@@ -76,8 +76,8 @@
 </section>
 
 <script>
-document.getElementById('_tel').addEventListener('input', function(e) {
-    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
-    e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
-});
+    document.getElementById('_tel').addEventListener('input', function(e) {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+        e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+    });
 </script>

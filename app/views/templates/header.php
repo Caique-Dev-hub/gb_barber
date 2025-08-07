@@ -1,4 +1,4 @@
-<header>
+<header id="header">
     <div class="site">
 
         <div class="menu" id="main-header">
@@ -8,10 +8,10 @@
             </div>
             <div class="conteudo-menu-2">
                 <ul>
-                    <li ><a class="session-menu" href="#home">HOME</a></li>
-                    <li ><a class="session-menu" href="#servico">SERVIÇO</a></li>
-                    <li ><a class="session-menu" href="#sobre">SOBRE</a></li>
-                    <li ><a class="session-menu" href="#contato">RESERVA</a></li>
+                    <li ><a class="session-menu" data-destiny="header">HOME</a></li>
+                    <li ><a class="session-menu" data-destiny="servico">SERVIÇO</a></li>
+                    <li ><a class="session-menu" data-destiny="sobre">SOBRE</a></li>
+                    <li ><a class="session-menu" data-destiny="contato">RESERVA</a></li>
                 </ul>
             </div>
         </div>
@@ -29,6 +29,18 @@
             }else{
                 header.classList.remove('scrolled');// Remove a classe se voltou ao topo
             }
+        })
+    })
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('.session-menu').forEach((header) => {
+            header.addEventListener('click', function(){
+                let destino = this.dataset.destiny;
+
+                document.getElementById(`${destino}`).scrollIntoView({behavior: "smooth"});
+            })
         })
     })
 </script>
