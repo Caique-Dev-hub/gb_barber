@@ -7,7 +7,9 @@ class Database{
         try {
             $this->db = new PDO("mysql:host=$_ENV[DB_HOST];dbname=$_ENV[DB_NAME]", $_ENV['DB_USER'], $_ENV['DB_PASSWORD'], [
                 PDO::ATTR_ERRMODE,
-                PDO::ERRMODE_EXCEPTION
+                PDO::ERRMODE_EXCEPTION,
+                PDO::FETCH_ASSOC
+                
             ]);
         } catch (PDOException $e) {
             die('Erro: '. $e->getMessage());

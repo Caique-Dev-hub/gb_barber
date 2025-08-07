@@ -7,10 +7,10 @@ if (!isset($_SESSION['admin'])) {
 
 $uri = explode('/', $_SERVER['REQUEST_URI']);
 
-$countServicos = $this->db_servico->getCount();
-$countCombo = $this->db_servico->getCount_combo();
+$count = $this->db_servico->getCount();
+$countcombo = $this->db_servico->getCountcombo();
 
-$countTotal = (int)$countServicos['total'] + (int)$countCombo['total'];
+$soma = (int)$count + (int)$countcombo; 
 
 ?>
 
@@ -796,7 +796,7 @@ $countTotal = (int)$countServicos['total'] + (int)$countCombo['total'];
                         </div>
                         <div class="card-content">
                             <h3 class="card-title" style="font-size: 20px;">Servicos</h3>
-                            <p class="card-value"><?= $countTotal ?></p>
+                            <p class="card-value"><?= $soma ?></p>
                         </div>
                     </div>
 

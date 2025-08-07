@@ -1,7 +1,7 @@
 <?php
 
 class Router{
-    public static function routers(){
+    public static function url(){
         $url = $_GET['url'];
 
         if(empty($url)){

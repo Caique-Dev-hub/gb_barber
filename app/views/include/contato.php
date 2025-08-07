@@ -50,23 +50,31 @@
                 <div class="container-form">
                     <div class="container-menu" style="display: flex;flex-direction: column; ">
                         <label class="" style="margin-left: 10px;width: 50px;color: white;" for="inputGroupSelect01">Serviços</label>
-                        <select class="" id="inputGroupSelect01" style="width: 320px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;">
+                        <select class="" id="inputGroupSelect01" style="width: 658px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;">
                             <option selected></option>
-                            <?php foreach ($servicos as $atributo) : ?>
-                                <option value="<?= isset($atributo['id_servico']) ? $atributo['id_servico'] : $atributo['id_combo'] + 3?>"><?= isset($atributo['nome_servico']) ? $atributo['nome_servico'] .' R$'.$atributo['valor_servico'] : $atributo['nome_combo'] . ' R$'. $atributo['valor_combo'] ?></option>
+                            <?php foreach ($todosservico as $coluna) : ?>
+                                <option value="<?= isset($coluna['id_servico']) ? $coluna['id_servico'] : $coluna['id_combo'] + 3 ?>"><?= isset($coluna['nome_servico']) ? $coluna['nome_servico'] . ' ' . 'R$' . str_replace('.', ',', $coluna['valor_servico']) : $coluna['nome_combo'] . ' ' . 'R$' . str_replace('.', ',', $coluna['valor_combo'])  ?></option>
                             <?php endforeach ?>
                         </select>
                     </div>
-                    <div class="container-menu" style="display: flex;flex-direction: column; ">
-                        <label class="" style="margin-left: 10px;width: 50px;color: white;" for="inputGroupSelect01">Horários</label>
-                        <select class="" id="inputGroupSelect01" style="width: 320px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;">
-                            <option selected></option>
-                            <option value="1">PM 14:00</option>
-                            <option value="2">PM 15:00</option>
-                            <option value="3">PM 16:00</option>
-                        </select>
-                    </div>
                 </div>
+                <div class="container-menu" style="display: flex;">
+                    <select class="" id="inputGroupSelect01" style="width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;">
+                        <option selected>Selecione algum Data</option>
+                        <option value="1">16/07/2025</option>
+                        <option value="2">17/07/2025</option>
+                        <option value="3">18/07/2025</option>
+
+
+                    </select>
+                    <select class="" id="inputGroupSelect01" style=" width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;">
+                        <option selected>Seleciona alguma Horário</option>
+                        <option value="1">PM 14:00</option>
+                        <option value="2">PM 15:00</option>
+                        <option value="3">PM 16:00</option>
+                    </select>
+                </div>
+
                 <div class="d-grid gap-2 col-6 mx-auto">
                     <button class="btn btn-primary" id="btn-reserva" style="background: linear-gradient(135deg, #BE4949 0%,rgb(93, 29, 29) 100%); background-color: #BE4949;border:none; margin-top: 40px;font-size: 1.3rem;" type="button"><a style="text-decoration:none; color:#fff;" href="">Reserva</a></button>
                 </div>

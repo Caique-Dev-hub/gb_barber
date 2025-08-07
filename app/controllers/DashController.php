@@ -178,14 +178,14 @@ class DashController extends Controller{
 
         switch($pasta){
             case 'servicos':
-                $servicos = $this->db_servicos->getServicos();
-                $combos = $this->db_servicos->getCombos();
+                $servicos = $this->db_servico->getServicos();
+                $combos = $this->db_servico->getCombos();
 
                 $dados['servicos'] = array_merge($servicos, $combos);
                 break;
         }
         
 
-        $this->carregarViews('admin/dash', $dados);
+        $this->view('admin/dash', $dados);
     }
 }

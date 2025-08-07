@@ -3,12 +3,13 @@
 class InicioController extends Controller{
     public function index(){
         $dados = [];
+        $servico = $this->db_servico->getservico();
+        $combo = $this->db_servico->getcombo();
+        $todosservico = $this->db_servico->getcombotodos();
 
-        $servicos = $this->db_servico->getServicos();
-        $combo = $this->db_servico->getCombos();
+        $dados['servicos'] = array_merge($servico , $combo);
+        $dados['todosservico'] = array_merge($servico, $todosservico);
 
-        $dados['servicos'] = array_merge($servicos, $combo);
-        
         $this->view('inicio', $dados);
     }
 }

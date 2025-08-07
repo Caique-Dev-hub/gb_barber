@@ -1,6 +1,6 @@
 <?php
 
-define('URL_BASE', 'http://localhost/gb-barber/public/');
+define('URL_BASE', 'http://localhost/gb_barber/public/');
 
 spl_autoload_register(function($class){
     $caminhos = [

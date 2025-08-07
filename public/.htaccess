@@ -4,7 +4,7 @@ RewriteEngine On
 # Definir o caminho base da aplicação
 # Isso é necessário para garantir que as regras de reescrita sejam aplicadas corretamente
 # em relação ao diretório onde o .htaccess está localizado.
-RewriteBase /gb-barber/public/
+RewriteBase /gb_barber/public/
 
 # Se a URL requisitada não for um arquivo existente
 RewriteCond %{REQUEST_FILENAME} !-f
