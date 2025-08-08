@@ -18,11 +18,11 @@ spl_autoload_register(function($class){
 });
 
 function env(){
-    $linhas = file("../.env", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $line = file('../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-    foreach($linhas as $valor){
+    foreach($line as $valor){
         $env = explode('=', $valor);
-
+        
         $_ENV[$env[0]] = $env[1];
     }
 }

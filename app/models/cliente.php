@@ -1,8 +1,41 @@
 <?php
 
 class Cliente extends Database{
+    public function getEmail($email){
+        $sql = "SELECT * FROM tbl_cliente WHERE email_hash = :email AND status_cliente = 'Ativo'";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':email' => (string)$email
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getWhatsapp($whatsapp){
+        $sql = "SELECT * FROM tbl_cliente WHERE whatsapp_hash = :whatsapp AND status_cliente = 'Ativo'";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':whatsapp' => (string)$whatsapp
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function addCliente($campos){
-        
+        extract($campos);
+
+        $sql = "INSERT INTO tbl_cliente (nome_cliente, email_cliente, email_hash, whatsapp_cliente, whatsapp_hash, senha_cliente)
+        VALUES (:nome, :email, :email_hash, :whatsapp, :whatsapp_hash, :senha)";
+
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':nome' => (string)$nome,
+            ':email' => (string)$email,
+            ':email_hash' => (string)$email_hash,
+            ':whatsapp' => (string)$whatsapp,
+            ':whatsapp_hash' => (string)$whatsapp_hash,
+            ':senha' => (string)$senha
+        ]);
     }
 
     public function updateEstrela($cliente){
@@ -12,21 +45,6 @@ class Cliente extends Database{
         return $stmt->execute([
             ':cliente' => (int)$cliente
         ]);
-    }
-
-    public function addCliente_agendamento($campos){
-        extract($campos);
-
-        $sql = "INSERT INTO tbl_cliente (nome_cliente, email_cliente, whatsapp_cliente)
-        VALUES (:nome, :email, :whatsapp)";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':nome' => $nome,
-            ':email' => $email,
-            ':whatsapp' => $whatsapp
-        ]);
-        return $this->db->lastInsertId();
     }
 
     public function updateSenha($id, $senha){

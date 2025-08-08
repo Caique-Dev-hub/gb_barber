@@ -2,7 +2,6 @@
 require_once('templates/head.php');
 require_once('templates/header.php');
 
-
 //BANNER//
 require_once('include/banner.php');
 //SERVICO

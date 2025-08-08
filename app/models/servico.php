@@ -4,13 +4,33 @@ class Servico extends Database{
 public function getservico(){
     $sql = "SELECT * FROM tbl_servico WHERE status_servico = 'Ativo' ORDER BY id_servico ASC";
     $stmt = $this->db->query($sql);
-    return $stmt->fetchAll();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function getDetalhe_combo($id){
+    $sql = "SELECT * FROM tbl_combo_servico WHERE id_combo = :id AND status_combo = 'Ativo'";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([
+        ':id' => (int)$id
+    ]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+public function getDetalhe_servico($id){
+    $sql = "SELECT * FROM tbl_servico WHERE id_servico = :id AND status_servico = 'Ativo'";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([
+        ':id' => (int)$id
+    ]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 public function getcombo(){
     $sql = "SELECT * FROM tbl_combo_servico WHERE status_combo = 'Ativo' ORDER BY id_combo ASC LIMIT 3";
     $stmt = $this->db->query($sql);
-    return $stmt->fetchAll();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 public function getcombotodos(){
