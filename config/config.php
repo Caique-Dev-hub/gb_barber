@@ -1,4 +1,5 @@
 <?php
+//host -- br61-cp.valueserver.com.br
 
 define('URL_BASE', 'http://localhost/gb_barber/public/');
 

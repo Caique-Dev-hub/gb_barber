@@ -26,7 +26,7 @@
                     </div>
                 </div>
             </div>
-            <form action="" method="post" class="form-contato" id="reserva">
+            <form class="form-contato" id="reserva">
                 <div style="margin: 0 auto; ">
                     <h3>FALE CONOSCO</h3>
                 </div>
@@ -34,24 +34,24 @@
                 <div class="container-menu">
                     <div class="input-name">
                         <label for="_name" style="width: 50px;color: white;">Nome:</label>
-                        <input type="text" placeholder="Nome completo" id="_name" required>
+                        <input type="text" placeholder="Nome completo" id="name" required>
                     </div>
                     <div class="input-name">
                         <label for="_tel" style="width: 50px;color: white;">Telefone:</label>
-                        <input type="text" id="_tel" placeholder="(11) 99999-9999" maxlength="15" required>
+                        <input type="text" id="telefone" placeholder="(11) 99999-9999" maxlength="15" required>
                     </div>
                 </div>
                 <div class="container-menu">
                     <div class="input-name">
                         <label style="width: 50px;color: white;" for="">E-mail</label>
-                        <input style="WIDTH:660px;" type="text" placeholder="@example.com" required>
+                        <input style="WIDTH:660px;" type="text" id="email" placeholder="@example.com" required>
                     </div>
                 </div>
                 <div class="container-form">
                     <div class="container-menu" style="display: flex;flex-direction: column; ">
                         <label class="" style="margin-left: 10px;width: 50px;color: white;" for="inputGroupSelect01">Serviços</label>
                         <select class="" id="inputGroupSelect01" style="width: 658px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;" required>
-                            <option selected></option>
+                            <option value="0" selected></option>
                             <?php foreach ($todosservico as $coluna) : ?>
                                 <option value="<?= isset($coluna['id_servico']) ? $coluna['id_servico'] : $coluna['id_combo'] + 3 ?>"><?= isset($coluna['nome_servico']) ? $coluna['nome_servico'] . ' ' . 'R$' . str_replace('.', ',', $coluna['valor_servico']) : $coluna['nome_combo'] . ' ' . 'R$' . str_replace('.', ',', $coluna['valor_combo'])  ?></option>
                             <?php endforeach ?>
@@ -59,14 +59,14 @@
                     </div>
                 </div>
                 <div class="container-menu" style="display: flex;">
-                    <select class="" id="inputGroupSelect01" style="width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;" required>
-                        <option selected>Selecione algum Data</option>
+                    <select class="" id="data" style="width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;" required>
+                        <option value="0" selected>Selecione algum Dia</option>
                         <option value="1">16/07/2025</option>
                         <option value="2">17/07/2025</option>
                         <option value="3">18/07/2025</option>
                     </select>
-                    <select class="" id="inputGroupSelect01" style=" width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;">
-                        <option selected>Seleciona alguma Horário</option>
+                    <select class="" id="horario" style=" width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;">
+                        <option value="0" selected>Seleciona algum Horário</option>
                         <option value="1">PM 14:00</option>
                         <option value="2">PM 15:00</option>
                         <option value="3">PM 16:00</option>
@@ -74,16 +74,54 @@
                 </div>
 
                 <div class="d-grid gap-2 col-6 mx-auto">
-                    <button class="btn btn-primary" type="submit" id="btn-reserva" style="background: linear-gradient(135deg, #BE4949 0%,rgb(93, 29, 29) 100%); background-color: #BE4949;border:none; margin-top: 40px;font-size: 1.3rem;" type="button"><a style="text-decoration:none; color:#fff;" href="">Reserva</a></button>
+                    <button class="btn btn-primary" type="submit" id="btn-reserva"
+                        style="background: linear-gradient(135deg, #BE4949 0%,rgb(93, 29, 29) 100%); 
+                    background-color: #BE4949;border:none; margin-top: 40px;font-size: 1.3rem;">
+                        Reserva
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </section>
 
+
+<!-- //script do tratamento do telefone -->
 <script>
-    document.getElementById('_tel').addEventListener('input', function(e) {
+    document.getElementById('telefone').addEventListener('input', function(e) {
         let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
         e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
     });
+</script>
+
+<script>
+    document.getElementById('reserva').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const input = {
+            'nome': document.getElementById('name').value,
+            'telefone': document.getElementById('telefone').value,
+            'email': document.getElementById('email').value,
+            'servico': document.getElementById('inputGroupSelect01').value,
+            'data': document.getElementById('data').value,
+            'horario': document.getElementById('horario').value
+        }
+
+        fetch(`<?= URL_BASE ?>contato/adicionar_reserva`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'Application/json'
+            },
+            body: JSON.stringify(input)
+        })
+
+        .then(response => response.text())
+        .then(data => {
+            alert(data)
+        })
+
+        .catch(error =>{
+            alert (error)
+        })
+    })
 </script>
