@@ -11,46 +11,58 @@ class ContatoController extends Controller
                 echo 'Preencha todos os campos';
                 return;
             }
+
             switch ($campo) {
                 case 'nome':
-
                     $nome = filter_var($valor, FILTER_SANITIZE_SPECIAL_CHARS);
                     $nome = explode(' ', $nome); //Caique Martins
+
                     if (count($nome) < 2) {
                         echo 'Coloque seu Nome Completo';
                         return;
                     }
+
                     foreach ($nome as $valor) {
                         if (strlen($valor) < 2) { //passando por cada nome e conferindo se os caracter esta acima de 2
                             echo 'Nome Inválido';
                             return;
                         }
                     }
+
                     $nome = implode(' ', $nome); //Caique Martins
                     break;
+
                 case 'email':
                     $email = filter_var($valor, FILTER_SANITIZE_EMAIL);
+
                     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                         echo 'E-mail Inválido';
                         return;
                     }
+        
+                    $email = Controller::criptografia($email);
                     break;
+
                 case 'telefone':
                     $telefone = filter_var($valor, FILTER_SANITIZE_SPECIAL_CHARS);
+
                     if (strlen($telefone) != 15) {
                         echo 'Telefone Inválido';
                         return;
                     }
+
                     if (preg_match('/^\(\d{2}\) \d{5}-\d{4}$/', $telefone) == 0) {
                         echo 'Formato Inválido';
                         return;
                     }
 
+                    $telefone = Controller::criptografia($telefone);
                     break;
             }
         }
 
         $file['servico'] = (int)$file['servico'];
+
         if ($file['servico'] > 3) {
             $combo = $file['servico'] - 3;
 
@@ -62,19 +74,22 @@ class ContatoController extends Controller
         $file['telefone'] = $telefone; //telefone tratado
 
         if (isset($file['combo'])) {
-            $addcombo = $this->db_contato->addcombo($file);
+            $addcombo = $this->db_reserva->addcombo($file);
+
             if (!$addcombo) {
                 echo 'Erro ao fazer reserva';
                 return;
             }
-            echo 'Certo';
 
+            echo 'Certo';
         } else {
-            $addservico = $this->db_contato->addservico($file);
+            $addservico = $this->db_reserva->addservico($file);
+            
             if (!$addservico) {
                 echo 'Erro ao fazer reserva';
                 return;
             }
+
             echo 'Certo';
         }
     }

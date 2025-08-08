@@ -7,6 +7,7 @@ class Controller {
     protected $db_dashboard;
     protected $db_contato;
     protected $db_data;
+    protected $db_reserva;
 
     public function __construct(){
         $this->db_cliente = new Cliente();  
@@ -15,6 +16,7 @@ class Controller {
         $this->db_dashboard = new Dashboard();
         $this->db_contato = new Contato();
         $this->db_data = new Data();
+        $this->db_reserva = new Reserva();
     }
 
 
@@ -28,23 +30,24 @@ class Controller {
     }
 
     public static function criptografia($text){
-        $nonce = random_bytes(SODIUM_CRYPTO_BOX_NONCEBYTES);
-        
+        $iv = random_bytes(openssl_cipher_iv_length($_ENV['METHOD']));
+
         $key = base64_decode($_ENV['CRYPTO_KEY']);
 
-        $crypto = sodium_crypto_secretbox($text, $nonce, $key);
+        $crypto = openssl_encrypt($text, $_ENV['METHOD'], $key, OPENSSL_RAW_DATA, $iv);
 
-        return base64_encode($nonce . $crypto);
+        return base64_encode($iv . $crypto);
     }
     
     public static function descriptografia($crypto){
         $bin = base64_decode($crypto);
 
+        $iv = substr($bin, 0, openssl_cipher_iv_length($_ENV['METHOD']));
+
+        $text = substr($bin, openssl_cipher_iv_length($_ENV['METHOD']));
+        
         $key = base64_decode($_ENV['CRYPTO_KEY']);
 
-        $nonce = substr($bin, 0, SODIUM_CRYPTO_BOX_NONCEBYTES);
-        $text = substr($bin, SODIUM_CRYPTO_BOX_NONCEBYTES);
-
-        return sodium_crypto_secretbox_open($text, $nonce, $key);
+        return openssl_decrypt($text, $_ENV['METHOD'], $key, OPENSSL_RAW_DATA, $iv);
     }
 }
