@@ -8,7 +8,7 @@ class Cliente extends Database{
         $stmt->execute([
             ':email' => (string)$email
         ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getWhatsapp($whatsapp){
@@ -17,6 +17,30 @@ class Cliente extends Database{
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             ':whatsapp' => (string)$whatsapp
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAgendamentoComentario($id){
+        $sql = "SELECT * FROM tbl_cliente
+        INNER JOIN tbl_agendamento ON tbl_cliente.id_cliente = tbl_agendamento.id_cliente
+        INNER JOIN tbl_comentario ON tbl_cliente.id_cliente = tbl_comentario.id_cliente
+        WHERE tbl_cliente.id_cliente = :cliente AND tbl_cliente.status_cliente = 'Ativo'";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':cliente' => (int)$id
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getDetailsCliente($id){
+        $sql = "SELECT nome_cliente, email_cliente, whatsapp_cliente, senha_cliente FROM tbl_cliente 
+        WHERE id_cliente = :id AND status_cliente = 'Ativo'";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => (int)$id
         ]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -38,6 +62,30 @@ class Cliente extends Database{
         ]);
     }
 
+    public function updateCliente($campos, $id){
+        extract($campos);
+
+        $sql = "UPDATE tbl_cliente SET 
+        nome_cliente = :nome,
+        email_cliente = :email,
+        email_hash = :email_hash,
+        whatsapp_cliente = :whatsapp,
+        whatsapp_hash = :whatsapp_hash,
+        senha_cliente = :senha
+        WHERE id_cliente = :id";
+
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':nome' => (string)$nome,
+            ':email' => (string)$email,
+            ':email_hash' => (string)$email_hash,
+            ':whatsapp' => (string)$whatsapp,
+            ':whatsapp_hash' => (string)$whatsapp_hash,
+            ':senha' => (string)$senha,
+            ':id' => (int)$id
+        ]);
+    }
+
     public function updateEstrela($cliente){
         $sql = "UPDATE tbl_cliente SET estrela_cliente = 1 WHERE id_cliente = :cliente";
 
@@ -46,49 +94,25 @@ class Cliente extends Database{
             ':cliente' => (int)$cliente
         ]);
     }
-
-    public function updateSenha($id, $senha){
-        $sql = "UPDATE tbl_cliente SET senha_cliente = :senha WHERE id_cliente = :cliente";
+    public function deleteClienteFull($id){
+        $sql = "DELETE tbl_cliente, tbl_comentario, tbl_agendamento FROM tbl_cliente
+        INNER JOIN tbl_comentario ON tbl_cliente.id_cliente = tbl_comentario.id_cliente
+        INNER JOIN tbl_agendamento ON tbl_cliente.id_cliente = tbl_agendamento.id_cliente
+        WHERE tbl_cliente.id_cliente = :cliente AND tbl_cliente.status_cliente = 'Ativo'";
 
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':senha' => $senha,
-            ':cliente' => $id
+            ':cliente' => (int)$id
         ]);
     }
 
-    public function getCliente($id){
-        $sql = "SELECT * FROM tbl_cliente WHERE id_cliente = :cliente";
+    public function deleteClienteOne($id){
+        $sql = "DELETE FROM tbl_cliente
+        WHERE id_cliente = :cliente";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':cliente' => $id
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function getClientes(){
-        $sql = "SELECT * FROM tbl_cliente";
-
-        $stmt = $this->db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function updateCliente($id, $campos){
-        extract($campos);
-
-        $sql = "UPDATE tbl_cliente SET nome_cliente = :nome,
-        email_cliente = :email,
-        whatsapp_cliente = :whatsapp,
-        senha_cliente = :senha WHERE id_cliente = :cliente";
-        
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':nome' => $nome,
-            ':email' => $email,
-            ':whatsapp' => $whatsapp,
-            ':senha' => $senha,
-            ':cliente' => $id
+            ':cliente' => (int)$id
         ]);
     }
 }

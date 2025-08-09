@@ -34,9 +34,11 @@ class Controller {
 
         $key = base64_decode($_ENV['CRYPTO_KEY']);
 
-        $crypto = openssl_encrypt($text, $_ENV['METHOD'], $key, OPENSSL_RAW_DATA, $iv);
+        $tag = '';
 
-        return base64_encode($iv . $crypto);
+        $crypto = openssl_encrypt($text, $_ENV['METHOD'], $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+        return base64_encode($iv . $tag . $crypto);
     }
     
     public static function descriptografia($crypto){
@@ -44,10 +46,14 @@ class Controller {
 
         $iv = substr($bin, 0, openssl_cipher_iv_length($_ENV['METHOD']));
 
-        $text = substr($bin, openssl_cipher_iv_length($_ENV['METHOD']));
-        
+        $ivTag = openssl_cipher_iv_length($_ENV['METHOD']) + 16;
+
+        $tag = substr($bin, openssl_cipher_iv_length($_ENV['METHOD']), 16);
+
+        $text = substr($bin, $ivTag);
+
         $key = base64_decode($_ENV['CRYPTO_KEY']);
 
-        return openssl_decrypt($text, $_ENV['METHOD'], $key, OPENSSL_RAW_DATA, $iv);
+        return openssl_decrypt($text, $_ENV['METHOD'], $key, OPENSSL_RAW_DATA, $iv, $tag);
     }
 }
