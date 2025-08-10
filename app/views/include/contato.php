@@ -61,15 +61,27 @@
                 <div class="container-menu" style="display: flex;">
                     <select class="" id="data" style="width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;" required>
                         <option value="0" selected>Selecione algum Dia</option>
-                        <option value="1">16/07/2025</option>
-                        <option value="2">17/07/2025</option>
-                        <option value="3">18/07/2025</option>
+                        <?php foreach ($datas as $atributo) : ?>
+                            <?php
+                            $nome_data = explode('-', $atributo['nome_data']);
+
+                            $nome_data = array_reverse($nome_data);
+
+                            $dia_data = $nome_data[0];
+
+                            $nome_data = implode('/', $nome_data);
+
+                            $dia = date('d');
+                            ?>
+
+                            <?php if ((int)$dia_data <= (int)$dia) : ?>
+                                <option value="<?= $atributo['id_data'] ?>"><?= $nome_data ?></option>
+                            <?php endif ?>
+
+                        <?php endforeach ?>
                     </select>
-                    <select class="" id="horario" style=" width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;">
+                    <select class="" id="horario" style=" width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;" disabled>
                         <option value="0" selected>Seleciona algum Horário</option>
-                        <option value="1">PM 14:00</option>
-                        <option value="2">PM 15:00</option>
-                        <option value="3">PM 16:00</option>
                     </select>
                 </div>
 
@@ -86,28 +98,22 @@
 </section>
 
 
-<!-- //script do tratamento do telefone -->
-<script>
-    document.getElementById('telefone').addEventListener('input', function(e) {
-        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
-        e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
-    });
-</script>
+
+<!--------------------------------------- AJAX ---------------------------------->
 
 <script>
-    document.getElementById('reserva').addEventListener('submit', function(e) {
+    document.getElementById('reserva').addEventListener('submit', function(e){
         e.preventDefault();
 
         const input = {
             'nome': document.getElementById('name').value,
-            'telefone': document.getElementById('telefone').value,
             'email': document.getElementById('email').value,
+            'whatsapp': document.getElementById('telefone').value,
             'servico': document.getElementById('inputGroupSelect01').value,
-            'data': document.getElementById('data').value,
-            'horario': document.getElementById('horario').value
-        }
+            'data': document.getElementById('data').value
+        };
 
-        fetch(`<?= URL_BASE ?>contato/adicionar_reserva`, {
+        fetch(`<?= URL_BASE?>reserva/add_reserva`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'Application/json'
@@ -115,13 +121,48 @@
             body: JSON.stringify(input)
         })
 
-        .then(response => response.text())
+        .then(response => response.json())
         .then(data => {
-            alert(data)
+            data.forEach((valor) => {
+                alert(valor);
+            });
         })
 
-        .catch(error =>{
-            alert (error)
+        .catch(error => {
+            console.error(error)
         })
     })
+</script>
+
+<!-- Horarios -->
+<script>
+    document.getElementById('data').addEventListener('change', function(){
+        const horario = document.getElementById('horario');
+        const id = this.value;
+
+        fetch(`<?= URL_BASE?>inicio/listar_horarios/${id}`)
+
+        .then(response => response.text())
+        .then(data => {
+            horario.disabled = false;
+
+            horario.innerHTML += data;
+        })
+
+        .catch(error => {
+            alert(error);
+        })
+    })
+</script>
+
+
+
+
+
+<!-- //script do tratamento do telefone -->
+<script>
+    document.getElementById('telefone').addEventListener('input', function(e) {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+        e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+    });
 </script>

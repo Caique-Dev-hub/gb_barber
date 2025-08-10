@@ -74,7 +74,7 @@ class ContatoController extends Controller
         $file['telefone'] = $telefone; //telefone tratado
 
         if (isset($file['combo'])) {
-            $addcombo = $this->db_reserva->addcombo($file);
+            $addcombo = $this->db_reserva->addCombo($file);
 
             if (!$addcombo) {
                 echo 'Erro ao fazer reserva';
@@ -82,8 +82,9 @@ class ContatoController extends Controller
             }
 
             echo 'Certo';
+            return;
         } else {
-            $addservico = $this->db_reserva->addservico($file);
+            $addservico = $this->db_reserva->addServico($file);
             
             if (!$addservico) {
                 echo 'Erro ao fazer reserva';
@@ -91,6 +92,7 @@ class ContatoController extends Controller
             }
 
             echo 'Certo';
+            return;
         }
     }
 }

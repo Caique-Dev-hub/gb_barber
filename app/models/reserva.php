@@ -2,40 +2,49 @@
 
 class Reserva extends Database
 {
-    public function getReserva($id)
+
+    public function getReservas(){
+        $sql = "SELECT * FROM tbl_reserva
+        INNER JOIN tbl_data_horario ON tbl_data_horario.id_data_horario = tbl_reserva.id_data_horario
+        INNER JOIN tbl_data ON tbl_data_horario.id_data = tbl_data.id_data
+        INNER JOIN tbl_horario ON tbl_horario.id_horario = tbl_data_horario.id_horario
+        ORDER BY tbl_data.nome_data ASC";
+
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function addCombo($campos)
     {
-        $sql = "SELECT * FROM tbl_reserva WHERE id_reserva = :id";
+        extract($campos);
+        
+        $sql = "INSERT INTO tbl_reserva (nome_reserva, email_reserva, whatsapp_reserva, id_combo, id_data_horario)
+        VALUES (:nome, :email, :whatsapp, :combo, :data_horario)";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':id' => (int)$id
+        return $stmt->execute([
+            ':nome' => (string)$nome,
+            ':email' => (string)$email,
+            ':whatsapp' => (string)$whatsapp,
+            ':combo' => (int)$combo,
+            ':data_horario' => (int)$data
         ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function addcombo($campos)
+    public function addServico($campos)
     {
         extract($campos);
-        $sql = "INSERT INTO tbl_reserva(nome_reserva, email_reserva, whatsapp_reserva, id_combo, id_horario) 
-        VALUES (:nome , :email, :telefone, :servico)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':nome', $nome, PDO::PARAM_STR);
-        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-        $stmt->bindValue(':telefone', $telefone, PDO::PARAM_STR);
-        $stmt->bindValue(':servico', $combo, PDO::PARAM_STR);
-        return $stmt->execute();
-    }
 
-    public function addservico($campos)
-    {
-        extract($campos);
-        $sql = "INSERT INTO tbl_reserva(nome_reserva, email_reserva, 
-        whatsapp_reserva, id_servico) VALUES(:nome , :email, :telefone, :servico)";
+        $sql = "INSERT INTO tbl_reserva (nome_reserva, email_reserva, whatsapp_reserva, id_servico, id_data_horario)
+        VALUES (:nome, :email, :whatsapp, :servico, :data_horario)";
+
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':nome', $nome, PDO::PARAM_STR);
-        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-        $stmt->bindValue(':telefone', $telefone, PDO::PARAM_STR);
-        $stmt->bindValue(':servico', $servico, PDO::PARAM_STR);
-        return $stmt->execute();
+        return $stmt->execute([
+            ':nome' => (string)$nome,
+            ':email' => (string)$email,
+            ':whatsapp' => (string)$whatsapp,
+            ':servico' => (int)$servico,
+            ':data_horario' => (int)$data
+        ]);
     }
 }

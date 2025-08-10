@@ -7,10 +7,10 @@ if (!isset($_SESSION['admin'])) {
 
 $uri = explode('/', $_SERVER['REQUEST_URI']);
 
-$count = $this->db_servico->getCount();
-$countcombo = $this->db_servico->getCountcombo();
+$servicos = $this->db_servico->getCount();
+$combos = $this->db_servico->getCountCombo();
 
-$soma = (int)$count + (int)$countcombo; 
+$totalServicos = (int)$servicos['total'] + (int)$combos['total'];
 
 ?>
 
@@ -21,7 +21,7 @@ $soma = (int)$count + (int)$countcombo;
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="<?= URL_BASE ?>dashboard/assets/img/apple-icon.png">
+    <link rel="shortcut icon" href="<?= URL_BASE ?>assets/img/logo-gb.png" type="imagem.iconx">
     <title>
         GB-Barber
     </title>
@@ -796,7 +796,7 @@ $soma = (int)$count + (int)$countcombo;
                         </div>
                         <div class="card-content">
                             <h3 class="card-title" style="font-size: 20px;">Servicos</h3>
-                            <p class="card-value"><?= $soma ?></p>
+                            <p class="card-value"><?= $totalServicos ?></p>
                         </div>
                     </div>
 
