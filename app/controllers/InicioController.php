@@ -4,8 +4,8 @@ class InicioController extends Controller{
     public function index(){
         $dados = [];
 
-        $servico = $this->db_servico->getservico();
-        $combo = $this->db_servico->getcombo();
+        $servico = $this->db_servico->getServicos();
+        $combo = $this->db_servico->getCombos();
         $todosservico = $this->db_servico->getcombotodos();
 
         $dados['datas'] = $this->db_data->getDatas();
