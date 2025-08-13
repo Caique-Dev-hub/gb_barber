@@ -2,9 +2,10 @@
 
 class Servico extends Database
 {
-    public function getservico()
+    public function getServicos()
     {
         $sql = "SELECT * FROM tbl_servico WHERE status_servico = 'Ativo' ORDER BY id_servico ASC";
+
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -31,9 +32,10 @@ class Servico extends Database
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getcombo()
+    public function getCombos()
     {
         $sql = "SELECT * FROM tbl_combo_servico WHERE status_combo = 'Ativo' ORDER BY id_combo ASC LIMIT 3";
+
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -41,6 +43,7 @@ class Servico extends Database
     public function getcombotodos()
     {
         $sql = "SELECT * FROM tbl_combo_servico WHERE status_combo = 'Ativo' ORDER BY id_combo ASC";
+        
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
     }

@@ -8,6 +8,26 @@ class Cliente extends Database{
         $stmt->execute([
             ':email' => (string)$email
         ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getEmailTodos($email){
+        $sql = "SELECT * FROM tbl_cliente WHERE email_hash = :email AND status_cliente = 'Ativo'";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':email' => $email
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getWhatsappTodos($whatsapp){
+        $sql = "SELECT * FROM tbl_cliente WHERE whatsapp_hash = :whatsapp AND status_cliente = 'Ativo'";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':whatsapp' => $whatsapp
+        ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -18,7 +38,7 @@ class Cliente extends Database{
         $stmt->execute([
             ':whatsapp' => (string)$whatsapp
         ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getAgendamentoComentario($id){
@@ -72,7 +92,7 @@ class Cliente extends Database{
         whatsapp_cliente = :whatsapp,
         whatsapp_hash = :whatsapp_hash,
         senha_cliente = :senha
-        WHERE id_cliente = :id";
+        WHERE id_cliente = :cliente AND status_cliente = 'Ativo'";
 
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
@@ -82,7 +102,7 @@ class Cliente extends Database{
             ':whatsapp' => (string)$whatsapp,
             ':whatsapp_hash' => (string)$whatsapp_hash,
             ':senha' => (string)$senha,
-            ':id' => (int)$id
+            ':cliente' => (int)$id
         ]);
     }
 
@@ -92,27 +112,6 @@ class Cliente extends Database{
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':cliente' => (int)$cliente
-        ]);
-    }
-    public function deleteClienteFull($id){
-        $sql = "DELETE tbl_cliente, tbl_comentario, tbl_agendamento FROM tbl_cliente
-        INNER JOIN tbl_comentario ON tbl_cliente.id_cliente = tbl_comentario.id_cliente
-        INNER JOIN tbl_agendamento ON tbl_cliente.id_cliente = tbl_agendamento.id_cliente
-        WHERE tbl_cliente.id_cliente = :cliente AND tbl_cliente.status_cliente = 'Ativo'";
-
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':cliente' => (int)$id
-        ]);
-    }
-
-    public function deleteClienteOne($id){
-        $sql = "DELETE FROM tbl_cliente
-        WHERE id_cliente = :cliente";
-
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':cliente' => (int)$id
         ]);
     }
 }
