@@ -101,7 +101,7 @@ class Cliente extends Database{
             ':email_hash' => (string)$email_hash,
             ':whatsapp' => (string)$whatsapp,
             ':whatsapp_hash' => (string)$whatsapp_hash,
-            ':senha' => (string)$senha,
+            ':senha' => $senha,
             ':cliente' => (int)$id
         ]);
     }

@@ -1,0 +1,15 @@
+POST https://localhost/gb_barber/public/api/atu_cadastro/1
+Content-Type: application/json
+
+{
+    "nome": "Gustavo Costa Brito",
+    "email": "gustavocosta@email.com",
+    "whatsapp": "(11) 91295-3232",
+    "senha": "teste"
+}
+
+
+############
+GET https://localhost/gb_barber/public/api/listar_servicos
+
+
