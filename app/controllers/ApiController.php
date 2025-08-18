@@ -336,35 +336,41 @@ class ApiController extends Controller
         return;
     }
 
-    public function listar_detalhe($id): void
+    public function listar_detalhe($nomeServico): void
     {
         header('Content-Type: application/json');
 
-        $id = (int)$id;
+        $getServicos = $this->db_servico->getServicos();
 
-        if($id > 3){
-            $id -= 3;
-
-            $getCombo = $this->db_servico->getDetalhe_combo($id);
-
-            if(!$getCombo){
-            self::erro('Erro ao retornar todos os detalhes do combo', 500);
-                return;
-            }
-
-            self::exibir_dados($getCombo);
-            return;
-        } else{
-            $getServico = $this->db_servico->getDetalhe_servico($id);
-
-            if(!$getServico){
-            self::erro('Erro ao retornar todos os detalhes do servico', 500);
-                return;
-            }
-
-            self::exibir_dados($getServico);
+        if(!$getServicos){
+            self::erro('Erro ao retornar todos os servicos', 500);
             return;
         }
+
+        $getCombos = $this->db_servico->getCombos();
+
+        if(!$getCombos){
+            self::erro('Erro ao retornar todos os combos');
+            return;
+        }
+
+        $total = array_merge($getServicos, $getCombos);
+
+        foreach($total as $atributo){
+            $nome = $atributo['nome_servico'] ?? $atributo['nome_combo'];
+
+            if(self::tratar_url($nome) === $nomeServico){
+                $detalheServico = $atributo;
+            }
+        }
+
+        if(!isset($detalheServico)){
+            self::erro('Erro ao buscar detalhes do servico', 500);
+            return;
+        }
+
+        self::exibir_dados($detalheServico);
+        return;
     }
 
 

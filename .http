@@ -10,6 +10,6 @@ Content-Type: application/json
 
 
 ############
-GET https://localhost/gb_barber/public/api/listar_servicos
+GET https://localhost/gb_barber/public/api/listar_detalhe/barba
 
 
