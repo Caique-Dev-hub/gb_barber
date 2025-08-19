@@ -32,7 +32,7 @@ class Controller
         require_once("../app/views/$pag.php");
     }
 
-    public static function criptografia($text): string
+    public static function criptografia(string|int|float $text): string
     {
         $iv = random_bytes(openssl_cipher_iv_length($_ENV['METHOD']));
 
@@ -45,7 +45,7 @@ class Controller
         return base64_encode($iv . $tag . $crypto);
     }
 
-    public static function descriptografia($crypto): bool|string
+    public static function descriptografia(string $crypto): bool|string
     {
         $bin = base64_decode($crypto);
 

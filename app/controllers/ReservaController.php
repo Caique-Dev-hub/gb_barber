@@ -3,162 +3,153 @@
 
 class ReservaController extends Controller
 {
-    public function add_reserva()
+    public function adicionar_reserva(): void
     {
-        header('Content-Type: application/json');
-
-        if(isset($_SESSION['reset'])){
-            $timeLimit = 20;
-
-            $expirar = time() - $_SESSION['reset'];
-
-            if($expirar >= $timeLimit){
-                session_unset();
-                session_destroy();
-                session_start();
-                return;
-            }
-        }
-
-        if (isset($_SESSION['time'])) {
+        if(isset($_SESSION['time'])){
             $time = time();
 
-            if (($time - $_SESSION['time']) < 60) {
-                http_response_code(429);
+            if(($time - $_SESSION['time']) < 60){
                 echo json_encode([
-                    'Aguarde 1 minuto para realizar outra reserva'
+                    'erro' => 'Aguarde 30 minutos para tentar novamente'
                 ]);
                 return;
             }
         }
 
-        $_SESSION['time'] = time();
+        $input = file_get_contents('php://input');
+        $input = json_decode($input, true);
 
-        if (!isset($_SESSION['count'])) {
-            $_SESSION['count'] = 0;
-        } else {
-            $_SESSION['count']++;
-        }
+        header('Content-Type: application/json');
 
-        if ($_SESSION['count'] >= 3) {
-            $_SESSION['reset'] = time();
+        $campos = ['nome', 'email', 'whatsapp', 'servico', 'data', 'horario'];
 
-            http_response_code(429);
+        if(count($campos) <> count($input)){
             echo json_encode([
-                'Voce excendeu o numero maximo de tentativas de reserva (3), tente novamente daqui 30 minutos'
+                'erro' => 'Envio do formulario corrompido'
             ]);
             return;
         }
 
-        $input = file_get_contents('php://input');
-        $input = json_decode($input, true);
+        foreach($campos as $valor){
+            if(!isset($input[$valor])){
+                echo json_encode([
+                    'erro' => 'Campo invalido identificado'
+                ]);
+                return;
+            }
+        }
 
-        $error = [];
-        $inputVerify = [];
-
-        foreach ($input as $campo => $valor) {
-            if (empty(trim($valor))) {
-                $error[] = 'Preencha todos os campos';
+        foreach($input as $campo => $valor){
+            if(empty(trim($valor))){
+                echo json_encode([
+                    'erro' => 'Preencha todos os campos'
+                ]);
+                return;
             }
 
-            switch ($campo) {
+            switch($campo){
                 case 'nome':
-                    $inputVerify['nome'] = filter_var($valor, FILTER_SANITIZE_SPECIAL_CHARS);
+                    $nome = filter_var($valor, FILTER_SANITIZE_SPECIAL_CHARS);
 
-                    if (str_word_count($inputVerify['nome']) < 2) {
-                        $error[] = 'Insira o seu nome completo';
+                    if(str_word_count($nome) < 2){
+                        echo json_encode([
+                            'erro' => 'Insira o seu nome completo'
+                        ]);
+                        return;
                     }
 
-                    $nome = str_word_count($inputVerify['nome'], 1);
+                    $nome = str_word_count($nome, 1);
 
-                    foreach ($nome as $n) {
-                        if (strlen($n) < 2) {
-                            $error[] = 'Nome invalido';
+                    foreach($nome as $valor){
+                        if(strlen($valor) < 2){
+                            echo json_encode([
+                                'erro' => 'Nome invalido'
+                            ]);
+                            return;
                         }
                     }
 
+                    $nome = implode(' ', $nome);
                     break;
 
                 case 'email':
-                    $inputVerify['email'] = filter_var($valor, FILTER_SANITIZE_EMAIL);
+                    $email = filter_var($valor, FILTER_SANITIZE_EMAIL);
 
-                    if (!filter_var($inputVerify['email'], FILTER_VALIDATE_EMAIL)) {
-                        $error[] = 'E-mail invalido';
+                    if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                        echo json_encode([
+                            'erro' => 'E-mail invalido'
+                        ]);
+                        return;
                     }
 
-                    $inputVerify['email'] = Controller::criptografia($inputVerify['email']);
+                    $email = Controller::criptografia($email);
 
                     break;
 
                 case 'whatsapp':
-                    $inputVerify['whatsapp'] = filter_var($valor, FILTER_SANITIZE_SPECIAL_CHARS);
+                    $whatsapp = filter_var($valor, FILTER_SANITIZE_SPECIAL_CHARS);
 
-                    if (preg_match('/^\(\d{2}\) \d{5}-\d{4}$/', $inputVerify['whatsapp']) === 0) {
-                        $error[] = 'Telefone invalido';
+                    if(preg_match('/^\(\d{2}\) \d{5}-\d{4}$/', $whatsapp) !== 1){
+                        echo json_encode([
+                            'erro' => 'Formato de numero de whatsapp invalido'
+                        ]);
+                        return;
                     }
 
-                    $inputVerify['whatsapp'] = Controller::criptografia($inputVerify['whatsapp']);
+                    $whatsapp = Controller::criptografia($whatsapp);
+
+                    break;
+
+                case 'servico':
+                    $servico = (int)$valor;
+
+                    if($servico > 3){
+                        $combo = $servico - 3;
+                    }
 
                     break;
             }
         }
 
-        $inputVerify['servico'] = (int)$input['servico'];
+        $input['nome'] = $nome;
+        $input['email'] = $email;
+        $input['whatsapp'] = $whatsapp;
+        
+        if(isset($combo)){
+            $input['combo'] = $combo;
 
-        if ($inputVerify['servico'] > 3) {
-            $inputVerify['combo'] = $inputVerify['servico'];
+            $addReserva = $this->db_reserva->addCombo($input);
+        } else{
+            $addReserva = $this->db_reserva->addServico($input);
         }
 
-        $inputVerify['data'] = (int)$input['data'];
-
-        if (count($error) > 0) {
-            self::error(422, $error);
-            session_unset();
-            return;
-        }
-
-        if (isset($inputVerify['combo'])) {
-            $addCombo = $this->db_reserva->addCombo($inputVerify);
-
-            if (!$addCombo) {
-                self::errorBanco(500, 'Erro ao adicionar reserva com combo');
-                return;
-            }
-
-            http_response_code(201);
+        if(!$addReserva){
             echo json_encode([
-                'Reserva concluida com sucesso'
-            ]);
-            return;
-        } else {
-            $addServico = $this->db_reserva->addServico($inputVerify);
-
-            if (!$addServico) {
-                self::errorBanco(500, 'Erro ao adicionar reserva com servico');
-                return;
-            }
-
-            http_response_code(201);
-            echo json_encode([
-                'Reserva concluida com sucesso'
+                'erro' => 'Erro ao adicionar reserva'
             ]);
             return;
         }
-    }
 
-    private static function error(int $http, array $mensagens)
-    {
-        header('Content-Type: application/json');
-        http_response_code($http);
-        echo json_encode($mensagens);
-    }
-
-    private static function errorBanco(int $http, string $mensagem)
-    {
-        header('Content-Type: application/json');
-        http_response_code($http);
         echo json_encode([
-            'erro' => $mensagem
+            'sucesso' => 'Reserva adicionada com sucesso'
         ]);
+
+        if(!isset($_SESSION['count'])){
+            $_SESSION['count'] = 1;
+            return;
+        } else{
+            $_SESSION['count']++;
+
+            if($_SESSION['count'] >= 3){
+                echo json_encode([
+                    'erro' => 'Voce excedeu o limite maximo de reservas (3), aguarde 30 minutos para realizar novamente'
+                ]);
+
+                $_SESSION['time'] = time();
+                return;
+            } else{
+                return;
+            }
+        }
     }
 }

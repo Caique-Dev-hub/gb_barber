@@ -1,18 +1,20 @@
 <?php
 
-class Router{
-    public static function url(){
+class Router
+{
+    public static function url()
+    {
         $url = $_GET['url'];
 
-        if(empty($url)){
-            header('Location:'.URL_BASE.'inicio');
+        if (empty($url)) {
+            header('Location:' . URL_BASE . 'inicio');
             exit;
         }
 
         $url = explode('/', $url);
 
-        foreach($url as $posicao => $valor){
-            switch($posicao){
+        foreach ($url as $posicao => $valor) {
+            switch ($posicao) {
                 case 0:
                     $controller = ucfirst($valor) . 'Controller';
                     break;
@@ -22,21 +24,21 @@ class Router{
                     break;
 
                 default:
-                $param[] = $valor;
-                break;
+                    $param[] = $valor;
+                    break;
             }
         }
 
-        if(!isset($method)){
+        if (!isset($method)) {
             $method = 'index';
         }
 
-        if(!isset($param)){
+        if (!isset($param)) {
             $param[] = '';
         }
 
-        if(!class_exists($controller) || !method_exists($controller, $method)){
-            header('Location:'.URL_BASE.'inicio');
+        if (!class_exists($controller) || !method_exists($controller, $method)) {
+            header('Location:' . URL_BASE . 'inicio');
             exit;
         }
 

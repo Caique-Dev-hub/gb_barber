@@ -26,7 +26,7 @@
                     </div>
                 </div>
             </div>
-            <form class="form-contato" id="reserva">
+            <form class="form-contato" id="reserva" method="post" action="">
                 <div style="margin: 0 auto; ">
                     <h3>FALE CONOSCO</h3>
                 </div>
@@ -74,7 +74,7 @@
                             $dia = date('d');
                             ?>
 
-                            <?php if ((int)$dia_data <= (int)$dia) : ?>
+                            <?php if ((int)$dia_data >= (int)$dia) : ?>
                                 <option value="<?= $atributo['id_data'] ?>"><?= $nome_data ?></option>
                             <?php endif ?>
 
@@ -101,7 +101,8 @@
 
 <!--------------------------------------- AJAX ---------------------------------->
 
-<script>
+<!-- Reservas -->
+ <script>
     document.getElementById('reserva').addEventListener('submit', function(e){
         e.preventDefault();
 
@@ -110,29 +111,32 @@
             'email': document.getElementById('email').value,
             'whatsapp': document.getElementById('telefone').value,
             'servico': document.getElementById('inputGroupSelect01').value,
-            'data': document.getElementById('data').value
+            'data': document.getElementById('data').value,
+            'horario': document.getElementById('horario').value
         };
 
-        fetch(`<?= URL_BASE?>reserva/add_reserva`, {
+        fetch(`<?= URL_BASE?>reserva/adicionar_reserva`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'Application/json'
+                'Content-Type':'application/json'
             },
             body: JSON.stringify(input)
         })
 
         .then(response => response.json())
         .then(data => {
-            data.forEach((valor) => {
-                alert(valor);
-            });
+            if(data.erro){
+                alert(data.erro);
+            } else{
+                alert(data.sucesso);
+            }
         })
 
         .catch(error => {
-            console.error(error)
+            console.error(error);
         })
-    })
-</script>
+    });
+ </script>
 
 <!-- Horarios -->
 <script>
