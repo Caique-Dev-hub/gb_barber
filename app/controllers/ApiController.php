@@ -310,7 +310,6 @@ class ApiController extends Controller
     }
 
 
-
     // Servicos
     public function listar_servicos(): void
     {
@@ -428,6 +427,33 @@ class ApiController extends Controller
 
 
     // ---------------------------- Metodos auxiliares ------------------------------------- //
+    
+    // Validar Token
+    public function verificar(int $id): array
+    {
+        $httpAuthorization = $_SERVER['HTTP_AUTHORIZATION'] ?? ''; // Eu pego o token no cabeçalho "HTTP Authorization"
+
+        if(!preg_match('/Bearer\s(\S+)/', $httpAuthorization, $conteudo)){ // Verifico se o formato do Token está no formato correto
+            self::erro('Token inválido ou não encontrado', 401);
+            exit;
+        }
+
+        $payload = Token::validar_token($conteudo[1]); // Valido se o Token é válido ou inválido, se ele for válido retorno o conteúdo (payload) do Token em forma de Array associativo
+
+        if($payload ===  null || !$payload){ // Verifico se a validação do Token retorno com sucesso e caso ele estiver expirado retorna erro
+            self::erro('Token expirado', 401);
+            exit;
+        }
+
+        if($payload['id'] !== $id){ // Verifico se o id do conteúdo (payload) do Token é igual ao id do parametro
+            self::erro('Acesso negado', 401);
+            exit;
+        }
+
+        return $payload; // Retorno o conteúdo (payload) do Token
+    }
+
+
 
     // Respostas
     private static function erro(array|string $mensagem, int $http = 422): void
