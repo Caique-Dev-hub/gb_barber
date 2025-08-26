@@ -426,7 +426,7 @@ class ApiController extends Controller
 
 
 
-    // ---------------------------- Metodos auxiliares ------------------------------------- //
+    // -------------------------------- Metodos auxiliares ------------------------------------- //
     
     // Validar Token
     public function verificar(int $id): array

@@ -3,10 +3,28 @@
 
 class ServicoController extends Controller
 {
-    public function adicionar($controle)
+    // CRUD
+    public function listar(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if ($controle == 'servico') {
+        $dados = [];
+
+        $servicos = $this->db_servico->getServicos();
+        $combos = $this->db_servico->getcombotodos();
+
+        $dados['servicosListar'] = array_merge($servicos, $combos);
+        $dados['servicosAdicionar'] = $servicos;
+
+        $dados['hidden'] = 'none';
+
+        $dados['conteudo'] = "servicos/listar";
+
+        $this->view('admin/dash', $dados);
+    }
+
+    public function adicionar(string $servicoCombo): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if ($servicoCombo === 'servico') {
                 $input = [
                     'nome' => filter_input(INPUT_POST, 'nome_servico', FILTER_SANITIZE_SPECIAL_CHARS),
                     'valor' => filter_input(INPUT_POST, 'valor_servico', FILTER_SANITIZE_NUMBER_FLOAT),
@@ -14,79 +32,103 @@ class ServicoController extends Controller
                     'descricao' => filter_input(INPUT_POST, 'descricao_servico', FILTER_SANITIZE_SPECIAL_CHARS)
                 ];
 
-                foreach ($input as $valor) {
-                    if (empty(trim($valor)) || $_FILES['imagem_servico']['error'] === UPLOAD_ERR_NO_FILE) {
-                        self::response('Preencha todos os campos');
-                        exit;
-                    }
-                }
-
-                $img = $_FILES['imagem_servico'];
-
-                $newImg = Geral::tratar_imagem($input['nome'], $img);
-
-                if (!$newImg) {
-                    self::response('Erro ao adicionar imagem');
-                    exit;
-                }
-
-                foreach($input as $campo => $valor){
-                    switch($campo){
+                foreach ($input as $campo => $valor) {
+                    switch ($campo) {
                         case 'nome':
-                            $nome = explode(' ', $valor);
-
-                            foreach($nome as $valor){
-                                if(strlen($valor) < 2){
-                                    self::response('Nome invalido');
-                                    return;
-                                }
+                            if (strlen($valor) < 5) {
+                                $_SESSION['erro'] = 'Nome de servico invalido';
+                                header('Location: ' . URL_BASE . 'servico/listar');
+                                exit;
                             }
+
                             break;
 
                         case 'valor':
+                            if ((float)$valor <= 0) {
+                                $_SESSION['erro'] = 'O valor do servico precisa ser maior que R$0,00';
+                                header('Location: ' . URL_BASE . 'servico/listar');
+                                exit;
+                            }
+
                             $preco = (float)$valor;
+
                             break;
 
                         case 'tempo':
-                            $tempo = (int)$valor;
-                            $tempo *= 60;
+                            $tempo = (float)$valor;
 
-                            $tempo = gmdate('H:i:s', $tempo);
+                            $tempo /= 60;
+
+                            $tempo = explode('.', (string)$tempo);
+
+                            if ((int)$tempo[0] > 0 && (int)$tempo[0] < 10) {
+                                $tempoFormato = "0$tempo[0]:";
+                            } else {
+                                $tempoFormato = "00:";
+                            }
+
+                            if ((int)$tempo[1] > 0 && (int)$tempo[1] < 10) {
+                                $tempoFormato .= "0$tempo[1]:";
+                            } else {
+                                $tempoFormato .= "00:";
+                            }
+
+                            $tempoFormato .= "00";
+
                             break;
 
                         case 'descricao':
-                            $descricao = $valor;
-
-                            if(strlen($descricao) < 10){
-                                self::response('Descricao invalida');
-                                return;
+                            if (strlen($valor) < 5) {
+                                $_SESSION['erro'] = "Descricao de servico invalido";
+                                header('Location: ' . URL_BASE . 'servico/listar');
+                                exit;
                             }
+
                             break;
                     }
                 }
 
+                $input['tempo'] = $tempoFormato;
                 $input['valor'] = $preco;
-                $input['tempo'] = $tempo;
-                $input['imagem'] = $newImg;
 
-                $addServico = $this->db_servicos->addServico($input);
+                $imagem = $_FILES['imagem_servico'];
 
-                if(!$addServico){
-                    self::response('Erro ao adicionar servico');
-                    return;
+                $novoNome = Controller::tratar_imagem($imagem, 'teste');
+
+                if (!$novoNome) {
+                    $_SESSION['erro'] = "Nome de imagem ja existente";
+                    header('Location: ' . URL_BASE . 'servico/listar');
+                    exit;
                 }
 
-                $_SESSION['sucesso'] = 'Servico adicionado com sucesso';
-                header('Location:'.URL_BASE.'dash/listar/servicos');
-                return;
+                $input['imagem'] = $novoNome;
+
+                $addServico = $this->db_servico->addServico($input);
+
+                if (!$addServico) {
+                    $_SESSION['erro'] = 'Erro ao adicionar servico';
+                    header('Location: ' . URL_BASE . 'servico/listar');
+                    exit;
+                }
+
+                $_SESSION['sucesso'] = "Servico adicionado com sucesso";
+                header('Location: ' . URL_BASE . 'servico/listar');
+                exit;
+            } else if($servicoCombo === 'combo'){
+
+            } else{
+                die("Erro ao adicionar servico");
             }
         }
     }
 
-    private static function response($mensagem)
+
+    public function valor(int $servico1, int $servico2): void
     {
-        $_SESSION['servicoErro'] = $mensagem;
-        header('Location:' . URL_BASE . 'dash/listar/servicos');
+        $valor1 = $this->db_servico->getDetalhe_servico($servico1);
+        $valor2 = $this->db_servico->getDetalhe_servico($servico2);
+
+        echo (float)$valor1 + (float)$valor2;
         return;
     }
 }

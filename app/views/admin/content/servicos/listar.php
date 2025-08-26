@@ -716,60 +716,67 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($servicos as $atributo) : ?>
-                        <?php extract($atributo) ?>
+                    <?php foreach ($servicosListar as $atributo) : ?>
                         <tr>
                             <td data-label="Imagem">
-                                <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?ixlib=rb-1.2.1&auto=format&fit=crop&w=80&h=60&q=80" alt="Corte de Cabelo" class="img-thumbnail">
+                                <img src="<?= URL_BASE ?>assets/img/<?= $atributo['imagem_combo'] ?? $atributo['imagem_servico'] ?>" alt="Corte de Cabelo" class="img-thumbnail">
                             </td>
                             <td data-label="Serviço">
-                                <div class="service-name"><?= $nome_combo ?? $nome_servico ?></div>
+                                <div class="service-name"><?= $atributo['nome_combo'] ?? $atributo['nome_servico'] ?></div>
                             </td>
                             <td data-label="Descrição">
-                                <div class="service-description"><?= $descricao_combo ?? $descricao_servico ?></div>
+                                <div class="service-description"><?= $atributo['descricao_combo'] ?? $atributo['descricao_servico'] ?></div>
                             </td>
                             <td data-label="Valor">
-                                <div class="service-price">R$ <?= $valor_combo ?? $valor_servico ?></div>
+                                <div class="service-price">R$ <?= isset($atributo['valor_servico']) ? str_replace('.', ',', $atributo['valor_servico']) : str_replace('.', ',', $atributo['valor_combo']) ?></div>
                             </td>
                             <td data-label="Duração">
                                 <div class="service-duration">
                                     <?php
-                                    $horario = explode(':', $tempo_estimado);
 
-                                    if ($horario[0] <> '00' && $horario[1] <> '00') {
-                                        if ($horario[0] == '01') {
-                                            echo "$horario[0] hora e $horario[1] min";
+
+                                    $horario = explode(':', $atributo['tempo_estimado']);
+
+                                    if ((int)$horario[0] > 0) {
+                                        if ((int)$horario[1] > 0) {
+                                            echo "$horario[0]h e $horario[1]min";
                                         } else {
-                                            echo "$horario[0] horas e $horario[1] min";
+                                            echo "$horario[0]h";
+                                        }
+                                    } else {
+                                        if ((int)$horario[1] > 0) {
+                                            echo "$horario[1]min";
                                         }
                                     }
-                                    if ($horario[0] <> '00') {
-                                        if ($horario[0] == '01') {
-                                            echo "$horario[0] hora";
-                                        } else {
-                                            echo "$horario[0] horas";
-                                        }
-                                    }
 
-                                    if ($horario[1] <> '00') {
-                                        echo "$horario[1] min";
-                                    }
                                     ?>
                                 </div>
                             </td>
                             <td data-label="Status">
-                                <?php if ($status_servico == 'Ativo' || $status_combo == 'Ativo') : ?>
-                                    <span class="status-badge status-active">Ativo</span>
-                                <?php else: ?>
-                                    <span class="status-badge status-inactive">Desativado</span>
-                                <?php endif ?>
+                                <?php
+
+                                if (isset($atributo['status_servico'])) {
+                                    if ($atributo['status_servico'] === 'Ativo') {
+                                        echo "<span class=\"status-badge status-active\">Ativo</span>";
+                                    } else {
+                                        echo "<span class=\"status-badge status-inactive\">Desativado</span>";
+                                    }
+                                } else {
+                                    if ($atributo['status_combo'] === 'Ativo') {
+                                        echo "<span class=\"status-badge status-active\">Ativo</span>";
+                                    } else {
+                                        echo "<span class=\"status-badge status-inactive\">Desativado</span>";
+                                    }
+                                }
+
+                                ?>
                             </td>
                             <td data-label="Ações">
                                 <div class="action-buttons">
-                                    <button class="btn btn-icon btn-edit" data-name="<?= $nome_combo ?? $nome_servico ?>" data-bs-toggle="modal" data-bs-target="#editarServicoModal" data-id="<?= $id_combo ?? $id_servico ?>" title="Editar">
+                                    <button class="btn btn-icon btn-edit" data-name="" data-bs-toggle="modal" data-bs-target="#editarServicoModal" data-id="" title="Editar">
                                         <i class="fas fa-pen"></i>
                                     </button>
-                                    <button class="btn btn-icon btn-delete" data-id="<?= $id_combo ?? $id_servico ?>" title="Remover">
+                                    <button class="btn btn-icon btn-delete" data-id="" title="Remover">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -780,10 +787,6 @@
             </table>
         </div>
     </div>
-
-    <?php if(isset($_SESSION['servicoErro'])) :?>
-        <?= $_SESSION['servicoErro']?>
-    <?php endif?>
 
     <div id="serviceModal" class="modal">
         <div class="modal-content">
@@ -797,7 +800,7 @@
                 <button class="tab-btn" type="button" data-name="combo" onclick="openTab('combo-tab')">Combo de Serviços</button>
             </div>
 
-            <form id="service-tab" class="tab-content active" method="post" action="<?= URL_BASE?>servico/adicionar/servico" enctype="multipart/form-data">
+            <form id="service-tab" class="tab-content active" method="post" action="<?= URL_BASE ?>servico/adicionar/servico" enctype="multipart/form-data">
                 <!-- Upload de imagem -->
                 <div class="form-group image-upload">
                     <input type="file" id="imagem_servico" name="imagem_servico" class="image-upload-input" accept="image/*" required>
@@ -846,15 +849,15 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-cancel" >Cancelar</button>
+                    <button class="btn btn-cancel">Cancelar</button>
                     <button class="btn btn-save" id="addServico" type="submit">Salvar Serviço</button>
                 </div>
             </form>
 
-            <form id="combo-tab" class="tab-content" method="post" action="">
+            <form id="combo-tab" class="tab-content" method="post" action="<?= URL_BASE ?>servico/adicionar/combo">
                 <!-- Upload de imagem para combo -->
                 <div class="form-group image-upload">
-                    <input type="file" id="combo-image" class="image-upload-input" accept="image/*">
+                    <input type="file" id="imagem_combo" class="image-upload-input" accept="image/*">
                     <label for="combo-image" class="image-upload-label">
                         <div class="image-upload-icon">📷</div>
                         <div class="image-upload-text">
@@ -868,28 +871,24 @@
                 <div class="form-row">
                     <div class="form-col">
                         <div class="form-group">
-                            <label for="service1" class="form-label">Primeiro Serviço</label>
-                            <select id="service1" class="form-control">
+                            <label for="servico1" class="form-label">Primeiro Serviço</label>
+                            <select id="servico1" class="form-control">
                                 <option value="">Selecione um serviço</option>
-                                <option value="1">Corte de Cabelo</option>
-                                <option value="2">Barba</option>
-                                <option value="3">Hidratação Capilar</option>
-                                <option value="4">Progressiva</option>
-                                <option value="5">Coloração</option>
+                                <?php foreach ($servicosAdicionar as $atributos) : ?>
+                                    <option value="<?= $atributos['id_servico'] ?>"><?= $atributos['nome_servico'] ?></option>
+                                <?php endforeach ?>
                             </select>
                         </div>
                     </div>
 
                     <div class="form-col">
                         <div class="form-group">
-                            <label for="service2" class="form-label">Segundo Serviço</label>
-                            <select id="service2" class="form-control">
+                            <label for="servico2" class="form-label">Segundo Serviço</label>
+                            <select id="servico2" class="form-control">
                                 <option value="">Selecione um serviço</option>
-                                <option value="1">Corte de Cabelo</option>
-                                <option value="2">Barba</option>
-                                <option value="3">Hidratação Capilar</option>
-                                <option value="4">Progressiva</option>
-                                <option value="5">Coloração</option>
+                                <?php foreach ($servicosAdicionar as $atributos) : ?>
+                                    <option value="<?= $atributos['id_servico'] ?>"><?= $atributos['nome_servico'] ?></option>
+                                <?php endforeach ?>
                             </select>
                         </div>
                     </div>
@@ -899,7 +898,7 @@
                     <div class="form-col">
                         <div class="form-group">
                             <label for="combo-value" class="form-label">Valor Total (R$)</label>
-                            <input type="number" id="combo-value" class="form-control" step="0.01" placeholder="Ex: 75,00">
+                            <input type="number" id="combo-value" class="form-control" step="0.01" placeholder="Ex: 75,00" disabled>
                         </div>
                     </div>
 
@@ -922,6 +921,39 @@
                 </div>
             </form>
 
+            <script>
+                const servicos = [
+                    document.getElementById('servico1').value,
+                    document.getElementById('servico2').value
+                ];
+
+                function servico() {
+                    const servico1 = document.getElementById('servico1').value;
+                    const servico2 = document.getElementById('servico2').value;
+                                            
+
+                    if(servico1 === '' || servico2 === ''){
+                        return;
+                    }
+
+                    fetch(`<?= URL_BASE ?>servico/valor/${parseInt(servico[0])}/${parseInt(servico[1])}`)
+
+                        .then(response => response.text())
+                        .then(data => {
+                            alert(data);
+                        })
+
+                        .catch(error => {
+                            console.error(error);
+                        })
+                }
+
+                servicos.forEach((s) => {
+                    s.addEventListener('change', function(){
+                        servico();
+                    })
+                })
+            </script>
         </div>
     </div>
 

@@ -64,13 +64,12 @@ class Servico extends Database
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function addServico($campos)
+    public function addServico(array $campos): bool
     {
         extract($campos);
 
-        $sql = "INSERT INTO tbl_servico 
-        (nome_servico, descricao_servico, valor_servico, tempo_estimado, imagem_servico, alt_servico)
-        VALUES (:nome, :descricao, :valor, :tempo, :imagem, :alt)";
+        $sql = "INSERT INTO tbl_servico (nome_servico, descricao_servico, valor_servico, valor_antigo, tempo_estimado, imagem_servico, alt_servico, status_servico)
+        VALUES (:nome, :descricao, :valor, 0.00, :tempo, :imagem, :alt, 'Ativo')";
 
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
@@ -81,5 +80,5 @@ class Servico extends Database
             ':imagem' => (string)$imagem,
             ':alt' => (string)$nome
         ]);
-    }
+    } 
 }

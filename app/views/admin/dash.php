@@ -5,8 +5,6 @@ if (!isset($_SESSION['admin'])) {
     exit;
 }
 
-$uri = explode('/', $_SERVER['REQUEST_URI']);
-
 $servicos = $this->db_servico->getCount();
 $combos = $this->db_servico->getCountCombo();
 
@@ -601,7 +599,7 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= URL_BASE ?>dash/listar/servicos" class="nav-link text-white" id="listar_clientes">
+                    <a href="<?= URL_BASE?>servico/listar" class="nav-link text-white" id="listar_clientes">
                         <span class="nav-link-text ms-1">Serviços</span>
                     </a>
                 </li>
@@ -814,9 +812,7 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
                     </div>
                 </div>
             </div>
-
-            <?php if (count($uri) <= 5) : ?>
-                <div class="buttons" style="display: flex; justify-content: center; gap: 10px;">
+                <div class="buttons" style="display: <?= $hidden ?? 'flex'?>; justify-content: center; gap: 10px;">
                     <button class="agendamento-button active-button" id="agendamento" onclick="agendamento()">
                         <span class="button-text">Agendamento</span>
                         <span class="button-icon">
@@ -834,7 +830,6 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
                         </span>
                     </button>
                 </div>
-            <?php endif ?>
 
             <script>
                 document.getElementById('reserva').addEventListener('click', function() {

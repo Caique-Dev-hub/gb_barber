@@ -137,4 +137,28 @@ class Controller
 
         return $textoUrl;
     }
+
+    public static function tratar_imagem(array $imagem, string $nomeNovo): string|bool
+    {
+        $nome = pathinfo($imagem['name'], PATHINFO_BASENAME);
+
+        $nome = explode('.', $nome);
+
+        $nomeNovo = strtolower($nomeNovo);
+
+        $nomeNovo = self::tratar_url($nomeNovo);
+
+        $nome[0] = $nomeNovo;
+
+        $nome = implode('.', $nome);
+
+        if(file_exists("upload/$nome")){
+            return false;
+        }
+
+        move_uploaded_file($imagem['tmp_name'], "upload/$nome");
+
+        return $nome;
+    }
+
 }

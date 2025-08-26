@@ -160,20 +160,5 @@ class DashController extends Controller{
 
 
     // CRUD
-    public function listar($pasta){
-        $dados = [];
-        $dados['conteudo'] = "$pasta/listar";
-
-        switch($pasta){
-            case 'servicos':
-                $servicos = $this->db_servico->getServicos();
-                $combos = $this->db_servico->getCombos();
-
-                $dados['servicos'] = array_merge($servicos, $combos);
-                break;
-        }
-        
-
-        $this->view('admin/dash', $dados);
-    }
+    
 }
