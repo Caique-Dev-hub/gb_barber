@@ -12,37 +12,33 @@ class ApiController extends Controller
 
         $campos = ['nome', 'email', 'whatsapp', 'senha'];
 
-        if(count($campos) <> count($input)){
-            self::erro('Envio do formulario foi corrompido, tentar novamente do jeito correto', 400);
+        foreach($campos as $valor){
+            if(!isset($input[$valor])){
+                self::erro('Campo obrigatório não identificado, tentar novamente pelo formulário', 400);
+                return;
+            }
+        }
+
+        if(count($input) !== count($campos)){
+            self::erro('Envio formulário corrompido', 400);
             return;
         }
 
         foreach($input as $campo => $valor){
-            if(empty(trim($valor))){
-                match($campo){
-                    'nome' => self::erro('Seu nome nao foi preenchido, tentar novamente com todos os campos preenchidos'),
-                    'email' => self::erro('Seu E-mail nao foi preenchido, tentar novamente com todos os campos preenchidos'),
-                    'whatsapp' => self::erro('Seu numero de whatsapp nao foi preenchido, tentar novamente com todos os campos preenchidos'),
-                    'senha' => self::erro('Sua senha nao foi preenchida, tentar novamente com todos os campos preenchidos')
-                };
-                return;
-            }
-
             match($campo){
-                'nome' => $camposTratados['nome'] = self::tratar_nome($valor),
-                'email' => $camposTratados['email'] = self::tratar_email($valor),
-                'whatsapp' => $camposTratados['whatsapp'] = self::tratar_whatsapp($valor),
-                'senha' => $camposTratados['senha'] = self::tratar_senha($valor)
+                'nome' => $tratado['nome'] = self::tratar_nome($valor),
+                'email' => $tratado['email'] = self::tratar_email($valor),
+                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor),
+                'senha' => $tratado['senha'] = self::tratar_senha($valor)
             };
 
-            if(!$camposTratados[$campo]){
+            if(!$tratado[$campo]){
                 $erros[$campo] = match($campo){
-                    'nome' => 'Insira o seu nome completo e valido',
-                    'email' => 'Insira um E-mail valido',
-                    'whatsapp' => 'Insira um numero de whatsapp no formato correto',
-                    'senha' => 'Sua senha precisa conter 5 digitos ou mais'
+                    'nome' => 'Insira o seu nome completo',
+                    'email' => 'Insira um E-mail válido',
+                    'whatsapp' => 'Insira um numero de Whatsapp no formato (xx) xxxxx-xxxx ou (xx) xxxx-xxxx',
+                    'senha' => 'Sua senha precisa conter 5 dígitos ou mais'
                 };
-                continue;
             }
         }
 
@@ -51,29 +47,52 @@ class ApiController extends Controller
             return;
         }
 
-        $camposTratados['email_hash'] = self::hash_email_whatsapp($camposTratados['email']);
-        $camposTratados['whatsapp_hash'] = self::hash_email_whatsapp($camposTratados['whatsapp']);
+        $tratado['email_hash'] = self::hash_email_whatsapp($tratado['email']);
 
-        $getEmail = $this->db_cliente->getEmail($camposTratados['email_hash']);
-        $getWhatsapp = $this->db_cliente->getWhatsapp($camposTratados['whatsapp_hash']);
+        $getEmail = $this->db_cliente->getEmail($tratado['email_hash']);
 
-        if($getEmail <> false || $getWhatsapp <> false){
-            self::erro('E-mail ou whatsapp ja esta sendo utlizado', 409);
+        if($getEmail !== false){
+            self::erro('Dados inseridos já estão sendo utilizados', 409);
             return;
         }
 
-        $camposTratados['email'] = Controller::criptografia($camposTratados['email']);
-        $camposTratados['whatsapp'] = Controller::criptografia($camposTratados['whatsapp']);
-        $camposTratados['senha'] = password_hash($camposTratados['senha'], PASSWORD_DEFAULT);
+        $tratado['whatsapp_hash'] = self::hash_email_whatsapp($tratado['whatsapp']);
 
-        $addCadastro = $this->db_cliente->addCliente($camposTratados);
+        $getWhatsapp = $this->db_cliente->getWhatsapp($tratado['whatsapp_hash']);
+
+        if($getWhatsapp !== false){
+            self::erro('Dados inseridos já estão sendo utilizados', 409);
+            return;
+        }
+
+        $tratado['email'] = Controller::criptografia($tratado['email']);
+        $tratado['whatsapp'] = Controller::criptografia($tratado['whatsapp']);
+        $tratado['senha'] = password_hash($tratado['senha'], PASSWORD_DEFAULT);
+
+        $addCadastro = $this->db_cliente->addCadastro($tratado);
 
         if(!$addCadastro){
             self::erro('Erro ao realizar cadastro', 500);
             return;
         }
 
-        self::sucesso('Cadastro realizado com sucesso', 201);
+        $getCliente = $this->db_cliente->getDetalheCliente((int)$addCadastro);
+
+        if(!$getCliente){
+            self::erro('Erro ao retornar dados do cadastro', 500);
+            return;
+        }
+
+        $dadosToken = [
+            'id' => $getCliente['id_cliente'],
+            'nome' => $getCliente['nome_cliente'],
+            'email' => $getCliente['email_cliente'],
+            'exp' => time() + 3600
+        ];
+
+        $token = Token::gerar_token($dadosToken);
+
+        self::sucesso($token, 201);
         return;
     }
 
@@ -139,6 +158,7 @@ class ApiController extends Controller
         return;
     }
 
+    
     public function login_senha(): void
     {
         $input = file_get_contents('php://input');
@@ -148,36 +168,29 @@ class ApiController extends Controller
 
         $campos = ['email', 'senha'];
 
-        if(count($campos) <> count($input)){
-            self::erro('Envio do formulario foi corrompido, tentar novamente do jeito correto', 400);
-            return;
+        foreach($campos as $valor){
+            if(!isset($input[$valor])){
+                self::erro('Não identificamos um campo obrigatório na requisição, tentar novamente pelo formulário de Login', 404);
+                return;
+            }
+        }
+
+        if(count($input) !== count($campos)){
+            self::erro('Envio do formulário corrompido', 400);
+            exit;
         }
 
         foreach($input as $campo => $valor){
-            if(empty(trim($valor))){
-                $erros[$campo] = match($campo){
-                    'email' => "Seu E-mail nao foi preenchido, tentar novamente com todos os campos preenchidos",
-                    'senha' => "Sua senha nao foi preenchida, tentar novamente com todos os campos preenchidos"
-                };
-                continue;
-            }
-
-            if(isset($erros)){
-                self::erro($erros);
-                return;
-            }
-
             match($campo){
-                'email' => $camposTratados['email'] = self::tratar_email($valor),
-                'senha' => $camposTratados['senha'] = self::tratar_senha($valor)
+                'email' => $tratado['email'] = self::tratar_email($valor),
+                'senha' => $tratado['senha'] = self::tratar_senha($valor)
             };
 
-            if(!$camposTratados[$campo]){
+            if(!$tratado[$campo]){
                 $erros[$campo] = match($campo){
-                    'email' => "Insira um E-mail valido",
-                    'senha' => "Sua senha precisa conter 5 digitos ou mais"
+                    'email' => 'Insira um E-mail válido',
+                    'senha' => 'Sua senha precisa conter 5 dígitos ou mais'
                 };
-                continue;
             }
         }
 
@@ -186,21 +199,30 @@ class ApiController extends Controller
             return;
         }
 
-        $hashEmail = self::hash_email_whatsapp($camposTratados['email']);
+        $email_hash = self::hash_email_whatsapp($tratado['email']);
 
-        $getEmail = $this->db_cliente->getEmail($hashEmail);
+        $getEmail = $this->db_cliente->getEmail($email_hash);
 
         if(!$getEmail){
-            self::erro('Cadastro nao encontrado', 404);
+            self::erro('Dados inseridos não estão registrados', 404);
             return;
         }
 
-        if(!password_verify($camposTratados['senha'], $getEmail['senha_cliente'])){
-            self::erro('Cadastro nao encontrado', 404);
+        if(!password_verify($getEmail['senha_cliente'], $tratado['senha'])){
+            self::erro('Dados inseridos não estão registrados', 404);
             return;
         }
 
-        self::exibir_dados($getEmail);
+        $dadosToken = [
+            'id' => $getEmail['id_cliente'],
+            'nome' => $getEmail['nome_cliente'],
+            'email' => $getEmail['email_cliente'],
+            'exp' => time() + 3600
+        ];
+
+        $token = Token::gerar_token($dadosToken);
+
+        self::sucesso($token);
         return;
     }
 
@@ -528,7 +550,9 @@ class ApiController extends Controller
         $whatsappTratado = filter_var($whatsapp, FILTER_SANITIZE_SPECIAL_CHARS);
 
         if (preg_match('/^\(\d{2}\) \d{5}-\d{4}$/', $whatsappTratado) !== 1) {
-            return false;
+            if(preg_match('/^\(\d{2}\) \d{4}-\d{4}$/', $whatsappTratado) !== 1){
+                return false;
+            }
         }
 
         return $whatsappTratado;

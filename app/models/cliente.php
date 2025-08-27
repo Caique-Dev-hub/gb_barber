@@ -1,12 +1,15 @@
 <?php
 
 class Cliente extends Database{
-    public function getEmail($email){
+
+    // GET
+    public function getEmail(string $email_hash): array|bool
+    {
         $sql = "SELECT * FROM tbl_cliente WHERE email_hash = :email AND status_cliente = 'Ativo'";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':email' => (string)$email
+            ':email' => $email_hash
         ]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -31,12 +34,13 @@ class Cliente extends Database{
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getWhatsapp($whatsapp){
-        $sql = "SELECT * FROM tbl_cliente WHERE whatsapp_hash = :whatsapp AND status_cliente = 'Ativo'";
+    public function getWhatsapp(string $whatsapp_hash): array|bool
+    {
+        $sql = "SELECT * FROM tbl_cliente WHERE whatsapp_hash = :whatsapp AND status_cliente";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':whatsapp' => (string)$whatsapp
+            ':whatsapp' => $whatsapp_hash
         ]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -54,25 +58,28 @@ class Cliente extends Database{
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getDetailsCliente($id){
-        $sql = "SELECT nome_cliente, email_cliente, whatsapp_cliente, senha_cliente FROM tbl_cliente 
-        WHERE id_cliente = :id AND status_cliente = 'Ativo'";
+    public function getDetalheCliente(int $id): array|bool
+    {
+        $sql = "SELECT * FROM tbl_cliente WHERE id_cliente = :id AND status_cliente = 'Ativo'";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':id' => (int)$id
+            ':id' => $id
         ]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function addCliente($campos){
+    // ADD
+
+    public function addCadastro(array $campos): int
+    {
         extract($campos);
 
         $sql = "INSERT INTO tbl_cliente (nome_cliente, email_cliente, email_hash, whatsapp_cliente, whatsapp_hash, senha_cliente)
         VALUES (:nome, :email, :email_hash, :whatsapp, :whatsapp_hash, :senha)";
 
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
+        $stmt->execute([
             ':nome' => (string)$nome,
             ':email' => (string)$email,
             ':email_hash' => (string)$email_hash,
@@ -80,7 +87,13 @@ class Cliente extends Database{
             ':whatsapp_hash' => (string)$whatsapp_hash,
             ':senha' => (string)$senha
         ]);
+        return $this->db->lastInsertId();
     }
+
+
+
+
+    // UPDATE
 
     public function updateCliente($campos, $id){
         extract($campos);
