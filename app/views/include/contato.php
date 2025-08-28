@@ -129,6 +129,7 @@
     });
 
 </script>
+
 <script>
     document.getElementById('reserva').addEventListener('submit', function(e) {
         e.preventDefault();
