@@ -102,8 +102,35 @@
 <!--------------------------------------- AJAX ---------------------------------->
 
 <!-- Reservas -->
- <script>
-    document.getElementById('reserva').addEventListener('submit', function(e){
+<script>
+    document.getElementById("reserva").addEventListener("submit", function(e) {
+        e.preventDefault(); //evita envio normal do form 
+
+        const nome = document.getElementById("name").value;
+        const telefone = document.getElementById("telefone").value;
+        const email = document.getElementById("email").value;
+        const servico = document.getElementById("inputGroupSelect01").options[document.getElementById("inputGroupSelect01").selectedIndex].text;
+        const data = document.getElementById("data").options[document.getElementById("data").selectedIndex].text;
+        const horario = document.getElementById("horario").options[document.getElementById("horario").selectedIndex].text;
+
+        let mensagem = `Olá, meu nome é ${nome}. 
+                Gostaria de fazer uma reserva para:
+                - Serviço: ${servico}
+                - Data: ${data}
+                - Horário: ${horario}
+
+                Meu telefone: ${telefone}
+                E-mail: ${email}`;
+
+        const numero = '5511958538834';
+
+        const url = `https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(mensagem)}`;
+        window.open(url, "_blank");//abre a janela do wpp
+    });
+
+</script>
+<script>
+    document.getElementById('reserva').addEventListener('submit', function(e) {
         e.preventDefault();
 
         const input = {
@@ -115,47 +142,47 @@
             'horario': document.getElementById('horario').value
         };
 
-        fetch(`<?= URL_BASE?>reserva/adicionar_reserva`, {
-            method: 'POST',
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify(input)
-        })
+        fetch(`<?= URL_BASE ?>reserva/adicionar_reserva`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(input)
+            })
 
-        .then(response => response.json())
-        .then(data => {
-            if(data.erro){
-                alert(data.erro);
-            } else{
-                alert(data.sucesso);
-            }
-        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.erro) {
+                    alert(data.erro);
+                } else {
+                    alert(data.sucesso);
+                }
+            })
 
-        .catch(error => {
-            console.error(error);
-        })
+            .catch(error => {
+                console.error(error);
+            })
     });
- </script>
+</script>
 
 <!-- Horarios -->
 <script>
-    document.getElementById('data').addEventListener('change', function(){
+    document.getElementById('data').addEventListener('change', function() {
         const horario = document.getElementById('horario');
         const id = this.value;
 
-        fetch(`<?= URL_BASE?>inicio/listar_horarios/${id}`)
+        fetch(`<?= URL_BASE ?>inicio/listar_horarios/${id}`)
 
-        .then(response => response.text())
-        .then(data => {
-            horario.disabled = false;
+            .then(response => response.text())
+            .then(data => {
+                horario.disabled = false;
 
-            horario.innerHTML += data;
-        })
+                horario.innerHTML += data;
+            })
 
-        .catch(error => {
-            alert(error);
-        })
+            .catch(error => {
+                alert(error);
+            })
     })
 </script>
 
