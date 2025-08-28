@@ -1,15 +1,20 @@
-POST https://localhost/gb_barber/public/api/atu_cadastro/1
+POST https://localhost/gb_barber/public/api/login_senha
+Content-Type: application/json
+
+{
+    "email": "gustavocostabrito314@gmail.com",
+    "senha": "teste"
+}
+
+###
+POST https://localhost/gb_barber/public/api/add_cadastro
 Content-Type: application/json
 
 {
     "nome": "Gustavo Costa Brito",
-    "email": "gustavocosta@email.com",
-    "whatsapp": "(11) 91295-3232",
+    "email": "gustavocostabrito314@gmail.com",
+    "whatsapp": "(11) 97887-7805",
     "senha": "teste"
 }
-
-
-############
-GET https://localhost/gb_barber/public/api/listar_detalhe/barba
 
 
