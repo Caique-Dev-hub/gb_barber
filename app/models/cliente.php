@@ -14,24 +14,28 @@ class Cliente extends Database{
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getEmailTodos($email){
-        $sql = "SELECT * FROM tbl_cliente WHERE email_hash = :email AND status_cliente = 'Ativo'";
+    public function getEmailAtu(string $email_hash, int $id): array|bool
+    {
+        $sql = "SELECT * FROM tbl_cliente WHERE email_hash = :email AND id_cliente != :id AND status_cliente = 'Ativo'";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':email' => $email
+            ':email' => $email_hash,
+            ':id' => $id
         ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getWhatsappTodos($whatsapp){
-        $sql = "SELECT * FROM tbl_cliente WHERE whatsapp_hash = :whatsapp AND status_cliente = 'Ativo'";
+    public function getWhatsappAtu(string $whatsapp_hash, int $id): array|bool
+    {
+        $sql = "SELECT * FROM tbl_cliente WHERE whatsapp_hash = :whatsapp AND id_cliente = :id AND status_cliente = 'Ativo'";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':whatsapp' => $whatsapp
+            ':whatsapp' => $whatsapp_hash,
+            ':id' => $id
         ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getWhatsapp(string $whatsapp_hash): array|bool
@@ -69,6 +73,7 @@ class Cliente extends Database{
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+
     // ADD
 
     public function addCadastro(array $campos): int
@@ -95,7 +100,8 @@ class Cliente extends Database{
 
     // UPDATE
 
-    public function updateCliente($campos, $id){
+    public function updateCadastro(array $campos, int $id): bool
+    {
         extract($campos);
 
         $sql = "UPDATE tbl_cliente SET 
@@ -105,17 +111,17 @@ class Cliente extends Database{
         whatsapp_cliente = :whatsapp,
         whatsapp_hash = :whatsapp_hash,
         senha_cliente = :senha
-        WHERE id_cliente = :cliente AND status_cliente = 'Ativo'";
+        WHERE id_cliente = :id";
 
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':nome' => (string)$nome,
-            ':email' => (string)$email,
-            ':email_hash' => (string)$email_hash,
-            ':whatsapp' => (string)$whatsapp,
-            ':whatsapp_hash' => (string)$whatsapp_hash,
-            ':senha' => $senha,
-            ':cliente' => (int)$id
+            ':id' => $id,
+            ':nome' => $nome,
+            ':email' => $email,
+            ':email_hash' => $email_hash,
+            ':whatsapp' => $whatsapp,
+            ':whatsapp_hash' => $whatsapp_hash,
+            ':senha_cliente' => $senha ?? NULL
         ]);
     }
 

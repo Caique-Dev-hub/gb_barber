@@ -165,7 +165,6 @@ class ApiController extends Controller
         return;
     }
 
-    
     public function login_senha(): void
     {
         $input = file_get_contents('php://input');
@@ -233,59 +232,58 @@ class ApiController extends Controller
         return;
     }
 
-    public function atu_cadastro($id): void
+    public function atu_cadastro(int $id): void
     {
+        header('Content-Type: application/json');
+
+        $verificar = $this->verificar($id);
+
+        if(is_null($verificar)){
+            self::erro('Token expirado ou invalido', 400);
+            return;
+        }
+
         $input = file_get_contents('php://input');
         $input = json_decode($input, true);
 
-        header('Content-Type: application/json');
-
         $campos = ['nome', 'email', 'whatsapp', 'senha'];
 
-        if(count($campos) <> count($input)){
-            self::erro('Envio do formulario foi corrompido, tentar novamente preenchendo todos os campos');
+        foreach($campos as $valor){
+            if(!isset($input[$valor])){
+                self::erro('Campo obrigatorio nao indentificado', 404);
+                return;
+            }
+        }
+
+        if(count($input) !== count($campos)){
+            self::erro('Envio do formulario corrompido', 400);
             return;
         }
 
         foreach($input as $campo => $valor){
             if(empty(trim($valor))){
-                if($campo <> 'senha'){
-                    match($campo){
-                        'nome' => self::erro('Seu nome nao foi preenchido, tentar novamente com todos os campos preenchidos'),
-                        'email' => self::erro('Seu E-mail nao foi preenchido, tentar novamente com todos os campos preenchidos'),
-                        'whatsapp' => self::erro('Seu numero de whatsapp nao foi preenchido, tentar novamente com todos os campos preenchidos'),
-                    };
+                if($campo === 'senha'){
+                    continue;
+                } else{
+                    self::erro('Preencha todos os campos');
                     return;
                 }
             }
 
-            if($campo === 'senha'){
-                if(empty(trim($valor))){
-                    $camposTratado['senha'] = null;
-                } else{
-                    $camposTratado['senha'] = self::tratar_senha($valor);
-
-                    if(!$camposTratado['senha']){
-                        $erros['senha'] = 'Sua senha precisa conter 5 digitos ou mais';
-                        continue;
-                    }
-                }
-            }
-
             match($campo){
-                'nome' => $camposTratado['nome'] = self::tratar_nome($valor),
-                'email' => $camposTratado['email'] = self::tratar_email($valor),
-                'whatsapp' => $camposTratado['whatsapp'] = self::tratar_whatsapp($valor),
-                default => null,
+                'nome' => $tratado['nome'] = self::tratar_nome($valor),
+                'email' => $tratado['email'] = self::tratar_email($valor),
+                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor),
+                'senha' => $tratado['senha'] = self::tratar_senha($valor)
             };
 
-            if(!$camposTratado[$campo] && $campo <> 'senha'){
-                $erros[$campo] = match($campo){
-                    'nome' => 'Insira o seu nome completo e valido',
-                    'email' => 'Insira um E-mail valido',
-                    'whatsapp' => 'Insira um numero de whatsapp no formato (xx) xxxxx-xxxx',
+            if(!$tratado[$campo]){
+                $erros['erro'] = match($campo){
+                    'nome' => 'Insira o seu nome completo',
+                    'email' => 'Insira o seu E-mail valido',
+                    'whatsapp' => 'Insira um numero de whatsapp valido',
+                    'senha' => 'Sua senha precisa conter 5 digitos ou mais'
                 };
-                continue;
             }
         }
 
@@ -294,35 +292,66 @@ class ApiController extends Controller
             return;
         }
 
-        $camposTratado['email_hash'] = self::hash_email_whatsapp($camposTratado['email']);
-        $camposTratado['whatsapp_hash'] = self::hash_email_whatsapp($camposTratado['whatsapp']);
+        $email_hash = self::hash_email_whatsapp($tratado['email']);
 
-        $getEmail = $this->db_cliente->getEmailTodos($camposTratado['email_hash']);
-        $getWhatsapp = $this->db_cliente->getWhatsappTodos($camposTratado['whatsapp_hash']);
+        $getEmailAtu = $this->db_cliente->getEmailAtu($email_hash, $id);
 
-        if(count($getEmail) > 1 || count($getWhatsapp) > 1){
-            self::erro('E-mail ou whatsapp ja esta sendo utilizado', 409);
+        if($getEmailAtu !== false){
+            self::erro('Dados ja estao sendo utilizados', 409);
             return;
         }
 
-        $camposTratado['email'] = Controller::criptografia($camposTratado['email']);
-        $camposTratado['whatsapp'] = Controller::criptografia($camposTratado['whatsapp']);
-        $camposTratado['senha'] = password_hash($camposTratado['senha'], PASSWORD_DEFAULT);
 
-        $updateCliente = $this->db_cliente->updateCliente($camposTratado, $id);
+        $whatsapp_hash = self::hash_email_whatsapp($tratado['whatsapp']);
 
-        if(!$updateCliente){
-            self::erro('Erro ao atualizar cliente');
+        $getWhatsappAtu = $this->db_cliente->getWhatsappAtu($whatsapp_hash, $id);
+
+        if($getWhatsappAtu !== false){
+            self::erro('Dados ja estao sendo utilizados', 409);
             return;
         }
 
-        self::sucesso('Dados atualizados com sucesso');
+        $tratado['email'] = Controller::criptografia($tratado['email']);
+        $tratado['whatsapp'] = Controller::criptografia($tratado['whatsapp']);
+
+        $tratado['email_hash'] = $email_hash;
+        $tratado['whatsapp_hash'] = $whatsapp_hash;
+
+        $updateCadastro = $this->db_cliente->updateCadastro($tratado, $id);
+
+        if(!$updateCadastro){
+            self::erro('Erro ao atualizar cadastro', 500);
+            return;
+        }
+
+        self::sucesso('Cadastro atualizado com sucesso');
         return;
     }
 
-    public function listar_login(): void
+    public function listar_login(int $id): void
     {
+        $payload = $this->verificar($id);
 
+        if(is_null($payload)){
+            self::erro('Token invalido', 404);
+            return;
+        }
+
+        header('Content-Type: application/json');
+
+        $getLogin = $this->db_cliente->getDetalheCliente((int)$payload['id']);
+
+        if(!$getLogin){
+            self::erro('Erro ao retornar dados do Login', 500);
+            return;
+        }
+
+        $listarLogin['nome'] = $getLogin['nome_cliente'];
+        $listarLogin['email'] = Controller::descriptografia($getLogin['email_cliente']);
+        $listarLogin['whatsapp'] = Controller::descriptografia($getLogin['whatsapp_cliente']);
+
+        self::exibir_dados($listarLogin);
+        return;
     }
 
 
@@ -396,42 +425,33 @@ class ApiController extends Controller
     {
         header('Content-Type: application/json');
 
-        $exibirDatas = [];
-        $diaAtual = date('d');
+        $datas = $this->db_data->getDatas();
 
-        $getDatas = $this->db_data->getDatas();
-
-        if(!$getDatas){
-            self::erro('Erro ao retornar todos as datas', 500);
+        if(!$datas){
+            self::erro('Erro ao retornar todas as datas', 500);
             return;
         }
 
-        foreach($getDatas as $atributo){
-            $data = explode('-', $atributo['nome_data']);
-
-            if((int)$data[2] >= (int)$diaAtual){
-                $exibirDatas[] = $atributo;
-            }
-        }
-
-        self::exibir_dados($exibirDatas);
+        self::exibir_dados($datas);
         return;
     }
 
-    public function listar_horarios($data): void
+    public function listar_horarios(int $data): void
     {
         header('Content-Type: application/json');
 
-        $getHorarios = $this->db_data->getHorarios($data);
+        $horarios = $this->db_data->getHorarios($data);
 
-        if(!$getHorarios){
-            self::erro('Erro ao retornar todos os horarios', 500);
+        if(!$horarios){
+            self::erro('Erro ao retornar todos os horarios dessa data', 500);
             return;
         }
 
-        self::exibir_dados($getHorarios);
+        self::exibir_dados($horarios);
         return;
     }
+
+    
 
 
 
@@ -445,25 +465,22 @@ class ApiController extends Controller
     // -------------------------------- Metodos auxiliares ------------------------------------- //
     
     // Validar Token
-    public function verificar(int $id): array
+    public function verificar(int $id): ?array
     {
-        $httpAuthorization = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        $token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
-        if(!preg_match('/Bearer\s(\S+)/', $httpAuthorization, $conteudo)){
-            self::erro('Token inválido ou não encontrado', 401);
-            exit;
+        if(preg_match('/Bearer\s(\S+)/', $token, $conteudo) !== 1){
+            return null;
         }
 
         $payload = Token::validar_token($conteudo[1]);
 
-        if($payload ===  null || !$payload){
-            self::erro('Token expirado', 401);
-            exit;
+        if(is_null($payload)){
+            return null;
         }
 
-        if($payload['id'] !== $id){
-            self::erro('Acesso negado', 401);
-            exit;
+        if((int)$payload['id'] !== $id){
+            return null;
         }
 
         return $payload;
