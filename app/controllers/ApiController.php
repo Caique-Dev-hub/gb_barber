@@ -454,6 +454,40 @@ class ApiController extends Controller
     
 
 
+    // Agendamento
+    public function add_agendamento(int $id): void
+    {
+        header('Content-Type: application/json');
+
+        $verificar = $this->verificar($id);
+
+        if(is_null($verificar)){
+            self::erro('Token expirado ou invalido', 400);
+            return;
+        }
+
+        $input = file_get_contents('php://input');
+        $input = json_decode($input, true);
+
+        $campos = ['servico', 'data_horario'];
+
+        foreach($campos as $valor){
+            if(!isset($input[$valor])){
+                self::erro('Campo obrigatorio nao identificado', 404);
+                return;
+            }
+        }
+
+        if(count($campos) !== count($input)){
+            self::erro('Envio do formulario corrompido', 400);
+            return;
+        }
+
+        $tratado['servico'] = (int)$input['servico'];
+        $tratado['data_horario'] = (int)$input['data_horario'];
+
+        
+    }
 
 
 
