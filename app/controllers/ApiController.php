@@ -451,17 +451,17 @@ class ApiController extends Controller
         return;
     }
 
-    
 
 
-    // Agendamento
-    public function add_agendamento(int $id): void
+
+    // Comentario
+    public function add_comentario(int $id): void
     {
         header('Content-Type: application/json');
 
-        $verificar = $this->verificar($id);
+        $payload = $this->verificar($id);
 
-        if(is_null($verificar)){
+        if(is_null($payload)){
             self::erro('Token expirado ou invalido', 400);
             return;
         }
@@ -469,24 +469,33 @@ class ApiController extends Controller
         $input = file_get_contents('php://input');
         $input = json_decode($input, true);
 
-        $campos = ['servico', 'data_horario'];
-
-        foreach($campos as $valor){
-            if(!isset($input[$valor])){
-                self::erro('Campo obrigatorio nao identificado', 404);
-                return;
-            }
+        if(!isset($input['mensagem'])){
+            self::erro('Campo obrigatorio nao encontrado', 404);
+            return;
         }
 
-        if(count($campos) !== count($input)){
+        if(count($input) !== 1){
             self::erro('Envio do formulario corrompido', 400);
             return;
         }
 
-        $tratado['servico'] = (int)$input['servico'];
-        $tratado['data_horario'] = (int)$input['data_horario'];
 
-        
+        $mensagem = trim(filter_var($input['mensagem'], FILTER_SANITIZE_SPECIAL_CHARS));
+
+        if(str_word_count($mensagem) < 5){
+            self::erro('Mensagem muito curta');
+            return;
+        }
+
+        $addComentario = $this->db_contato->addComentario($id, $mensagem);
+
+        if(!$addComentario){
+            self::erro('Erro ao adicionar comentario', 500);
+            return;
+        }
+
+        self::sucesso('Comentario adicionado com sucesso', 201);
+        return;
     }
 
 
