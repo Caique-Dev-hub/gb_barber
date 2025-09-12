@@ -236,9 +236,9 @@ class ApiController extends Controller
     {
         header('Content-Type: application/json');
 
-        $verificar = $this->verificar($id);
+        $payload = $this->verificar($id);
 
-        if(is_null($verificar)){
+        if(is_null($payload)){
             self::erro('Token expirado ou invalido', 400);
             return;
         }
@@ -250,7 +250,7 @@ class ApiController extends Controller
 
         foreach($campos as $valor){
             if(!isset($input[$valor])){
-                self::erro('Campo obrigatorio nao indentificado', 404);
+                self::erro('Campo obrigatorio nao identificado', 404);
                 return;
             }
         }
@@ -261,30 +261,35 @@ class ApiController extends Controller
         }
 
         foreach($input as $campo => $valor){
-            if(empty(trim($valor))){
-                if($campo === 'senha'){
-                    continue;
-                } else{
-                    self::erro('Preencha todos os campos');
-                    return;
-                }
+            if($campo === 'senha'){
+                continue;
             }
 
             match($campo){
                 'nome' => $tratado['nome'] = self::tratar_nome($valor),
                 'email' => $tratado['email'] = self::tratar_email($valor),
-                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor),
-                'senha' => $tratado['senha'] = self::tratar_senha($valor)
+                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor)
             };
 
             if(!$tratado[$campo]){
                 $erros['erro'] = match($campo){
-                    'nome' => 'Insira o seu nome completo',
-                    'email' => 'Insira o seu E-mail valido',
-                    'whatsapp' => 'Insira um numero de whatsapp valido',
-                    'senha' => 'Sua senha precisa conter 5 digitos ou mais'
+                    'nome' => 'Insira seu nome completo e valido',
+                    'email' => 'Insira seu E-mail valido',
+                    'whatsapp' => 'Insira seu numero de Whatsapp no formato (xx) xxxxx-xxxx ou (xx) xxxx-xxxx'
                 };
             }
+        }
+
+        if(is_string($input['senha'])){
+            $tratado['senha'] = self::tratar_senha($input['senha']);
+
+            if(!$tratado['senha']){
+                $erros['erro'] = 'Sua senha precisa conter 5 digitos ou mais';
+            } else {
+                $tratado['senha'] = password_hash($tratado['senha'], PASSWORD_DEFAULT);
+            }
+        } else {
+            $tratado['senha'] = $input['senha'];
         }
 
         if(isset($erros)){
@@ -294,20 +299,19 @@ class ApiController extends Controller
 
         $email_hash = self::hash_email_whatsapp($tratado['email']);
 
-        $getEmailAtu = $this->db_cliente->getEmailAtu($email_hash, $id);
+        $getEmail = $this->db_cliente->getEmailAtu($email_hash, $id);
 
-        if($getEmailAtu !== false){
-            self::erro('Dados ja estao sendo utilizados', 409);
+        if($getEmail !== false){
+            self::erro('Dados inseridos ja estao sendo utilizados', 409);
             return;
         }
 
-
         $whatsapp_hash = self::hash_email_whatsapp($tratado['whatsapp']);
 
-        $getWhatsappAtu = $this->db_cliente->getWhatsappAtu($whatsapp_hash, $id);
+        $getWhatsapp = $this->db_cliente->getWhatsappAtu($whatsapp_hash, $id);
 
-        if($getWhatsappAtu !== false){
-            self::erro('Dados ja estao sendo utilizados', 409);
+        if($getWhatsapp !== false){
+            self::erro('Dados inseridos ja estao sendo utilizados', 409);
             return;
         }
 
@@ -354,6 +358,30 @@ class ApiController extends Controller
         return;
     }
 
+    public function deletar_cadastro(int $id): void
+    {
+        header('Content-Type: application/json');
+
+        $payload = $this->verificar($id);
+
+        if(is_null($payload)){
+            self::erro('Token expirado ou invalido', 400);
+            return;
+        }
+
+        $deleteCadastro = $this->db_cliente->deleteCadastro($id);
+
+        if(!$deleteCadastro){
+            self::erro('Erro ao deletar cadastro', 500);
+            return;
+        }
+
+        self::sucesso('Cadastro deletado com sucesso', 200);
+        return;
+    }
+
+
+
 
     // Servicos
     public function listar_servicos(): void
@@ -380,7 +408,7 @@ class ApiController extends Controller
         return;
     }
 
-    public function listar_detalhe($nomeServico): void
+    public function listar_detalhe(string $nomeServico): void
     {
         header('Content-Type: application/json');
 
@@ -498,7 +526,76 @@ class ApiController extends Controller
         return;
     }
 
+    public function atu_comentario(int $comentario, int $id): void
+    {
+        header('Content-Type: application/json');
 
+        $payload = $this->verificar($id);
+
+        if(is_null($payload)){
+            self::erro('Token expirado ou invalido');
+            return;
+        }
+
+        $input = file_get_contents('php://input');
+        $input = json_decode($input, true);
+
+        if(!isset($input['mensagem'])){
+            self::erro('Campo obrigatorio nao identificado', 404);
+            return;
+        }
+
+        if(count($input) !== 1){
+            self::erro('Envio do formulario corrompido', 400);
+            return;
+        }
+
+        
+        $mensagem = filter_var($input['mensagem'], FILTER_SANITIZE_SPECIAL_CHARS);
+
+        if(str_word_count($mensagem) < 5 || strlen($mensagem) < 5){
+            self::erro('Sua mensagem esta muito curta');
+            return;
+        }
+
+        $updateComentario = $this->db_contato->updateComentario($comentario, $mensagem);
+
+        if(!$updateComentario){
+            self::erro('Erro ao atualizar comentario', 500);
+            return;
+        }
+
+        self::sucesso('Comentario atualizado com sucesso');
+        return;
+    }
+
+    
+
+
+
+
+    // Notificacao
+    public function listar_notificacao(int $id): void
+    {
+        header('Content-Type: application/json');
+
+        $payload = $this->verificar($id);
+
+        if(is_null($payload)){
+            self::erro('Token expirado ou invalido', 400);
+            return;
+        }
+
+        $getNotificacao = $this->db_notificacao->getNotificacao($id);
+
+        if(!$getNotificacao){
+            self::erro('Erro ao retornar dados da notificacao', 500);
+            return;
+        }
+
+        self::exibir_dados($getNotificacao);
+        return;
+    }
 
 
 

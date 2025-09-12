@@ -12,4 +12,18 @@ class Contato extends Database{
             ':mensagem' => $mensagem
         ]);
     }
+
+    public function updateComentario(int $id, string $mensagem): bool
+    {
+        $sql = "UPDATE tbl_comentario SET
+        mensagem_comentario = :mensagem,
+        data_atualizacao = NOW()
+        WHERE id_comentario = :comentario";
+
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':mensagem' => $mensagem,
+            ':comentario' => $id
+        ]);
+    }
 }

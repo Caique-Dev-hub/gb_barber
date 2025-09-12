@@ -36,5 +36,5 @@
     <script src="<?= URL_BASE ?>assets/js/circletype.min.js"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 
-    <title>GB-BARBER</title>
+    <title>GB-BARBEARIA</title>
 </head>

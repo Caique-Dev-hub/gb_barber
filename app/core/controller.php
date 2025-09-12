@@ -9,6 +9,7 @@ class Controller
     protected $db_contato;
     protected $db_data;
     protected $db_reserva;
+    protected $db_notificacao;
 
     public function __construct()
     {
@@ -19,6 +20,7 @@ class Controller
         $this->db_contato = new Contato();
         $this->db_data = new Data();
         $this->db_reserva = new Reserva();
+        $this->db_notificacao = new Notificacao();
     }
 
 
@@ -160,5 +162,4 @@ class Controller
 
         return $nome;
     }
-
 }

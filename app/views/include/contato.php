@@ -88,7 +88,7 @@
                 <div class="d-grid gap-2 col-6 mx-auto">
                     <button class="btn btn-primary" type="submit" id="btn-reserva"
                         style="background: linear-gradient(135deg, #BE4949 0%,rgb(93, 29, 29) 100%); 
-                    background-color: #BE4949;border:none; margin-top: 40px;font-size: 1.3rem;">
+                    background-color: #BE4949;border:none; margin-top: 20px;font-size: 1.3rem;">
                         Reserva
                     </button>
                 </div>
