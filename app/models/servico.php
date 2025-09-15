@@ -10,24 +10,24 @@ class Servico extends Database
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getDetalhe_combo($id)
+    public function getDetalhe_combo(int $id): array
     {
         $sql = "SELECT * FROM tbl_combo_servico WHERE id_combo = :id AND status_combo = 'Ativo'";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':id' => (int)$id
+            ':id' => $id
         ]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getDetalhe_servico($id)
+    public function getDetalhe_servico(int $id): array
     {
         $sql = "SELECT * FROM tbl_servico WHERE id_servico = :id AND status_servico = 'Ativo'";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':id' => (int)$id
+            ':id' => $id
         ]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }

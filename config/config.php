@@ -21,12 +21,17 @@ spl_autoload_register(function($class){
     }
 });
 
-function env(){
-    $line = file('../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+function env(): void
+{
+    $arquivo = file("../.env", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-    foreach($line as $valor){
-        $env = explode('=', $valor);
-        
+    foreach($arquivo as $valor){
+        if(str_contains($valor, '#')){
+            continue;
+        }
+
+        $env = explode('=', $valor, 2);
+
         $_ENV[$env[0]] = $env[1];
     }
 }
