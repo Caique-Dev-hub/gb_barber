@@ -569,6 +569,28 @@ class ApiController extends Controller
         return;
     }
 
+    public function listar_comentario_cliente(int $id): void
+    {
+        header('Content-Type: application/json');
+
+        $payload = $this->verificar($id);
+
+        if(is_null($payload)){
+            self::erro('Token expirado ou inválido', 400);
+            return;
+        }
+
+        $getComentario = $this->db_contato->getComentariosCliente($id);
+
+        if(!$getComentario){
+            self::erro('Erro ao retornar ao os comentarios', 500);
+            return;
+        }
+
+        self::exibir_dados($getComentario);
+        return;
+    }
+
 
 
     // Agendamento

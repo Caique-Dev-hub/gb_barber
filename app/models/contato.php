@@ -1,6 +1,20 @@
 <?php
 
 class Contato extends Database{
+    public function getComentariosCliente(int $id_cliente): array|bool
+    {
+        $sql = "SELECT * FROM tbl_comentario 
+        LEFT JOIN tbl_resposta ON tbl_comentario.id_comentario = tbl_resposta.id_resposta
+        WHERE tbl_comentario.id_cliente = :cliente";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':cliente' => $id_cliente
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
     public function addComentario(int $id, string $mensagem): bool
     {
         $sql = "INSERT INTO tbl_comentario (id_cliente, data_comentario, mensagem_comentario)
