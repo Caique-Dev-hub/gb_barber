@@ -33,7 +33,7 @@ class ApiController extends Controller
             };
 
             if(!$tratado[$campo]){
-                $erros[$campo] = match($campo){
+                $erros['erro'] = match($campo){
                     'nome' => 'Insira o seu nome completo',
                     'email' => 'Insira um E-mail válido',
                     'whatsapp' => 'Insira um numero de Whatsapp no formato (xx) xxxxx-xxxx ou (xx) xxxx-xxxx',
@@ -583,7 +583,7 @@ class ApiController extends Controller
         $getComentario = $this->db_contato->getComentariosCliente($id);
 
         if(!$getComentario){
-            self::erro('Erro ao retornar ao os comentarios', 500);
+            self::erro('Erro ao exibir comentario do cliente', 500);
             return;
         }
 

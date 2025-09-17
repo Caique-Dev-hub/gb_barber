@@ -3,8 +3,9 @@
 class Contato extends Database{
     public function getComentariosCliente(int $id_cliente): array|bool
     {
-        $sql = "SELECT * FROM tbl_comentario 
-        LEFT JOIN tbl_resposta ON tbl_comentario.id_comentario = tbl_resposta.id_resposta
+        $sql = "SELECT * FROM tbl_comentario
+        LEFT JOIN tbl_resposta ON tbl_comentario.id_comentario = tbl_resposta.id_comentario
+        INNER JOIN tbl_cliente ON tbl_comentario.id_cliente = tbl_cliente.id_cliente
         WHERE tbl_comentario.id_cliente = :cliente";
 
         $stmt = $this->db->prepare($sql);
