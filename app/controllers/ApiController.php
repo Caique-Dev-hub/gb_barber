@@ -448,6 +448,10 @@ class ApiController extends Controller
 
 
 
+
+
+
+
     // Data
     public function listar_datas(): void
     {
@@ -478,6 +482,8 @@ class ApiController extends Controller
         self::exibir_dados($getHorarioData);
         return;
     }
+
+
 
 
 
@@ -591,117 +597,24 @@ class ApiController extends Controller
         return;
     }
 
-
-
-    // Agendamento
-    public function add_agendamento(int $id): void
+    public function deletar_comentario(int $id, int $id_cliente): void
     {
         header('Content-Type: application/json');
 
-        $payload = $this->verificar($id);
+        $payload = $this->verificar($id_cliente);
 
         if(is_null($payload)){
-            self::erro('Token expirado ou invalido', 400);
+            self::erro('Token expirado ou inválido', 400);
             return;
         }
 
-        $input = file_get_contents('php://input');
-        $input = json_decode($input, true);
+        $deleteComentario = $this->db_contato->deleteComentario($id);
 
-        $campos = ['servico', 'data_horario'];
-
-        foreach($campos as $valor){
-            if(!isset($input[$valor])){
-                self::erro('Campo obrigatorio nao encontrado', 404);
-                return;
-            }
-        }
-
-        if(count($campos) !== count($input)){
-            self::erro('Envio do formulario corrompido', 400);
-            return;
-        }
-
-        $servico = (int)$input['servico'];
-
-        if($servico > 3){
-            $tratado['combo'] = $servico - 3;
-            
-        } else{
-            $tratado['servico'] = $servico;
-        }
-
-        $tratado['data_horario'] = (int)$input['data_horario'];
-
-        $addAgendamento = $this->db_agendamento->addAgendamento($tratado, $id);
-
-        if(!$addAgendamento){
-            self::erro('Erro ao adicionar agendamento', 500);
-            return;
-        }
-
-        $getAgendamento = $this->db_agendamento->getAgendamentoDetalhes((int)$addAgendamento);
-
-        if(!$getAgendamento){
-            self::erro('Erro ao retornar todos os dados do agendamento', 500);
-            return;
-        }
-
-        if(isset($getAgendamento['id_servico'])){
-            $servicoAgendado = $this->db_servico->getDetalhe_servico((int)$getAgendamento['id_servico']);
-            
-            if(!$servicoAgendado){
-                self::erro('Erro ao retornar todos os dados do servico agendado', 500);
-                return;
-            }
-
-            $tempoEstimado = $servicoAgendado['tempo_estimado'];
-
-        } else{
-            $comboAgendado = $this->db_servico->getDetalhe_combo((int)$getAgendamento['id_combo']);
-
-            if(!$comboAgendado){
-                self::erro('Erro ao retornar todos os dados do combo agendado', 500);
-                return;
-            }
-
-            $tempoEstimado = $comboAgendado['tempo_estimado'];
+        if(!$deleteComentario){
 
         }
-
-        $dataHorario = $this->db_data->getDataHorario((int)$getAgendamento['id_data_horario']);
-
-        if(!$dataHorario){
-            self::erro('Erro ao retornar todos os dados da data agendamento', 500);
-            return;
-        }
-
-        $horario = $this->db_data->getHorarioDetalhe((int)$dataHorario['id_horario']);
-
-        if(!$horario){
-            self::erro('Erro ao retornar todos os dados do horario agendado', 500);
-            return;
-        }
-
-        $tempoServico = strtotime($tempoEstimado) - strtotime("00:00:00");
-
-        $tempoHorario = strtotime($horario['hora_inicio']) - strtotime("00:00:00");
-
-        $tempoTotal = $tempoServico + $tempoHorario;
-
-        $tempoTotal = gmdate("H:i:s", $tempoTotal);
-
-
-        $updateHorario = $this->db_agendamento->updateAgendamentoHorario((int)$dataHorario['id_data'], $horario['hora_inicio'], $tempoTotal);
-
-        if(!$updateHorario){
-            self::erro('Erro ao atualizar horario para indisponivel', 500);
-            return;
-        }
-
-        self::sucesso('Agendamento realizado com sucesso', 201);
-        return;
     }
+
     
 
 

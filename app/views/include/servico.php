@@ -27,6 +27,7 @@
     <div class="site">
         <div class="lista-servico">
             <?php foreach ($servicos as $coluna) : ?>
+
                 <div class="containe servicos" data-id="<?= isset($coluna['id_servico']) ? $coluna ['id_servico'] : $coluna ['id_combo'] + 3?>">
                     <div class="container1" style="background-image: url(<?= URL_BASE ?>assets/img/<?= isset($coluna['imagem_servico']) ? $coluna['imagem_servico'] : $coluna['imagem_combo'] ?>);background-size: cover; background-position: center;">
                         <div class="container-content">
@@ -56,8 +57,8 @@
             document.getElementById('contato').scrollIntoView({//descer para contato e trazer o que tem especificado no id
                 behavior: 'smooth'
             });
-        })
-    })
+        });
+    });
 </script>
 
 <script>

@@ -1,6 +1,8 @@
 <?php
 
 class Contato extends Database{
+
+    
     public function getComentariosCliente(int $id_cliente): array|bool
     {
         $sql = "SELECT * FROM tbl_comentario
@@ -38,6 +40,18 @@ class Contato extends Database{
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':mensagem' => $mensagem,
+            ':comentario' => $id
+        ]);
+    }
+
+    public function deleteComentario(int $id): bool
+    {
+        $sql = "DELETE tbl_comentario, tbl_resposta FROM tbl_comentario 
+        INNER JOIN tbl_resposta ON tbl_comentario.id_comentario = tbl_resposta.id_comentario
+        WHERE tbl_comentario.id_comentario = :comentario";
+
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
             ':comentario' => $id
         ]);
     }

@@ -42,6 +42,22 @@ class Agendamento extends Database
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getDataAgendamento(int $id_data, string $horaMaxima): array|bool
+    {
+        $sql = "SELECT * FROM tbl_agendamento
+        INNER JOIN tbl_data_horario ON tbl_agendamento.id_data_horario = tbl_data_horario.id_data_horario
+        INNER JOIN tbl_horario ON tbl_data_horario.id_horario = tbl_horario.id_horario
+        WHERE :horaMaxima > tbl_horario.hora_inicio AND id_data = :data
+        AND tbl_agendamento.status_agendamento = 'Aguardando'";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':data' => $id_data,
+            ':horaMaxima' => $horaMaxima
+        ]);
+        return $stmt->fetchAll();
+    }
+
 
     // UPDATE 
     public function updateAgendamentoHorario(int $id_data, string $tempoMinino, string $tempoMaximo): bool

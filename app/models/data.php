@@ -1,6 +1,7 @@
 <?php
 
-class Data extends Database{
+class Data extends Database
+{
 
     // GET
     public function getHorarios(int $data)
@@ -25,9 +26,11 @@ class Data extends Database{
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getDataHorario(int $id): array|bool
+    public function getDataHorarioDetalhe(int $id): array|bool
     {
-        $sql = "SELECT * FROM tbl_data_horario WHERE id_data_horario = :data_horario";
+        $sql = "SELECT * FROM tbl_data_horario
+        INNER JOIN tbl_horario ON tbl_data_horario.id_horario = tbl_horario.id_horario
+        WHERE tbl_data_horario.id_data_horario = :data_horario";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
