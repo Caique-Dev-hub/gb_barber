@@ -10,26 +10,45 @@ class Servico extends Database
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getDetalhe_combo(int $id): array
+    public function getDetalhe_combo(int $id): ?array
     {
-        $sql = "SELECT * FROM tbl_combo_servico WHERE id_combo = :id AND status_combo = 'Ativo'";
+        if(empty(trim($id)) || is_null($id) || !$id){
+            return null;
+        }
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':id' => $id
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try{
+            $sql = "SELECT * FROM tbl_combo WHERE id_combo = :combo AND status_combo = 'Ativo'";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':combo' => $id
+            ]);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+
+        } catch(PDOException $e){
+            return null;
+        }
     }
 
-    public function getDetalhe_servico(int $id): array
+    public function getDetalhe_servico(int $id): ?array
     {
-        $sql = "SELECT * FROM tbl_servico WHERE id_servico = :id AND status_servico = 'Ativo'";
+        if(empty(trim($id)) || is_null($id) || !$id){
+            return null;
+        }
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':id' => $id
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try{
+            $sql = "SELECT * FROM tbl_servico WHERE id_servico = :servico AND status_servico = 'Ativo'";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':servico' => $id
+            ]);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch(PDOException $e){
+            return null;
+        }
     }
 
     public function getCombos()
@@ -48,12 +67,18 @@ class Servico extends Database
         return $stmt->fetchAll();
     }
 
-    public function getCount()
+    public function getCount(): ?array
     {
-        $sql = "SELECT COUNT(*) AS total FROM tbl_servico WHERE status_servico = 'Ativo'";
+        try{
+            $sql = "SELECT COUNT(*) AS total FROM tbl_servico WHERE status_servico = 'Ativo'";
 
-        $stmt = $this->db->query($sql);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $this->db->query($sql);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+
+        } catch(PDOException $e){
+            return null;
+        }
     }
 
     public function getCountCombo()

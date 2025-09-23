@@ -31,16 +31,6 @@ class Agendamento extends Database
 
 
     // GET
-    public function getAgendamentoDetalhes(int $id): array|bool
-    {
-        $sql = "SELECT * FROM tbl_agendamento WHERE id_agendamento = :agendamento";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':agendamento' => $id
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
 
     public function getDataAgendamento(int $id_data, string $horaMaxima): array|bool
     {
@@ -56,6 +46,19 @@ class Agendamento extends Database
             ':horaMaxima' => $horaMaxima
         ]);
         return $stmt->fetchAll();
+    }
+
+    public function getAgendamentosHorario(string $tempoMaximo): ?array
+    {
+        if(empty(trim($tempoMaximo)) || is_null($tempoMaximo) || !$tempoMaximo){
+            return null;
+        }
+
+        try{
+            $sql = "SELECT"
+        } catch(PDOException $e){
+
+        }
     }
 
 

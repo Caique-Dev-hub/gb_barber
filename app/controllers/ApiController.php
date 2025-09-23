@@ -647,6 +647,96 @@ class ApiController extends Controller
 
 
 
+    // Agendamento
+    public function add_agendamento(int $id_cliente): void
+    {
+        header('Content-Type: application/json');
+
+        $payload = $this->verificar($id_cliente);
+
+        if(is_null($payload)){
+            self::erro('Token expirado ou inválido', 400);
+            return;
+        }
+
+        $input = file_get_contents('php://input');
+        $input = json_decode($input, true);
+
+
+        $campos = ['data_horario', 'servico'];
+
+        foreach($campos as $valor){
+            if(!isset($input[$valor])){
+                self::erro('Campo obrigatório não identificado', 404);
+                return;
+            }
+        }
+
+        if(count($input) !== count($campos)){
+            self::erro('Envio do formulario corrompido, tentar novamente do jeito correto', 400);
+            return;
+        }
+
+        $servico = (int)$input['servico'];
+        $data_horario = (int)$input['data_horario'];
+
+        $detalheDataHorario = $this->db_data->getDataHorarioDetalhe($data_horario);
+
+        if(is_null($detalheDataHorario)){
+            self::erro('Erro ao carregar detalhe da data do agendamento', 500);
+            return;
+        }
+
+        $countServico = $this->db_servico->getCount();
+
+        if($servico > (int)$countServico['total']){
+            $combo = $servico - 3;
+
+            $detalheCombo = $this->db_servico->getDetalhe_combo($combo);
+
+            if(is_null($detalheCombo)){
+                self::erro('Erro ao buscar detalhes do combo', 500);
+                return;
+            }
+
+            $servicoHorario = $detalheCombo['tempo_estimado'];
+
+        } else {
+            $detalheServico = $this->db_servico->getDetalhe_servico($servico);
+
+            if(is_null($detalheServico)){
+                self::erro('Erro ao retornar detalhes do serviço', 500);
+                return;
+            }
+
+
+
+            $servicoHorario = $detalheServico['tempo_estimado'];
+        }
+
+        $data = (int)$detalheDataHorario['id_data'];
+
+
+        $tempoMinimo = $detalheDataHorario['hora_inicio'];
+
+
+        $segundoMinimo = strtotime($tempoMinimo) - strtotime("00:00:00");
+
+        $segundoServico = strtotime($servicoHorario) - strtotime("00:00:00");
+
+        $segundoTotal = $segundoMinimo + $segundoServico;
+
+
+        $tempoMaximo = date("H:i:s", $segundoTotal);
+
+        
+        
+    }
+
+
+
+
+
 
     // -------------------------------- Metodos auxiliares ------------------------------------- //
     
