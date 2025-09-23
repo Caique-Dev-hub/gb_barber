@@ -38,8 +38,8 @@
         }
 
         .img-thumbnail {
-            width: 80px;
-            height: 60px;
+            width: 120px;
+            height: 77px;
             border-radius: 4px;
             object-fit: cover;
             border: 1px solid rgba(0, 0, 0, 0.08);
@@ -73,7 +73,7 @@
         }
 
         .table tbody td {
-            padding: 1rem;
+            padding: 0.5rem;
             vertical-align: middle;
             border-color: rgba(0, 0, 0, 0.03);
         }
@@ -616,6 +616,10 @@
             gap: 12px;
         }
 
+        .modal-backdrop {
+            position: unset;
+        }
+
         .btn {
             padding: 12px 24px;
             border-radius: 8px;
@@ -773,15 +777,54 @@
                             </td>
                             <td data-label="Ações">
                                 <div class="action-buttons">
-                                    <button class="btn btn-icon btn-edit" data-name="" data-bs-toggle="modal" data-bs-target="#editarServicoModal" data-id="" title="Editar">
-                                        <i class="fas fa-pen"></i>
-                                    </button>
-                                    <button class="btn btn-icon btn-delete" data-id="" title="Remover">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    <?php if (isset($atributo['id_servico'])): ?>
+                                        <a href="<?= URL_BASE ?>servico/editar/servico/<?= $atributo['id_servico'] ?>">
+                                            <button class="btn btn-icon btn-edit" title="Editar">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="<?= URL_BASE ?>servico/editar/combo/<?= $atributo['id_combo'] ?>">
+                                            <button class="btn btn-icon btn-edit" title="Editar">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+                                        </a>
+                                    <?php endif; ?>
+
+                                    <?php if (isset($atributo['id_servico'])): ?>
+
+                                        <button class="btn btn-icon btn-delete" data-bs-toggle="modal" data-bs-target="#servico<?= $atributo['id_servico'] ?>" data-id="" title="Remover">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    <?php else: ?>
+
+                                        <button class="btn btn-icon btn-delete " data-bs-toggle="modal" data-bs-target="#combo<?= $atributo['id_combo'] ?>" data-id="" title="Remover">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+
+                                    <?php endif ?>
                                 </div>
                             </td>
                         </tr>
+                        <div class="modal fade" id="<?= isset($atributo['id_servico']) ? "servico" . $atributo['id_servico'] : "combo" . $atributo['id_combo'] ?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Voçê deseja realmente excluir este item "<?= $atributo['nome_servico'] ?? $atributo['nome_combo'] ?>" ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <a href="<?= URL_BASE ?>servico/excluir/<?= isset($atributo['id_servico']) ? "servico" : "combo" ?>/<?= $atributo['id_servico'] ?? $atributo['id_combo']?>">
+                                            <button class="btn btn-primary" id="addServico">Excluir</button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     <?php endforeach ?>
                 </tbody>
             </table>
@@ -800,18 +843,12 @@
                 <button class="tab-btn" type="button" data-name="combo" onclick="openTab('combo-tab')">Combo de Serviços</button>
             </div>
 
-            <form id="service-tab" class="tab-content active" method="post" action="<?= URL_BASE ?>servico/adicionar/servico" enctype="multipart/form-data">
+            <form id="service-tab" class="tab-content active" method="post" action="<?= URL_BASE ?>servico/adicionarServico" enctype="multipart/form-data">
                 <!-- Upload de imagem -->
-                <div class="form-group image-upload">
-                    <input type="file" id="imagem_servico" name="imagem_servico" class="image-upload-input" accept="image/*" required>
-                    <label for="service-image" class="image-upload-label">
-                        <div class="image-upload-icon">📷</div>
-                        <div class="image-upload-text">
-                            <span>Clique para adicionar uma imagem</span><br>
-                            ou arraste e solte aqui
-                        </div>
-                    </label>
-                    <img id="service-image-preview" class="image-preview" src="#" alt="Pré-visualização da imagem">
+                <div class="form-group">
+                    <label for="imagem_servico">Imagem:</label>
+                    <input type="file" id="imagem_servico" accept="image/*" name="imagem_servico">
+                    <br>
                 </div>
 
                 <div class="form-row">
@@ -854,7 +891,7 @@
                 </div>
             </form>
 
-            <form id="combo-tab" class="tab-content" method="post" action="<?= URL_BASE ?>servico/adicionar/combo">
+            <form id="combo-tab" class="tab-content" method="post" action="<?= URL_BASE ?>servico/adicionar/">
                 <!-- Upload de imagem para combo -->
                 <div class="form-group image-upload">
                     <input type="file" id="imagem_combo" class="image-upload-input" accept="image/*">
@@ -917,45 +954,15 @@
 
                 <div class="modal-footer">
                     <button class="btn btn-cancel">Cancelar</button>
-                    <button class="btn btn-save" id="addServico">Salvar Serviço</button>
+                    <button class="btn btn-save" id="addServico">Excluir</button>
                 </div>
             </form>
 
-            <script>
-                const servicos = [
-                    document.getElementById('servico1').value,
-                    document.getElementById('servico2').value
-                ];
 
-                function servico() {
-                    const servico1 = document.getElementById('servico1').value;
-                    const servico2 = document.getElementById('servico2').value;
-                                            
-
-                    if(servico1 === '' || servico2 === ''){
-                        return;
-                    }
-
-                    fetch(`<?= URL_BASE ?>servico/valor/${parseInt(servico[0])}/${parseInt(servico[1])}`)
-
-                        .then(response => response.text())
-                        .then(data => {
-                            alert(data);
-                        })
-
-                        .catch(error => {
-                            console.error(error);
-                        })
-                }
-
-                servicos.forEach((s) => {
-                    s.addEventListener('change', function(){
-                        servico();
-                    })
-                })
-            </script>
         </div>
     </div>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

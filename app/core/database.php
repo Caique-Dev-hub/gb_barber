@@ -1,21 +1,26 @@
 <?php
-
+ 
 class Database{
-    protected mixed $db;
-
+   
+    protected ?object $db = null;
+ 
     public function __construct()
     {
-        $host = $_ENV['DB_HOST'];
-        $dbname = $_ENV['DB_NAME'];
-        $dbuser = $_ENV['DB_USER'];
-        $dbpassword = $_ENV['DB_PASSWORD'];
-
-        try {
-            $this->db = new PDO("mysql:host=$host;dbname=$dbname", $dbuser, $dbpassword, [
+        if(is_null($this->db)){
+            $this->conection(DB_HOST, DB_NAME, DB_USER, DB_PASSWORD);
+        }
+    }
+ 
+ 
+    private function conection(string $host, string $dbName, string $dbUser, string $dbPassword): void
+    {
+        try{
+            $this->db = new PDO("mysql:host=$host;dbname=$dbName", $dbUser, $dbPassword, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             ]);
-        } catch (PDOException $e) {
-            die("Erro: {$e->getMessage()}");
+        } catch(PDOException $e){
+            die($e->getMessage());
         }
     }
 }
+ 

@@ -1,134 +1,189 @@
  <?php
 
 
-class ServicoController extends Controller
-{
-    // CRUD
-    public function listar(): void
+    class ServicoController extends Controller
     {
-        $dados = [];
+        // CRUD
+        public function excluir($tipo, $id)
+        {
+            $dados = [];
 
-        $servicos = $this->db_servico->getServicos();
-        $combos = $this->db_servico->getcombotodos();
-
-        $dados['servicosListar'] = array_merge($servicos, $combos);
-        $dados['servicosAdicionar'] = $servicos;
-
-        $dados['hidden'] = 'none';
-
-        $dados['conteudo'] = "servicos/listar";
-
-        $this->view('admin/dash', $dados);
-    }
-
-    public function adicionar(string $servicoCombo): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if ($servicoCombo === 'servico') {
-                $input = [
-                    'nome' => filter_input(INPUT_POST, 'nome_servico', FILTER_SANITIZE_SPECIAL_CHARS),
-                    'valor' => filter_input(INPUT_POST, 'valor_servico', FILTER_SANITIZE_NUMBER_FLOAT),
-                    'tempo' => filter_input(INPUT_POST, 'tempo_servico', FILTER_SANITIZE_NUMBER_INT),
-                    'descricao' => filter_input(INPUT_POST, 'descricao_servico', FILTER_SANITIZE_SPECIAL_CHARS)
-                ];
-
-                foreach ($input as $campo => $valor) {
-                    switch ($campo) {
-                        case 'nome':
-                            if (strlen($valor) < 5) {
-                                $_SESSION['erro'] = 'Nome de servico invalido';
-                                header('Location: ' . URL_BASE . 'servico/listar');
-                                exit;
-                            }
-
-                            break;
-
-                        case 'valor':
-                            if ((float)$valor <= 0) {
-                                $_SESSION['erro'] = 'O valor do servico precisa ser maior que R$0,00';
-                                header('Location: ' . URL_BASE . 'servico/listar');
-                                exit;
-                            }
-
-                            $preco = (float)$valor;
-
-                            break;
-
-                        case 'tempo':
-                            $tempo = (float)$valor;
-
-                            $tempo /= 60;
-
-                            $tempo = explode('.', (string)$tempo);
-
-                            if ((int)$tempo[0] > 0 && (int)$tempo[0] < 10) {
-                                $tempoFormato = "0$tempo[0]:";
-                            } else {
-                                $tempoFormato = "00:";
-                            }
-
-                            if ((int)$tempo[1] > 0 && (int)$tempo[1] < 10) {
-                                $tempoFormato .= "0$tempo[1]:";
-                            } else {
-                                $tempoFormato .= "00:";
-                            }
-
-                            $tempoFormato .= "00";
-
-                            break;
-
-                        case 'descricao':
-                            if (strlen($valor) < 5) {
-                                $_SESSION['erro'] = "Descricao de servico invalido";
-                                header('Location: ' . URL_BASE . 'servico/listar');
-                                exit;
-                            }
-
-                            break;
-                    }
+            if ($tipo === "servico") {
+                $deleteservico = $this->db_servico->deletarServico($id);
+                if (!$deleteservico) {
+                    echo ("Serviço não encontrado");
+                } else {
+                    header('Location:' . URL_BASE . 'servico/listar');
+                    exit;
                 }
+            } else {
+                $deleteCombo = $this->db_servico->deletarCombo($id);
+                if (!$deleteCombo) {
+                    echo ("Combo não encontrado");
+                } else {
+                    header('Location:' . URL_BASE . 'servico/listar');
+                    exit;
+                }
+            };
+        }
 
-                $input['tempo'] = $tempoFormato;
-                $input['valor'] = $preco;
+        public function editar($tipo, $id)
+        {
+            $dados = [];
+
+            if ($tipo == 'servico') {
+                $getservico = $this->db_servico->getServicosByid($id);
+                $servico = [
+                    'nome' => $getservico['nome_servico'],
+                    'descricao' => $getservico['descricao_servico'],
+                    'tempo' => $getservico['tempo_estimado'],
+                    'valor' => $getservico['valor_servico'],
+                    'tipo' => 'servico',
+                    'id' => $getservico['id_servico'],
+                    'imagem' => $getservico['imagem_servico']
+                ];
+            } else {
+                $getcombo = $this->db_servico->getComboByid($id);
+
+                $servico = [
+                    'nome' => $getcombo['nome_combo'],
+                    'descricao' => $getcombo['descricao_combo'],
+                    'tempo' => $getcombo['tempo_estimado'],
+                    'tipo' => 'combo',
+                    'id' => $getcombo['id_combo'],
+                    'valor' => $getcombo['valor_combo'],
+                    'imagem' => $getcombo['imagem_combo']
+                ];
+            };
+
+
+            $dados['servico'] = $servico;
+
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if ($tipo === 'servico') {
+                    $servico = [
+                        'nome' => $_POST['nome'],
+                        'descricao' => $_POST['descricao'],
+                        'valor' => $_POST['valor'],
+                        'tempo' => $_POST['tempo'],
+                        'imagem' => $_POST['imagem'],
+                        'id' => $id
+                    ];
+
+                    $serv = $this->db_servico->salvarServico($servico);
+                } else {
+                    $combo = [
+                        'nome' => $_POST['nome'],
+                        'descricao' => $_POST['descricao'],
+                        'valor' => $_POST['valor'],
+                        'tempo' => $_POST['tempo'],
+                        'imagem' => $_POST['imagem'],
+                        'id' => $id
+                    ];
+                    $serv = $this->db_servico->salvarCombo($combo);
+                }
+                //Ao enviar o form
+                if (!$serv || !isset($serv)) {
+                    $_SESSION['mensage'] = "Erro ao realizar atualização, confira os dados";
+                    header('Location:' . URL_BASE . 'servicos/listar');
+                    exit;
+                } else {
+                    $_SESSION['sucess'] = "Dados atualizados com sucesso!";
+                    header('Location:' . URL_BASE . 'servico/listar');
+                    exit;
+                }
+            }
+
+
+
+            $this->view('admin/content/servicos/editar', $dados);
+        }
+
+        public function listar(): void
+        {
+            $dados = [];
+
+            $servicos = $this->db_servico->getServicos();
+            $combos = $this->db_servico->getcombotodos();
+
+            $dados['servicosListar'] = array_merge($servicos, $combos);
+            $dados['servicosAdicionar'] = $servicos;
+
+            $dados['hidden'] = 'none';
+
+
+
+            $dados['conteudo'] = "servicos/listar";
+
+            $this->view('admin/dash', $dados);
+        }
+
+        public function adicionarServico(): void
+        {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $dados = [];
 
                 $imagem = $_FILES['imagem_servico'];
-
-                $novoNome = Controller::tratar_imagem($imagem, 'teste');
-
-                if (!$novoNome) {
-                    $_SESSION['erro'] = "Nome de imagem ja existente";
-                    header('Location: ' . URL_BASE . 'servico/listar');
-                    exit;
+                $nome = filter_input(INPUT_POST, 'nome_servico', FILTER_SANITIZE_SPECIAL_CHARS);
+                $valor = filter_input(INPUT_POST, 'valor_servico', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+                $tempo = filter_input(INPUT_POST, 'tempo_servico', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+                $descricao = filter_input(INPUT_POST, 'descricao_servico', FILTER_SANITIZE_SPECIAL_CHARS);
+                if (!$imagem['name']) {
+                    echo ("CAMPO IMAGEM VAZIO PREENCHA!");
+                    return;
+                }
+                if (!$nome) {
+                    echo ("CAMPO NOME VAZIO PREENCHA!");
+                    return;
+                }
+                if (!$valor) {
+                    echo ("CAMPO VALOR VAZIO PREENCHA!");
+                    return;
+                }
+                if (!$tempo) {
+                    echo ("CAMPO TEMPO VAZIO PREENCHA!");
+                    return;
+                }
+                if (!$descricao) {
+                    echo ("CAMPO DESCRIÇÂO VAZIO PREENCHA!");
+                    return;
                 }
 
-                $input['imagem'] = $novoNome;
+                $dados = [
+                    'imagem' => $imagem['name'],
+                    'nome' => $nome,
+                    'valor' => (float)$valor,
+                    'tempo' => $tempo,
+                    'descricao' => $descricao,
+                ];
 
-                $addServico = $this->db_servico->addServico($input);
+                $respostaServico = $this->db_servico->adicionarServico($dados);
 
-                if (!$addServico) {
-                    $_SESSION['erro'] = 'Erro ao adicionar servico';
-                    header('Location: ' . URL_BASE . 'servico/listar');
+
+                if (!$respostaServico) {
+                    echo ("erro ao adicionar o servico, tente novamente");
+                    return;
+                } else {
+                    header('Location:' . URL_BASE . 'servico/listar');
                     exit;
                 }
-
-                $_SESSION['sucesso'] = "Servico adicionado com sucesso";
-                header('Location: ' . URL_BASE . 'servico/listar');
-                exit;
-            } else if($servicoCombo === 'combo'){
-
-            } else{
-                die("Erro ao adicionar servico");
             }
         }
+
+        public function adicionarCombo(): void
+        {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            }
+        }
+
+
+        public function valor(int $servico1, int $servico2): void
+        {
+            $valor1 = $this->db_servico->getDetalhe_servico($servico1);
+            $valor2 = $this->db_servico->getDetalhe_servico($servico2);
+
+            echo (float)$valor1 + (float)$valor2;
+            return;
+        }
     }
-
-
-    public function valor(int $servico1, int $servico2): void
-    {
-        $valor1 = $this->db_servico->getDetalhe_servico($servico1);
-        $valor2 = $this->db_servico->getDetalhe_servico($servico2);
-
-        echo (float)$valor1 + (float)$valor2;
-        return;
-    }
-}
