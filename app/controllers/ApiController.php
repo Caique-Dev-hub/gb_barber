@@ -690,7 +690,7 @@ class ApiController extends Controller
         $countServico = $this->db_servico->getCount();
 
         if($servico > (int)$countServico['total']){
-            $combo = $servico - 3;
+            $combo = $servico - (int)$countServico;
 
             $detalheCombo = $this->db_servico->getDetalhe_combo($combo);
 
@@ -730,7 +730,46 @@ class ApiController extends Controller
         $tempoMaximo = date("H:i:s", $segundoTotal);
 
         
-        
+        $getAgendamentos = $this->db_agendamento->getAgendamentosHorario($tempoMinimo, $tempoMaximo, $data);
+
+        if(is_null($getAgendamentos)){
+            self::erro('Erro ao buscar agendamentos com base no horario', 500);
+            return;
+        }
+
+        if($getAgendamentos){
+            self::erro('Nao e possivel agendar esse servico nesse horario, tentar novamente com outro servico ou em outro horario', 409);
+            return;
+        }
+
+
+        $validado = [
+            'data_horario' => $data_horario,
+            'cliente' => $id_cliente
+        ];
+
+        if(isset($combo)){
+            $validado['combo'] = $combo;
+        } else{
+            $validado['servico'] = $servico;
+        }
+
+        $addAgendamento = $this->db_agendamento->addAgendamento($validado);
+
+        if(!$addAgendamento){
+            self::erro('Erro ao adicionar agendamento', 500);
+            return;
+        }
+
+        $updateDataHorario = $this->db_data->updateDataHorario($tempoMinimo, $tempoMaximo, $data);
+
+        if(!$updateDataHorario){
+            self::erro('Erro ao atualizar datas do agendamento', 500);
+            return;
+        }
+
+        self::sucesso('Agendamento realizado com sucesso', 201);
+        return;
     }
 
 

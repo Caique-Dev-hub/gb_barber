@@ -59,4 +59,27 @@ class Data extends Database
         ]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+
+    // UPDATE
+    public function updateDataHorario(string $tempoMinimo, string $tempoMaximo, int $data): ?bool
+    {
+        try{
+            $sql = "UPDATE tbl_data_horario
+            INNER JOIN tbl_horario ON tbl_data_horario.id_horario = tbl_horario.id_horario
+            SET tbl_data_horario.status_data_horario = 'Indisponivel'
+            WHERE tbl_horario.hora_inicio BETWEEN :tempoMinimo AND :tempoMaximo
+            AND tbl_data_horario.id_data = :data AND tbl_data_horario.status_data_horario = 'Disponivel'";
+
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                ':data' => $data,
+                ':tempoMinimo' => $tempoMinimo,
+                ':tempoMaximo' => $tempoMaximo
+            ]);
+        } catch(PDOException $e){
+            return null;
+        }
+    }
+
 }

@@ -2,6 +2,104 @@
 
 class Servico extends Database
 {
+    public function adicionarServico($dados){
+        extract($dados);
+
+        $sql = "INSERT INTO tbl_servico(nome_servico, descricao_servico, valor_servico, 
+        tempo_estimado, imagem_servico, alt_servico)
+        VALUES (:nome,:descricao,:valor,:tempo,:imagem, :alt)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':nome' => $nome,
+            ':imagem' => $imagem,
+            ':valor' => $valor,
+            ':tempo' => $tempo,
+            ':descricao' => $descricao,
+            ':alt' => $nome
+        ]);
+    }
+
+    public function salvarCombo($dadosAtualizacaoCombo)
+    {
+        $sql = "UPDATE tbl_combo SET nome_combo = :nome,
+        valor_combo = :valor,tempo_estimado = :tempo,imagem_combo = :imagem, descricao_combo = :descricao
+        WHERE id_combo = :id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':nome' => $dadosAtualizacaoCombo['nome'],
+            ':valor' => $dadosAtualizacaoCombo['valor'],
+            ':descricao' => $dadosAtualizacaoCombo['descricao'],
+            ':tempo' => $dadosAtualizacaoCombo['tempo'],
+            ':imagem' => $dadosAtualizacaoCombo['imagem'],
+            ':id' => $dadosAtualizacaoCombo['id']
+        ]);
+        return $stmt->rowCount();
+    }
+
+    public function salvarServico($dadosAtualizacaoServico)
+    {
+        $sql = "UPDATE tbl_servico SET nome_servico = :nome,
+        valor_servico = :valor,tempo_estimado = :tempo,imagem_servico = :imagem, descricao_servico = :descricao
+        WHERE id_servico = :id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':nome' => $dadosAtualizacaoServico['nome'],
+            ':valor' => $dadosAtualizacaoServico['valor'],
+            ':descricao' => $dadosAtualizacaoServico['descricao'],
+            ':tempo' => $dadosAtualizacaoServico['tempo'],
+            ':imagem' => $dadosAtualizacaoServico['imagem'],
+            ':id' => $dadosAtualizacaoServico['id']
+        ]);
+        return $stmt->rowCount();
+    }
+
+    public function getServicosByid($id)
+    {
+        $sql = "SELECT * FROM tbl_servico WHERE id_servico = :id ORDER BY id_servico ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $id
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getComboByid($id)
+    {
+        $sql = "SELECT * FROM tbl_combo_servico WHERE id_combo = :id ORDER BY id_combo ASC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $id
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function deletarServico($id)
+    {
+        $this->db->query("SET FOREIGN_KEY_CHECKS = 0");
+        $sql = "DELETE FROM tbl_servico WHERE id_servico = :id ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $id
+        ]);
+        return $this->db->query("SET FOREIGN_KEY_CHECKS = 1");
+    }
+
+    public function deletarCombo($id)
+    {
+        $this->db->query("SET FOREIGN_KEY_CHECKS = 0");
+
+        $sql = "DELETE FROM tbl_combo_servico WHERE id_combo = :id ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $id
+        ]);
+
+        return $this->db->query("SET FOREIGN_KEY_CHECKS = 1");
+    }
+    
     public function getServicos()
     {
         $sql = "SELECT * FROM tbl_servico WHERE status_servico = 'Ativo' ORDER BY id_servico ASC";
@@ -10,45 +108,26 @@ class Servico extends Database
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getDetalhe_combo(int $id): ?array
+    public function getDetalhe_combo(int $id): array
     {
-        if(empty(trim($id)) || is_null($id) || !$id){
-            return null;
-        }
+        $sql = "SELECT * FROM tbl_combo_servico WHERE id_combo = :id AND status_combo = 'Ativo'";
 
-        try{
-            $sql = "SELECT * FROM tbl_combo WHERE id_combo = :combo AND status_combo = 'Ativo'";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([
-                ':combo' => $id
-            ]);
-
-            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
-
-        } catch(PDOException $e){
-            return null;
-        }
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $id
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getDetalhe_servico(int $id): ?array
+    public function getDetalhe_servico(int $id): array
     {
-        if(empty(trim($id)) || is_null($id) || !$id){
-            return null;
-        }
+        $sql = "SELECT * FROM tbl_servico WHERE id_servico = :id AND status_servico = 'Ativo'";
 
-        try{
-            $sql = "SELECT * FROM tbl_servico WHERE id_servico = :servico AND status_servico = 'Ativo'";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([
-                ':servico' => $id
-            ]);
-
-            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
-        } catch(PDOException $e){
-            return null;
-        }
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $id
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getCombos()
@@ -62,23 +141,17 @@ class Servico extends Database
     public function getcombotodos()
     {
         $sql = "SELECT * FROM tbl_combo_servico WHERE status_combo = 'Ativo' ORDER BY id_combo ASC";
-        
+
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
     }
 
-    public function getCount(): ?array
+    public function getCount()
     {
-        try{
-            $sql = "SELECT COUNT(*) AS total FROM tbl_servico WHERE status_servico = 'Ativo'";
+        $sql = "SELECT COUNT(*) AS total FROM tbl_servico WHERE status_servico = 'Ativo'";
 
-            $stmt = $this->db->query($sql);
-
-            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
-
-        } catch(PDOException $e){
-            return null;
-        }
+        $stmt = $this->db->query($sql);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getCountCombo()
@@ -105,5 +178,5 @@ class Servico extends Database
             ':imagem' => (string)$imagem,
             ':alt' => (string)$nome
         ]);
-    } 
+    }
 }
