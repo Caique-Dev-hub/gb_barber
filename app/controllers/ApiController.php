@@ -709,8 +709,6 @@ class ApiController extends Controller
                 return;
             }
 
-
-
             $servicoHorario = $detalheServico['tempo_estimado'];
         }
 
@@ -727,7 +725,8 @@ class ApiController extends Controller
         $segundoTotal = $segundoMinimo + $segundoServico;
 
 
-        $tempoMaximo = date("H:i:s", $segundoTotal);
+        $tempoMaximo = gmdate('H:i:s', $segundoTotal);
+
 
         
         $getAgendamentos = $this->db_agendamento->getAgendamentosHorario($tempoMinimo, $tempoMaximo, $data);
@@ -795,6 +794,7 @@ class ApiController extends Controller
         }
 
         if((int)$payload['id'] !== $id){
+
             return null;
         }
 

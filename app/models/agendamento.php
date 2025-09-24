@@ -9,17 +9,20 @@ class Agendamento extends Database
             extract($campos);
 
             $sql = "INSERT INTO tbl_agendamento (id_cliente, id_servico, id_combo, id_data_horario)
-            SELECT id_cliente, :servico, :combo, :data_horario FROM tbl_servico WHERE id_cliente = :cliente";
+            SELECT id_cliente, :servico, :combo, :data_horario FROM tbl_cliente WHERE id_cliente = :cliente";
 
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute([
+            $stmt->execute([
                 ':cliente' => (int)$cliente,
                 ':servico' => isset($servico) ? (int)$servico : null,
                 ':combo' => isset($combo) ? (int)$combo : null,
                 ':data_horario' => (int)$data_horario
             ]);
 
-            return (int)$this->db->lastInsertId();
+            $id = $this->db->lastInsertId();
+
+            return $id ?: null;
+
         } catch(PDOException $e){
             return null;
         }
