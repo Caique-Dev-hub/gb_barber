@@ -692,6 +692,9 @@ class ApiController extends Controller
 
 
 
+    
+
+
     // -------------------------------- Metodos auxiliares ------------------------------------- //
     
     // Validar Token
