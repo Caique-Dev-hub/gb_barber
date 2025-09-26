@@ -232,11 +232,11 @@ class ApiController extends Controller
         return;
     }
 
-    public function atu_cadastro(int $id): void
+    public function atu_cadastro(int $id_cliente): void
     {
         header('Content-Type: application/json');
 
-        $payload = $this->verificar($id);
+        $payload = $this->verificar($id_cliente);
 
         if(is_null($payload)){
             self::erro('Token expirado ou invalido', 400);
@@ -246,90 +246,6 @@ class ApiController extends Controller
         $input = file_get_contents('php://input');
         $input = json_decode($input, true);
 
-        $campos = ['nome', 'email', 'whatsapp', 'senha'];
-
-        foreach($campos as $valor){
-            if(!isset($input[$valor])){
-                self::erro('Campo obrigatorio nao identificado', 404);
-                return;
-            }
-        }
-
-        if(count($input) !== count($campos)){
-            self::erro('Envio do formulario corrompido', 400);
-            return;
-        }
-
-        foreach($input as $campo => $valor){
-            if($campo === 'senha'){
-                continue;
-            }
-
-            match($campo){
-                'nome' => $tratado['nome'] = self::tratar_nome($valor),
-                'email' => $tratado['email'] = self::tratar_email($valor),
-                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor)
-            };
-
-            if(!$tratado[$campo]){
-                $erros['erro'] = match($campo){
-                    'nome' => 'Insira seu nome completo e valido',
-                    'email' => 'Insira seu E-mail valido',
-                    'whatsapp' => 'Insira seu numero de Whatsapp no formato (xx) xxxxx-xxxx ou (xx) xxxx-xxxx'
-                };
-            }
-        }
-
-        if(is_string($input['senha'])){
-            $tratado['senha'] = self::tratar_senha($input['senha']);
-
-            if(!$tratado['senha']){
-                $erros['erro'] = 'Sua senha precisa conter 5 digitos ou mais';
-            } else {
-                $tratado['senha'] = password_hash($tratado['senha'], PASSWORD_DEFAULT);
-            }
-        } else {
-            $tratado['senha'] = $input['senha'];
-        }
-
-        if(isset($erros)){
-            self::erro($erros);
-            return;
-        }
-
-        $email_hash = self::hash_email_whatsapp($tratado['email']);
-
-        $getEmail = $this->db_cliente->getEmailAtu($email_hash, $id);
-
-        if($getEmail !== false){
-            self::erro('Dados inseridos ja estao sendo utilizados', 409);
-            return;
-        }
-
-        $whatsapp_hash = self::hash_email_whatsapp($tratado['whatsapp']);
-
-        $getWhatsapp = $this->db_cliente->getWhatsappAtu($whatsapp_hash, $id);
-
-        if($getWhatsapp !== false){
-            self::erro('Dados inseridos ja estao sendo utilizados', 409);
-            return;
-        }
-
-        $tratado['email'] = Controller::criptografia($tratado['email']);
-        $tratado['whatsapp'] = Controller::criptografia($tratado['whatsapp']);
-
-        $tratado['email_hash'] = $email_hash;
-        $tratado['whatsapp_hash'] = $whatsapp_hash;
-
-        $updateCadastro = $this->db_cliente->updateCadastro($tratado, $id);
-
-        if(!$updateCadastro){
-            self::erro('Erro ao atualizar cadastro', 500);
-            return;
-        }
-
-        self::sucesso('Cadastro atualizado com sucesso');
-        return;
     }
 
     public function listar_login(int $id): void
@@ -575,25 +491,25 @@ class ApiController extends Controller
         return;
     }
 
-    public function listar_comentario_cliente(int $id): void
+    public function listar_comentarios_cliente(int $id_cliente): void
     {
         header('Content-Type: application/json');
 
-        $payload = $this->verificar($id);
+        $payload = $this->verificar($id_cliente);
 
         if(is_null($payload)){
-            self::erro('Token expirado ou inválido', 400);
+            self::erro('Token expirado ou invalido', 400);
             return;
         }
 
-        $getComentario = $this->db_contato->getComentariosCliente($id);
+        $getComentarios = $this->db_contato->getComentariosCliente($id_cliente);
 
-        if(!$getComentario){
-            self::erro('Erro ao exibir comentario do cliente', 500);
+        if(!$getComentarios){
+            self::erro('Erro ao buscar comentarios', 500);
             return;
         }
 
-        self::exibir_dados($getComentario);
+        self::exibir_dados($getComentarios);
         return;
     }
 
