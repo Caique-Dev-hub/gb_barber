@@ -29,7 +29,7 @@
             <?php foreach ($servicos as $coluna) : ?>
 
                 <div class="containe servicos" data-id="<?= isset($coluna['id_servico']) ? $coluna ['id_servico'] : $coluna ['id_combo'] + 3?>">
-                    <div class="container1" style="background-image: url(<?= URL_BASE ?>assets/img/<?= isset($coluna['imagem_servico']) ? $coluna['imagem_servico'] : $coluna['imagem_combo'] ?>);background-size: cover; background-position: center;">
+                    <div class="container1" style="background-image: url(<?= URL_BASE?>upload/<?= $coluna['imagem_combo'] ?? $coluna['imagem_servico']?>);background-size: cover; background-position: center;">
                         <div class="container-content">
                             <h2><?= isset($coluna['nome_servico']) ? $coluna ['nome_servico'] : $coluna ['nome_combo'] ?></h2>
                             <P><?= isset($coluna['descricao_servico']) ? $coluna ['descricao_servico'] : $coluna ['descricao_combo'] ?></P>

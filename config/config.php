@@ -2,10 +2,10 @@
 
 define('URL_BASE', 'http://localhost/gb_barber/public/');
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'db_barberaria');
-define('DB_USER', 'root');
-define('DB_PASSWORD', '');
+// define('DB_HOST', 'localhost');
+// define('DB_NAME', 'db_barberaria');
+// define('DB_USER', 'root');
+// define('DB_PASSWORD', '');
 
 spl_autoload_register(function($class){
     $caminhos = [
