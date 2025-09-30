@@ -100,12 +100,17 @@ class Servico extends Database
         return $this->db->query("SET FOREIGN_KEY_CHECKS = 1");
     }
     
-    public function getServicos()
+    public function getServicos(): ?array
     {
-        $sql = "SELECT * FROM tbl_servico WHERE status_servico = 'Ativo' ORDER BY id_servico ASC";
+        try{
+            $sql = "SELECT * FROM tbl_servico WHERE status_servico = 'Ativo' ORDER BY nome_servico";
 
-        $stmt = $this->db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $this->db->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: null;
+
+        } catch(PDOException $e){
+            return null;
+        }
     }
 
     public function getDetalhe_combo(int $id): array
@@ -128,14 +133,6 @@ class Servico extends Database
             ':id' => $id
         ]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function getCombos()
-    {
-        $sql = "SELECT * FROM tbl_combo_servico WHERE status_combo = 'Ativo' ORDER BY id_combo ASC LIMIT 3";
-
-        $stmt = $this->db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getcombotodos()

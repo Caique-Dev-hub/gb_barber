@@ -30,7 +30,6 @@ class Agendamento extends Database
 
 
     // GET
-
     public function getDataAgendamento(int $id_data, string $horaMaxima): array|bool
     {
         $sql = "SELECT * FROM tbl_agendamento

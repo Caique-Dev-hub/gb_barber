@@ -28,7 +28,7 @@
             </div>
             <form class="form-contato" id="reserva" method="post" action="">
                 <div style="margin: 0 auto; ">
-                    <h3>FALE CONOSCO</h3>
+                    <h3>Faça sua reserva</h3>
                 </div>
 
                 <div class="container-menu">

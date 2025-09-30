@@ -34,6 +34,8 @@ class Controller
         require_once("../app/views/$pag.php");
     }
 
+
+    
     public static function criptografia(string|int|float $text): string
     {
         $iv = random_bytes(openssl_cipher_iv_length($_ENV['METHOD']));
@@ -63,6 +65,10 @@ class Controller
 
         return openssl_decrypt($text, $_ENV['METHOD'], $key, OPENSSL_RAW_DATA, $iv, $tag);
     }
+
+
+
+
 
     public static function tratar_url(string $texto): string
     {

@@ -14,37 +14,32 @@ class Reserva extends Database
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function addCombo($campos)
+    public function addReserva(array $campos): ?bool
     {
-        extract($campos);
-        
-        $sql = "INSERT INTO tbl_reserva (nome_reserva, email_reserva, whatsapp_reserva, id_combo, id_data_horario)
-        VALUES (:nome, :email, :whatsapp, :combo, :data_horario)";
+        foreach($campos as $valor){
+            if(empty($valor)){
+                return null;
+            }
+        }
 
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':nome' => (string)$nome,
-            ':email' => (string)$email,
-            ':whatsapp' => (string)$whatsapp,
-            ':combo' => (int)$combo,
-            ':data_horario' => (int)$data
-        ]);
-    }
+        try{
+            extract($campos);
 
-    public function addServico($campos)
-    {
-        extract($campos);
+            $sql = "INSERT INTO tbl_reserva (nome_reserva, email_reserva, whatsapp_reserva, id_servico, id_combo, id_data_horario)
+            VALUES (:nome, :email, :whatsapp, :servico, :combo, :horario)";
 
-        $sql = "INSERT INTO tbl_reserva (nome_reserva, email_reserva, whatsapp_reserva, id_servico, id_data_horario)
-        VALUES (:nome, :email, :whatsapp, :servico, :data_horario)";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                ':nome' => $nome,
+                ':email' => $email,
+                ':whatsapp' => $whatsapp,
+                ':servico' => $servico ?? null,
+                ':combo' => $combo ?? null,
+                ':horario' => $horario
+            ]);
 
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':nome' => (string)$nome,
-            ':email' => (string)$email,
-            ':whatsapp' => (string)$whatsapp,
-            ':servico' => (int)$servico,
-            ':data_horario' => (int)$data
-        ]);
+        } catch(PDOException $e){
+            return null;
+        }
     }
 }
