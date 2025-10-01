@@ -12,28 +12,28 @@ class ApiController extends Controller
 
         $campos = ['nome', 'email', 'whatsapp', 'senha'];
 
-        foreach($campos as $valor){
-            if(!isset($input[$valor])){
+        foreach ($campos as $valor) {
+            if (!isset($input[$valor])) {
                 self::erro('Campo obrigatório não identificado, tentar novamente pelo formulário', 400);
                 return;
             }
         }
 
-        if(count($input) !== count($campos)){
+        if (count($input) !== count($campos)) {
             self::erro('Envio formulário corrompido', 400);
             return;
         }
 
-        foreach($input as $campo => $valor){
-            match($campo){
+        foreach ($input as $campo => $valor) {
+            match ($campo) {
                 'nome' => $tratado['nome'] = self::tratar_nome($valor),
                 'email' => $tratado['email'] = self::tratar_email($valor),
                 'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor),
                 'senha' => $tratado['senha'] = self::tratar_senha($valor)
             };
 
-            if(!$tratado[$campo]){
-                $erros['erro'] = match($campo){
+            if (!$tratado[$campo]) {
+                $erros['erro'] = match ($campo) {
                     'nome' => 'Insira o seu nome completo',
                     'email' => 'Insira um E-mail válido',
                     'whatsapp' => 'Insira um numero de Whatsapp no formato (xx) xxxxx-xxxx ou (xx) xxxx-xxxx',
@@ -42,7 +42,7 @@ class ApiController extends Controller
             }
         }
 
-        if(isset($erros)){
+        if (isset($erros)) {
             self::erro($erros);
             return;
         }
@@ -51,7 +51,7 @@ class ApiController extends Controller
 
         $getEmail = $this->db_cliente->getEmail($tratado['email_hash']);
 
-        if($getEmail !== false){
+        if ($getEmail !== false) {
             self::erro('Dados inseridos já estão sendo utilizados', 409);
             return;
         }
@@ -60,7 +60,7 @@ class ApiController extends Controller
 
         $getWhatsapp = $this->db_cliente->getWhatsapp($tratado['whatsapp_hash']);
 
-        if($getWhatsapp !== false){
+        if ($getWhatsapp !== false) {
             self::erro('Dados inseridos já estão sendo utilizados', 409);
             return;
         }
@@ -71,14 +71,14 @@ class ApiController extends Controller
 
         $addCadastro = $this->db_cliente->addCadastro($tratado);
 
-        if(!$addCadastro){
+        if (!$addCadastro) {
             self::erro('Erro ao realizar cadastro', 500);
             return;
         }
 
         $getCliente = $this->db_cliente->getDetalheCliente((int)$addCadastro);
 
-        if(!$getCliente){
+        if (!$getCliente) {
             self::erro('Erro ao retornar dados do cadastro', 500);
             return;
         }
@@ -105,33 +105,33 @@ class ApiController extends Controller
 
         $campos = ['email', 'whatsapp'];
 
-        foreach($campos as $valor){
-            if(!isset($input[$valor])){
+        foreach ($campos as $valor) {
+            if (!isset($input[$valor])) {
                 self::erro('Não identificamos um campo obrigatório na requisição, tentar novamente pelo formulário de Login', 400);
                 return;
             }
         }
 
-        if(count($input) !== count($campos)){
+        if (count($input) !== count($campos)) {
             self::erro('Envio do formulário corrompido', 400);
             return;
         }
 
-        foreach($input as $campo => $valor){
-            match($campo){
+        foreach ($input as $campo => $valor) {
+            match ($campo) {
                 'email' => $tratado['email'] = self::tratar_email($valor),
                 'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor)
             };
 
-            if(!$tratado[$campo]){
-                $erros[$campo] = match($campo){
+            if (!$tratado[$campo]) {
+                $erros[$campo] = match ($campo) {
                     'email' => 'Insira um E-mail valido',
                     'whatsapp' => 'Insira um numero de whatsapp no formato (xx) xxxxx-xxxx ou (xx) xxxx-xxxx'
                 };
             }
         }
 
-        if(isset($erros)){
+        if (isset($erros)) {
             self::erro($erros);
             return;
         }
@@ -140,14 +140,14 @@ class ApiController extends Controller
 
         $getEmail = $this->db_cliente->getEmail($email_hash);
 
-        if(!$getEmail){
+        if (!$getEmail) {
             self::erro('Dados inseridos nao registrados', 404);
             return;
         }
 
         $whatsapp_hash = self::hash_email_whatsapp($tratado['whatsapp']);
 
-        if(!hash_equals($getEmail['whatsapp_hash'], $whatsapp_hash)){
+        if (!hash_equals($getEmail['whatsapp_hash'], $whatsapp_hash)) {
             self::erro('Dados inseridos nao encontrado', 404);
             return;
         }
@@ -174,33 +174,33 @@ class ApiController extends Controller
 
         $campos = ['email', 'senha'];
 
-        foreach($campos as $valor){
-            if(!isset($input[$valor])){
+        foreach ($campos as $valor) {
+            if (!isset($input[$valor])) {
                 self::erro('Não identificamos um campo obrigatório na requisição, tentar novamente pelo formulário de Login', 404);
                 return;
             }
         }
 
-        if(count($input) !== count($campos)){
+        if (count($input) !== count($campos)) {
             self::erro('Envio do formulário corrompido', 400);
             exit;
         }
 
-        foreach($input as $campo => $valor){
-            match($campo){
+        foreach ($input as $campo => $valor) {
+            match ($campo) {
                 'email' => $tratado['email'] = self::tratar_email($valor),
                 'senha' => $tratado['senha'] = self::tratar_senha($valor)
             };
 
-            if(!$tratado[$campo]){
-                $erros[$campo] = match($campo){
+            if (!$tratado[$campo]) {
+                $erros[$campo] = match ($campo) {
                     'email' => 'Insira um E-mail válido',
                     'senha' => 'Sua senha precisa conter 5 dígitos ou mais'
                 };
             }
         }
 
-        if(isset($erros)){
+        if (isset($erros)) {
             self::erro($erros);
             return;
         }
@@ -209,12 +209,12 @@ class ApiController extends Controller
 
         $getEmail = $this->db_cliente->getEmail($email_hash);
 
-        if(!$getEmail){
+        if (!$getEmail) {
             self::erro('Dados inseridos não estão registrados', 404);
             return;
         }
 
-        if(!password_verify($tratado['senha'], $getEmail['senha_cliente'])){
+        if (!password_verify($tratado['senha'], $getEmail['senha_cliente'])) {
             self::erro('Dados inseridos não estão registrados', 404);
             return;
         }
@@ -232,27 +232,77 @@ class ApiController extends Controller
         return;
     }
 
-    public function atu_cadastro(int $id_cliente): void
+    public function atu_cadastro(int $id): void
     {
         header('Content-Type: application/json');
 
-        $payload = $this->verificar($id_cliente);
+        $payload = $this->verificar($id);
 
-        if(is_null($payload)){
-            self::erro('Token expirado ou invalido', 400);
+        if (!$payload) {
+            self::erro('Token expirado ou inválido', 400);
             return;
         }
 
         $input = file_get_contents('php://input');
         $input = json_decode($input, true);
 
+        $campos = ['nome', 'email', 'whatsapp', 'senha'];
+
+        foreach ($campos as $valor) {
+            if (!isset($input[$valor])) {
+                if ($valor !== 'senha') {
+                    self::erro('Campo obrigátorio não identificado', 404);
+                    return;
+                }
+            }
+        }
+
+        if(!isset($input['senha'])){
+            unset($campos[3]);
+        }
+
+        if (count($input) !== count($campos)) {
+            self::erro('Envio do formulário corrompido', 400);
+            return;
+        }
+
+        $tratado = [];
+
+        foreach ($input as $campo => $valor) {
+            match ($campo) {
+                'nome' => $tratado['nome'] = self::tratar_nome($valor),
+                'email' => $tratado['email'] = self::tratar_email($valor),
+                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor),
+                'senha' => $tratado['senha'] = self::tratar_senha($valor)
+            };
+        }
+
+        if (count($input) !== count($tratado)) {
+            self::erro('Erro ao realizar tratamento de um dos campos', 500);
+            return;
+        }
+
+        foreach ($tratado as $campo => $valor) {
+            if (!$valor) {
+                self::erro(match ($campo) {
+                    'nome' => 'Nome inválido, insira o seu nome completo',
+                    'email' => 'E-mail inválido, insira um e-mail válido',
+                    'whatsapp' => 'Whatsapp inválido, insira um numero de whatsapp no formato (xx) xxxxx-xxxx',
+                    'senha' => 'Senha inválida, insira um senha com no minímo 5 dígitos'
+                }, 422);
+                return;
+            }
+        }
+
+        $tratado['email_hash'] = self::hash_email_whatsapp($tratado['email']);
+        $tratado['whatsapp_hash'] = self::hash_email_whatsapp($tratado['whatsapp']);
     }
 
     public function listar_login(int $id): void
     {
         $payload = $this->verificar($id);
 
-        if(is_null($payload)){
+        if (is_null($payload)) {
             self::erro('Token invalido', 404);
             return;
         }
@@ -261,7 +311,7 @@ class ApiController extends Controller
 
         $getLogin = $this->db_cliente->getDetalheCliente((int)$payload['id']);
 
-        if(!$getLogin){
+        if (!$getLogin) {
             self::erro('Erro ao retornar dados do Login', 500);
             return;
         }
@@ -280,14 +330,14 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id);
 
-        if(is_null($payload)){
+        if (is_null($payload)) {
             self::erro('Token expirado ou invalido', 400);
             return;
         }
 
         $deleteCadastro = $this->db_cliente->deleteCadastro($id);
 
-        if(!$deleteCadastro){
+        if (!$deleteCadastro) {
             self::erro('Erro ao deletar cadastro', 500);
             return;
         }
@@ -306,14 +356,14 @@ class ApiController extends Controller
 
         $getServicos = $this->db_servico->getServicos();
 
-        if(!$getServicos){
+        if (!$getServicos) {
             self::erro('Erro ao retornar todos os servicos', 500);
             return;
         }
 
         $getCombos = $this->db_servico->getCombos();
 
-        if(!$getCombos){
+        if (!$getCombos) {
             self::erro('Erro ao retornar todos os combos');
             return;
         }
@@ -330,29 +380,29 @@ class ApiController extends Controller
 
         $getServicos = $this->db_servico->getServicos();
 
-        if(!$getServicos){
+        if (!$getServicos) {
             self::erro('Erro ao retornar todos os servicos', 500);
             return;
         }
 
         $getCombos = $this->db_servico->getCombos();
 
-        if(!$getCombos){
+        if (!$getCombos) {
             self::erro('Erro ao retornar todos os combos');
             return;
         }
 
         $total = array_merge($getServicos, $getCombos);
 
-        foreach($total as $atributo){
+        foreach ($total as $atributo) {
             $nome = $atributo['nome_servico'] ?? $atributo['nome_combo'];
 
-            if(self::tratar_url($nome) === $nomeServico){
+            if (self::tratar_url($nome) === $nomeServico) {
                 $detalheServico = $atributo;
             }
         }
 
-        if(!isset($detalheServico)){
+        if (!isset($detalheServico)) {
             self::erro('Erro ao buscar detalhes do servico', 500);
             return;
         }
@@ -375,7 +425,7 @@ class ApiController extends Controller
 
         $datas = $this->db_data->getDatas();
 
-        if(!$datas){
+        if (!$datas) {
             self::erro('Erro ao retornar todas as datas', 500);
             return;
         }
@@ -390,7 +440,7 @@ class ApiController extends Controller
 
         $getHorarioData = $this->db_data->getHorarios($id_data);
 
-        if(!$getHorarioData){
+        if (!$getHorarioData) {
             self::erro('Erro ao retornar todos os horarios da data', 500);
             return;
         }
@@ -411,7 +461,7 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id);
 
-        if(is_null($payload)){
+        if (is_null($payload)) {
             self::erro('Token expirado ou invalido', 400);
             return;
         }
@@ -419,12 +469,12 @@ class ApiController extends Controller
         $input = file_get_contents('php://input');
         $input = json_decode($input, true);
 
-        if(!isset($input['mensagem'])){
+        if (!isset($input['mensagem'])) {
             self::erro('Campo obrigatorio nao encontrado', 404);
             return;
         }
 
-        if(count($input) !== 1){
+        if (count($input) !== 1) {
             self::erro('Envio do formulario corrompido', 400);
             return;
         }
@@ -432,14 +482,14 @@ class ApiController extends Controller
 
         $mensagem = trim(filter_var($input['mensagem'], FILTER_SANITIZE_SPECIAL_CHARS));
 
-        if(str_word_count($mensagem) < 5){
+        if (str_word_count($mensagem) < 5) {
             self::erro('Mensagem muito curta');
             return;
         }
 
         $addComentario = $this->db_contato->addComentario($id, $mensagem);
 
-        if(!$addComentario){
+        if (!$addComentario) {
             self::erro('Erro ao adicionar comentario', 500);
             return;
         }
@@ -454,7 +504,7 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id);
 
-        if(is_null($payload)){
+        if (is_null($payload)) {
             self::erro('Token expirado ou invalido');
             return;
         }
@@ -462,27 +512,27 @@ class ApiController extends Controller
         $input = file_get_contents('php://input');
         $input = json_decode($input, true);
 
-        if(!isset($input['mensagem'])){
+        if (!isset($input['mensagem'])) {
             self::erro('Campo obrigatorio nao identificado', 404);
             return;
         }
 
-        if(count($input) !== 1){
+        if (count($input) !== 1) {
             self::erro('Envio do formulario corrompido', 400);
             return;
         }
 
-        
+
         $mensagem = filter_var($input['mensagem'], FILTER_SANITIZE_SPECIAL_CHARS);
 
-        if(str_word_count($mensagem) < 5 || strlen($mensagem) < 5){
+        if (str_word_count($mensagem) < 5 || strlen($mensagem) < 5) {
             self::erro('Sua mensagem esta muito curta');
             return;
         }
 
         $updateComentario = $this->db_contato->updateComentario($comentario, $mensagem);
 
-        if(!$updateComentario){
+        if (!$updateComentario) {
             self::erro('Erro ao atualizar comentario', 500);
             return;
         }
@@ -497,14 +547,14 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id_cliente);
 
-        if(is_null($payload)){
+        if (is_null($payload)) {
             self::erro('Token expirado ou invalido', 400);
             return;
         }
 
         $getComentarios = $this->db_contato->getComentariosCliente($id_cliente);
 
-        if(!$getComentarios){
+        if (!$getComentarios) {
             self::erro('Erro ao buscar comentarios', 500);
             return;
         }
@@ -519,19 +569,18 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id_cliente);
 
-        if(is_null($payload)){
+        if (is_null($payload)) {
             self::erro('Token expirado ou inválido', 400);
             return;
         }
 
         $deleteComentario = $this->db_contato->deleteComentario($id);
 
-        if(!$deleteComentario){
-
+        if (!$deleteComentario) {
         }
     }
 
-    
+
 
 
 
@@ -543,14 +592,14 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id);
 
-        if(is_null($payload)){
+        if (is_null($payload)) {
             self::erro('Token expirado ou invalido', 400);
             return;
         }
 
         $getNotificacao = $this->db_notificacao->getNotificacao($id);
 
-        if(!$getNotificacao){
+        if (!$getNotificacao) {
             self::erro('Erro ao retornar dados da notificacao', 500);
             return;
         }
@@ -570,7 +619,7 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id_cliente);
 
-        if(is_null($payload)){
+        if (is_null($payload)) {
             self::erro('Token expirado ou inválido', 400);
             return;
         }
@@ -581,14 +630,14 @@ class ApiController extends Controller
 
         $campos = ['data_horario', 'servico'];
 
-        foreach($campos as $valor){
-            if(!isset($input[$valor])){
+        foreach ($campos as $valor) {
+            if (!isset($input[$valor])) {
                 self::erro('Campo obrigatório não identificado', 404);
                 return;
             }
         }
 
-        if(count($input) !== count($campos)){
+        if (count($input) !== count($campos)) {
             self::erro('Envio do formulario corrompido, tentar novamente do jeito correto', 400);
             return;
         }
@@ -598,29 +647,28 @@ class ApiController extends Controller
 
         $detalheDataHorario = $this->db_data->getDataHorarioDetalhe($data_horario);
 
-        if(is_null($detalheDataHorario)){
+        if (is_null($detalheDataHorario)) {
             self::erro('Erro ao carregar detalhe da data do agendamento', 500);
             return;
         }
 
         $countServico = $this->db_servico->getCount();
 
-        if($servico > (int)$countServico['total']){
+        if ($servico > (int)$countServico['total']) {
             $combo = $servico - (int)$countServico;
 
             $detalheCombo = $this->db_servico->getDetalhe_combo($combo);
 
-            if(is_null($detalheCombo)){
+            if (is_null($detalheCombo)) {
                 self::erro('Erro ao buscar detalhes do combo', 500);
                 return;
             }
 
             $servicoHorario = $detalheCombo['tempo_estimado'];
-
         } else {
             $detalheServico = $this->db_servico->getDetalhe_servico($servico);
 
-            if(is_null($detalheServico)){
+            if (is_null($detalheServico)) {
                 self::erro('Erro ao retornar detalhes do serviço', 500);
                 return;
             }
@@ -644,15 +692,15 @@ class ApiController extends Controller
         $tempoMaximo = gmdate('H:i:s', $segundoTotal);
 
 
-        
+
         $getAgendamentos = $this->db_agendamento->getAgendamentosHorario($tempoMinimo, $tempoMaximo, $data);
 
-        if(is_null($getAgendamentos)){
+        if (is_null($getAgendamentos)) {
             self::erro('Erro ao buscar agendamentos com base no horario', 500);
             return;
         }
 
-        if($getAgendamentos){
+        if ($getAgendamentos) {
             self::erro('Nao e possivel agendar esse servico nesse horario, tentar novamente com outro servico ou em outro horario', 409);
             return;
         }
@@ -663,22 +711,22 @@ class ApiController extends Controller
             'cliente' => $id_cliente
         ];
 
-        if(isset($combo)){
+        if (isset($combo)) {
             $validado['combo'] = $combo;
-        } else{
+        } else {
             $validado['servico'] = $servico;
         }
 
         $addAgendamento = $this->db_agendamento->addAgendamento($validado);
 
-        if(!$addAgendamento){
+        if (!$addAgendamento) {
             self::erro('Erro ao adicionar agendamento', 500);
             return;
         }
 
         $updateDataHorario = $this->db_data->updateDataHorario($tempoMinimo, $tempoMaximo, $data);
 
-        if(!$updateDataHorario){
+        if (!$updateDataHorario) {
             self::erro('Erro ao atualizar datas do agendamento', 500);
             return;
         }
@@ -692,27 +740,27 @@ class ApiController extends Controller
 
 
 
-    
+
 
 
     // -------------------------------- Metodos auxiliares ------------------------------------- //
-    
+
     // Validar Token
     public function verificar(int $id): ?array
     {
         $token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
-        if(preg_match('/Bearer\s(\S+)/', $token, $conteudo) !== 1){
+        if (preg_match('/Bearer\s(\S+)/', $token, $conteudo) !== 1) {
             return null;
         }
 
         $payload = Token::validar_token($conteudo[1]);
 
-        if(is_null($payload)){
+        if (is_null($payload)) {
             return null;
         }
 
-        if((int)$payload['id'] !== $id){
+        if ((int)$payload['id'] !== $id) {
 
             return null;
         }
@@ -728,11 +776,11 @@ class ApiController extends Controller
         header('Content-Type: application/json');
         http_response_code($http);
 
-        if(is_string($mensagem)){
+        if (is_string($mensagem)) {
             echo json_encode([
                 'erro' => $mensagem
             ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        } else{
+        } else {
             echo json_encode($mensagem, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
     }
@@ -795,7 +843,7 @@ class ApiController extends Controller
         $whatsappTratado = filter_var($whatsapp, FILTER_SANITIZE_SPECIAL_CHARS);
 
         if (preg_match('/^\(\d{2}\) \d{5}-\d{4}$/', $whatsappTratado) !== 1) {
-            if(preg_match('/^\(\d{2}\) \d{4}-\d{4}$/', $whatsappTratado) !== 1){
+            if (preg_match('/^\(\d{2}\) \d{4}-\d{4}$/', $whatsappTratado) !== 1) {
                 return false;
             }
         }
