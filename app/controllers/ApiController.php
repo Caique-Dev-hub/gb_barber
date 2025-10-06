@@ -238,8 +238,8 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id);
 
-        if (!$payload) {
-            self::erro('Token expirado ou inválido', 400);
+        if(!$payload){
+            self::erro('Token expirado ou inválido', 500);
             return;
         }
 
@@ -248,54 +248,15 @@ class ApiController extends Controller
 
         $campos = ['nome', 'email', 'whatsapp', 'senha'];
 
-        foreach ($campos as $valor) {
-            if (!isset($input[$valor])) {
-                if ($valor !== 'senha') {
-                    self::erro('Campo obrigátorio não identificado', 404);
-                    return;
-                }
-            }
-        }
-
         if(!isset($input['senha'])){
-            unset($campos[3]);
+            unset($campos['senha']);
         }
 
-        if (count($input) !== count($campos)) {
-            self::erro('Envio do formulário corrompido', 400);
-            return;
-        }
-
-        $tratado = [];
-
-        foreach ($input as $campo => $valor) {
-            match ($campo) {
-                'nome' => $tratado['nome'] = self::tratar_nome($valor),
-                'email' => $tratado['email'] = self::tratar_email($valor),
-                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor),
-                'senha' => $tratado['senha'] = self::tratar_senha($valor)
-            };
-        }
-
-        if (count($input) !== count($tratado)) {
-            self::erro('Erro ao realizar tratamento de um dos campos', 500);
-            return;
-        }
-
-        foreach ($tratado as $campo => $valor) {
-            if (!$valor) {
-                self::erro(match ($campo) {
-                    'nome' => 'Nome inválido, insira o seu nome completo',
-                    'email' => 'E-mail inválido, insira um e-mail válido',
-                    'whatsapp' => 'Whatsapp inválido, insira um numero de whatsapp no formato (xx) xxxxx-xxxx',
-                    'senha' => 'Senha inválida, insira um senha com no minímo 5 dígitos'
-                }, 422);
-                return;
+        foreach($campos as $valor){
+            if(!isset($input[$valor])){
+                self::erro('Campo obrigátorio não ');
             }
         }
-
-        $tratado['email_hash'] = self::hash_email_whatsapp($tratado['email']);
-        $tratado['whatsapp_hash'] = self::hash_email_whatsapp($tratado['whatsapp']);
     }
 
     public function listar_login(int $id): void

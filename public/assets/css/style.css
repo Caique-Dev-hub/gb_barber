@@ -8,7 +8,7 @@ html {
         .site {
             max-width: 1600px;
             margin: 0 auto;
-            min-width: 100%;
+            min-width: 94%;
             height: 100%;
             background-color: #010103;
         }
@@ -29,6 +29,10 @@ html {
         }
     }
 }
+
+
+
+
 
 
 #main-header {
@@ -235,9 +239,6 @@ html {
     min-height: 450px;
     background: linear-gradient(to bottom, #010103, #010103);
 
-    .site {
-        height: 91%;
-    }
 
     .carrossel-wrapper {
         width: 100%;
@@ -384,7 +385,7 @@ html {
 }
 
 .geral-servico1 {
-    height: 73vh;
+    height: 50vh;
 }
 
 .containe {
@@ -987,4 +988,8 @@ html {
 
 #btn-reserva:hover {
     transform: scale(1.1);
+}
+
+.site{
+    min-width: 94%;
 }
