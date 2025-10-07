@@ -15,28 +15,54 @@ class Cliente extends Database
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getEmailAtu(string $email_hash, int $id): array|bool
+    public function getEmailAtu(string $emailHash, int $id): ?int
     {
-        $sql = "SELECT * FROM tbl_cliente WHERE email_hash = :email AND id_cliente != :id AND status_cliente = 'Ativo'";
+        if(empty($emailHash) || empty($id)){
+            return null;
+        }
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':email' => $email_hash,
-            ':id' => $id
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try{
+            $sql = "SELECT id_cliente FROM tbl_cliente 
+            WHERE email_hash = :emailHash AND id_cliente != :cliente AND status_cliente = 'Ativo'";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':emailHash' => $emailHash,
+                ':cliente' => $id
+            ]);
+            
+            $rowCount = $stmt->rowCount();
+
+            return (int)$rowCount ?: 0;
+
+        } catch(PDOException $e){
+            return null;
+        }
     }
 
-    public function getWhatsappAtu(string $whatsapp_hash, int $id): array|bool
+    public function getWhatsappAtu(string $whatsappHash, int $id): ?int
     {
-        $sql = "SELECT * FROM tbl_cliente WHERE whatsapp_hash = :whatsapp AND id_cliente != :id AND status_cliente = 'Ativo'";
+        if(empty($whatsappHash) || empty($id)){
+            return null;
+        }
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':whatsapp' => $whatsapp_hash,
-            ':id' => $id
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try{
+            $sql = "SELECT id_cliente FROM tbl_cliente
+            WHERE whatsapp_hash = :whatsappHash AND id_cliente != :cliente AND status_cliente = 'Ativo'";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':whatsappHash' => $whatsappHash,
+                ':cliente' => $id
+            ]);
+
+            $rowCount = $stmt->rowCount();
+
+            return (int)$rowCount ?: 0;
+
+        } catch(PDOException $e){
+            return null;
+        }
     }
 
     public function getWhatsapp(string $whatsapp_hash): array|bool
@@ -101,44 +127,46 @@ class Cliente extends Database
 
     // UPDATE
 
-    public function updateCadastro(array $campos, int $id): bool
+    public function updateCadastro(array $campos, int $id): ?true
     {
-        extract($campos);
+        foreach($campos as $valor){
+            if(empty($valor)){
+                return null;
+            }
+        }
 
-        if(is_bool($senha)){
-            $sql = "UPDATE tbl_cliente SET
+        if(empty($id)){
+            return null;
+        }
+
+        try{
+            extract($campos);
+
+            $sql = "UPDATE tbl_cliente SET 
             nome_cliente = :nome,
             email_cliente = :email,
-            email_hash = :email_hash,
+            email_hash = :emailHash, 
             whatsapp_cliente = :whatsapp,
-            whatsapp_hash = :whatsapp_hash
-            WHERE id_cliente = :cliente";
-        } else {
-            $sql = "UPDATE tbl_cliente SET
-            nome_cliente = :nome,
-            email_cliente = :email,
-            email_hash = :email_hash,
-            whatsapp_cliente = :whatsapp,
-            whatsapp_hash = :whatsapp_hash,
+            whatsapp_hash = :whatsappHash, 
             senha_cliente = :senha
             WHERE id_cliente = :cliente";
+
+            $stmt = $this->db->prepapre($sql);
+            $stmt->execute([
+                ':cliente' => $id,
+                ':nome' => (string)$nome,
+                ':email' => (string)$email,
+                ':emailHash' => $email_hash,
+                ':whatsapp' => (string)$whatsapp,
+                ':whatsappHash' => $whatsapp_hash,
+                ':senha' => (string)$senha
+            ]);
+
+            return true;
+
+        } catch(PDOException $e){
+            return null;
         }
-
-        $stmt = $this->db->prepare($sql);
-
-        $stmt->bindValue(':nome', $nome, PDO::PARAM_STR);
-        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-        $stmt->bindValue(':email_hash', $email_hash, PDO::PARAM_STR);
-        $stmt->bindValue(':whatsapp', $whatsapp, PDO::PARAM_STR);
-        $stmt->bindValue(':whatsapp_hash', $whatsapp_hash, PDO::PARAM_STR);
-        
-        if(is_string($senha)){
-            $stmt->bindValue(':senha', $senha, PDO::PARAM_STR);
-        }
-
-        $stmt->bindValue(':cliente', $id, PDO::PARAM_INT);
-
-        return $stmt->execute();
     }
 
 

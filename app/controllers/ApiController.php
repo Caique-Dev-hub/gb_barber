@@ -238,8 +238,8 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id);
 
-        if(!$payload){
-            self::erro('Token expirado ou inválido', 500);
+        if (!$payload) {
+            self::erro('Token expirado ou invalido', 400);
             return;
         }
 
@@ -248,15 +248,94 @@ class ApiController extends Controller
 
         $campos = ['nome', 'email', 'whatsapp', 'senha'];
 
-        if(!isset($input['senha'])){
-            unset($campos['senha']);
+        if (!isset($input['senha'])) {
+            unset($campos[3]);
         }
 
-        foreach($campos as $valor){
-            if(!isset($input[$valor])){
-                self::erro('Campo obrigátorio não ');
+        foreach ($campos as $valor) {
+            if (!isset($input[$valor])) {
+                self::erro('Campo obrigatorio nao identificado', 404);
+                return;
             }
         }
+
+        if (count($input) !== count($campos)) {
+            self::erro('Envio do formulario corrompido', 400);
+            return;
+        }
+
+        $tratado = [];
+
+        foreach ($input as $campo => $valor) {
+            match ($campo) {
+                'nome' => $tratado['nome'] = self::tratar_nome($valor),
+                'email' => $tratado['email'] = self::tratar_email($valor),
+                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor),
+                'senha' => $tratado['senha'] = self::tratar_senha($valor)
+            };
+
+            if (!$tratado[$campo]) {
+                $erros['erro'] = match ($campo) {
+                    'nome' => 'Insira o seu nome completo',
+                    'email' => 'Insira um E-mail valido',
+                    'whatsapp' => 'Insira um numero de whatsapp formatado corretamente',
+                    'senha' => 'Insira uma senha com no minimo 5 digitos'
+                };
+            }
+        }
+
+        if (isset($erros) && count($erros) > 0) {
+            self::erro($erros);
+            return;
+        }
+
+        $emailHash = self::hash_email_whatsapp($tratado['email']);
+
+        $getEmailAtu = $this->db_cliente->getEmailAtu($emailHash, $id);
+
+        if(is_null($getEmailAtu)){
+            self::erro('Erro ao realizar consulta no banco', 500);
+            return;
+        }
+
+        if($getEmailAtu > 0){
+            self::erro('Dados ja estao sendo utilizados', 409);
+            return;
+        }
+
+        $whatsappHash = self::hash_email_whatsapp($tratado['whatsapp']);
+
+        $getWhatsappAtu = $this->db_cliente->getWhatsappAtu($whatsappHash, $id);
+
+        if(is_null($getWhatsappAtu)){
+            self::erro('Erro ao realizar consulta no banco', 500);
+            return;
+        }
+
+        if($getWhatsappAtu > 0){
+            self::erro('Dados ja estao sendo utilizados', 409);
+            return;
+        }
+
+        $tratado['whatsapp_hash'] = $whatsappHash;
+        $tratado['email_hash'] = $emailHash;
+
+        $tratado['whatsapp'] = Controller::criptografia($tratado['whatsapp']);
+        $tratado['email'] = Controller::criptografia($tratado['email']);
+
+        if(isset($tratado['senha'])){
+            $tratado['senha'] = password_hash($tratado['senha'], PASSWORD_DEFAULT);
+        }
+
+        $atuCadastro = $this->db_cliente->updateCadastro($tratado, $id);
+        
+        if(is_null($atuCadastro)){
+            self::erro('Erro ao atualizar cadastro', 500);
+            return;
+        }
+
+        self::sucesso('Cadastro atualizado com sucesso', 200);
+        return;
     }
 
     public function listar_login(int $id): void
@@ -280,6 +359,7 @@ class ApiController extends Controller
         $listarLogin['nome'] = $getLogin['nome_cliente'];
         $listarLogin['email'] = Controller::descriptografia($getLogin['email_cliente']);
         $listarLogin['whatsapp'] = Controller::descriptografia($getLogin['whatsapp_cliente']);
+        $listarLogin['senha'] = empty($getLogin['senha_cliente']) || is_null($getLogin['senha_cliente']) ? false : true;
 
         self::exibir_dados($listarLogin);
         return;
