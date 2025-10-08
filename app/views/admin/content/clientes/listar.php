@@ -178,17 +178,6 @@
             color: white;
         }
 
-        .btn-delete1 {
-            background-color: rgba(78, 255, 58, 0.27);
-            color: green;
-            border: none;
-        }
-
-        .btn-delete1:hover {
-            background-color: green;
-            color: white;
-        }
-
         .btn-add {
             background-color: var(--primary-color);
             color: white;
@@ -707,7 +696,7 @@
 
     <div class="container">
         <div class="header">
-            <h1 class="title">Gestão de Serviços</h1>
+            <h1 class="title">Gestão de Clientes</h1>
             <div class="d-flex align-items-center gap-3">
                 <div class="search-box">
                     <i class="fas fa-search search-icon"></i>
@@ -721,366 +710,180 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th style="width: 100px;">Imagem</th>
-                        <th>Serviço</th>
-                        <th>Descrição</th>
-                        <th style="width: 120px;">Valor</th>
-                        <th style="width: 120px;">Duração</th>
+                        <th style="width: 100px;">Nome</th>
+                        <th style="text-align: center;">Telefone</th>
+                        <th style="text-align: center;">E-mail</th>
+                        <th>Avaliações</th>
                         <th style="width: 120px;">Status</th>
-                        <th style="width: 120px;">Ações</th>
+                        <th style="width: 120px;padding: 14px 34px;">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($servicosListar as $atributo) : ?>
+                    <?php foreach ($clientes as $atributo) : ?>
                         <tr>
-                            <td data-label="Imagem">
-                                <img src="<?= URL_BASE ?>assets/img/<?= $atributo['imagem_combo'] ?? $atributo['imagem_servico'] ?>" alt="Corte de Cabelo" class="img-thumbnail">
-                            </td>
                             <td data-label="Serviço">
-                                <div class="service-name"><?= $atributo['nome_combo'] ?? $atributo['nome_servico'] ?></div>
+                                <div class="service-name"><?= $atributo['nome_cliente'] ?></div>
                             </td>
-                            <td data-label="Descrição">
-                                <div class="service-description"><?= $atributo['descricao_combo'] ?? $atributo['descricao_servico'] ?></div>
+                            <td style="text-align: center;" data-label="Whatsapp">
+                                <div class="service-description"><?= Controller::descriptografia($atributo['whatsapp_cliente']) ?></div>
                             </td>
-                            <td data-label="Valor">
-                                <div class="service-price">R$ <?= isset($atributo['valor_servico']) ? str_replace('.', ',', $atributo['valor_servico']) : str_replace('.', ',', $atributo['valor_combo']) ?></div>
+                            <td style="text-align: center;" data-label="E-mail">
+                                <div class="service-price"><?= Controller::descriptografia($atributo['email_cliente']) ?></div>
                             </td>
-                            <td data-label="Duração">
-                                <div class="service-duration">
-                                    <?php
-
-
-                                    $horario = explode(':', $atributo['tempo_estimado']);
-
-                                    if ((int)$horario[0] > 0) {
-                                        if ((int)$horario[1] > 0) {
-                                            echo "$horario[0]h e $horario[1]min";
-                                        } else {
-                                            echo "$horario[0]h";
-                                        }
-                                    } else {
-                                        if ((int)$horario[1] > 0) {
-                                            echo "$horario[1]min";
-                                        }
-                                    }
-
-                                    ?>
-                                </div>
+                            <td data-label="Avaliações">
+                                <?php if ($atributo['estrela_cliente'] == 0) :  ?>
+                                    <div class="service-description">
+                                        <img class="avaliacaoimg" id="avaliacao" data-id="<?= $atributo['id_cliente'] ?>" style="width: 20px; height: 20px;margin-left: 39px; cursor: pointer;" src="<?= URL_BASE ?>assets/img/star.png" alt="">
+                                    </div>
+                                <?php else: ?>
+                                    <div class="service-description">
+                                        <img class="avaliacaoimg" style="width: 20px; height: 20px;margin-left: 39px;" src="<?= URL_BASE ?>assets/img/star2.png" alt="">
+                                    </div>
+                                <?php endif ?>
                             </td>
                             <td data-label="Status">
                                 <?php
-
-                                if (isset($atributo['status_servico'])) {
-                                    if ($atributo['status_servico'] === 'Ativo') {
+                                if (isset($atributo['status_cliente'])) {
+                                    if ($atributo['status_cliente'] === 'Ativo') {
                                         echo "<span class=\"status-badge status-active\">Ativo</span>";
                                     } else {
-                                        echo "<span class=\"status-badge status-inactive\">Inativo</span>";
-                                    }
-                                } else {
-                                    if ($atributo['status_combo'] === 'Ativo') {
-                                        echo "<span class=\"status-badge status-active\">Ativo</span>";
-                                    } else {
-                                        echo "<span class=\"status-badge status-inactive\">Inativo</span>";
+                                        echo "<span class=\"status-badge status-inactive\">Desativado</span>";
                                     }
                                 }
-
-
                                 ?>
                             </td>
                             <td data-label="Ações">
                                 <div class="action-buttons">
-                                    <?php if (isset($atributo['id_servico'])): ?>
-                                        <a href="<?= URL_BASE ?>servico/editar/servico/<?= $atributo['id_servico'] ?>">
-                                            <button class="btn btn-icon btn-edit" title="Editar">
-                                                <i class="fas fa-pen"></i>
-                                            </button>
-                                        </a>
-                                    <?php else: ?>
-                                        <a href="<?= URL_BASE ?>servico/editar/combo/<?= $atributo['id_combo'] ?>">
-                                            <button class="btn btn-icon btn-edit" title="Editar">
-                                                <i class="fas fa-pen"></i>
-                                            </button>
 
-                                        </a>
-                                    <?php endif; ?>
-
-                                    <?php if (isset($atributo['id_servico'])): ?>
-                                        <?php if ($atributo['status_servico'] == 'Ativo') : ?>
-                                            <button class="btn btn-icon btn-delete" data-bs-toggle="modal" data-bs-target="#servico<?= $atributo['id_servico'] ?>" data-id="" title="Remover">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        <?php else: ?>
-                                            <button class="btn btn-icon btn-delete1" data-bs-toggle="modal" data-bs-target="#servico<?= $atributo['id_servico'] ?>" data-id="" title="Remover">
-                                                <i class="">✔</i>
-                                            </button>
-                                        <?php endif; ?>
+                                    <a href="<?= URL_BASE ?>clientes/editar/<?= $atributo['id_cliente'] ?>">
+                                        <button class="btn btn-icon btn-edit" title="Editar">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                    </a>
+                                    <?php if ($atributo['status_cliente'] == 'Ativo') : ?>
+                                        <button class="btn btn-icon btn-delete" data-bs-toggle="modal" data-bs-target="#cliente<?= $atributo['id_cliente'] ?>" data-id="" title="Remover">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     <?php else: ?>
-                                        <?php if ($atributo['status_combo'] == 'Ativo') : ?>
-                                            <button class="btn btn-icon btn-delete " data-bs-toggle="modal" data-bs-target="#combo<?= $atributo['id_combo'] ?>" data-id="" title="Remover">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        <?php else: ?>
-                                            <button class="btn btn-icon btn-delete1 " data-bs-toggle="modal" data-bs-target="#combo<?= $atributo['id_combo'] ?>" data-id="" title="Remover">
-                                                <i class="">✔</i>
-                                            </button>
-                                        <?php endif; ?>
+                                        <button class="btn btn-icon btn-delete" style="background-color: #06d6a0; color: #043024ff;" data-bs-toggle="modal" data-bs-target="#cliente<?= $atributo['id_cliente'] ?>" data-id="" title="Remover">
+                                            <i class="">✔</i>
+                                        </button>
                                     <?php endif ?>
-                                </div>
                             </td>
                         </tr>
-                        <div class="modal fade" id="<?= isset($atributo['id_servico']) ? "servico" . $atributo['id_servico'] : "combo" . $atributo['id_combo'] ?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal fade" id="cliente<?= $atributo['id_cliente'] ?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-                                    <?php if ($atributo['status_servico'] ?? $atributo['status_combo'] === 'Ativo') : ?>
-                                        <div class="modal-body">
-                                            Voçê deseja realmente Desativar este item "<?= $atributo['nome_servico'] ?? $atributo['nome_combo'] ?>" ?
-                                        </div>
-                                    <?php else: ?>
-                                        <div class="modal-body">
-                                            Voçê deseja realmente Ativar este item " <?= $atributo['nome_servico'] ?? $atributo['nome_combo'] ?>" ?
-                                            </div>
-                                        <?php endif; ?>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <?php if ($atributo['status_servico'] ?? $atributo['status_combo'] == 'Ativo') : ?>
-                                                <a href="<?= URL_BASE ?>servico/excluir/<?= isset($atributo['id_servico']) ? "servico" : "combo" ?>/<?= $atributo['id_servico'] ?? $atributo['id_combo'] ?>">
-                                                    <button class="btn btn-primary" id="addServico">Desativar</button>
-                                                </a>
-                                            <?php else : ?>
-                                                <a href="<?= URL_BASE ?>servico/ativar/<?= isset($atributo['id_servico']) ? "servico" : "combo" ?>/<?= $atributo['id_servico'] ?? $atributo['id_combo'] ?>">
-                                                    <button class="btn btn-primary" id="addServico">Ativar</button>
-                                                </a>
-                                            <?php endif; ?>
-                                        </div>
+                                    <div class="modal-body">
+                                        Voçê deseja realmente excluir este cliente "<?= $atributo['nome_cliente'] ?>" ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <?php if ($atributo['status_cliente'] == 'Ativo'): ?>
+                                            <a href="<?= URL_BASE ?>clientes/excluir/<?= $atributo['id_cliente'] ?>">
+                                                <button class="btn btn-primary" id="addServico">Desativar</button>
+                                            </a>
+                                        <?php else : ?>
+                                            <a href="<?= URL_BASE ?>clientes/ativar/<?= $atributo['id_cliente'] ?>">
+                                                <button class="btn btn-primary" id="addServico">Ativar</button>
+                                            </a>
+                                        <?php endif ?>
+                                    </div>
+
                                 </div>
                             </div>
-                        <?php endforeach ?>
+                        </div>
+                    <?php endforeach ?>
+                    <div id="serviceModal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Novo Cliente</h2>
+                                <span class="close">&times;</span>
+                            </div>
+
+                            <div class="tab-buttons">
+                                <button class="tab-btn active" type="button" data-name="servico" onclick="openTab('service-tab')">Cliente</button>
+                            </div>
+
+                            <form id="service-tab" class="tab-content active" method="post" action="<?= URL_BASE ?>clientes/adicionar" enctype="multipart/form-data">
+
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="nome_servico" class="form-label">Nome do Cliente</label>
+                                            <input type="text" id="nome_servico" name="nome" class="tab-content active" placeholder="" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="valor_servico" class="form-label">Email</label>
+                                            <input type="text" id="nome_servico" name="email" class="tab-content active" placeholder="" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="tempo_servico" class="form-label">Whatsapp</label>
+                                            <input type="text" id="telefone" name="whatsapp" class="tab-content active" placeholder="" required>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="descricao_servico" class="form-label">Senha</label>
+                                    <input type="password" id="nome_servico" name="senha" class="tab-content active" placeholder="" required>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button class="btn btn-cancel">Cancelar</button>
+                                    <button class="btn btn-save" id="addServico" type="submit">Salvar Serviço</button>
+                                </div>
+                            </form>
+
+
+                        </div>
+                    </div>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div id="serviceModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Novo Serviço/Combo</h2>
-                <span class="close">&times;</span>
-            </div>
 
-            <div class="tab-buttons">
-                <button class="tab-btn active" type="button" data-name="servico" onclick="openTab('service-tab')">Serviço Individual</button>
-                <button class="tab-btn" type="button" data-name="combo" onclick="openTab('combo-tab')">Combo de Serviços</button>
-            </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            <form id="service-tab" class="tab-content active" method="post" action="<?= URL_BASE ?>servico/adicionarServico" enctype="multipart/form-data">
-                <!-- Upload de imagem -->
-                <div class="form-group">
-                    <label for="imagem_servico">Imagem:</label>
-                    <input type="file" id="imagem_servico" accept="image/*" name="imagem_servico">
-                    <br>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label for="nome_servico" class="form-label">Nome do Serviço</label>
-                            <input type="text" id="nome_servico" name="nome_servico" class="form-control" placeholder="Ex: Corte de Cabelo Masculino" required>
-                        </div>
-                    </div>
-
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label for="valor_servico" class="form-label">Valor (R$)</label>
-                            <input type="number" id="valor_servico" name="valor_servico" class="form-control" step="0.01" placeholder="Ex: 45,90" required>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label for="tempo_servico" class="form-label">Tempo Estimado (min)</label>
-                            <input type="text" id="tempo_servico" name="tempo_servico" class="form-control" placeholder="Ex: 30" required>
-                        </div>
-                    </div>
-
-                    <div class="form-col">
-                        <!-- Espaço reservado para possível segundo campo -->
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="descricao_servico" class="form-label">Descrição</label>
-                    <textarea id="descricao_servico" name="descricao_servico" class="form-control" placeholder="Descreva detalhes sobre o serviço..."></textarea>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-cancel">Cancelar</button>
-                    <button class="btn btn-save" id="addServico" type="submit">Salvar Serviço</button>
-                </div>
-            </form>
-
-            <form id="combo-tab" class="tab-content" method="post" action="<?= URL_BASE ?>servico/adicionarCombo" enctype="multipart/form-data">
-                <!-- Upload de imagem para combo -->
-                <div class="form-group">
-                    <label for="imagem_servico">Imagem:</label>
-                    <input type="file" id="imagem_combo" accept="image/*" name="imagem_combo">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label for="servico1" class="form-label">Primeiro Serviço</label>
-                            <select name="servico1" id="servico1" class="form-control">
-                                <option value="">Selecione um serviço</option>
-                                <?php foreach ($servicosAdicionar as $atributos) : ?>
-                                    <option value="<?= $atributos['id_servico'] ?>"><?= $atributos['nome_servico'] ?></option>
-                                <?php endforeach ?>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label for="servico2" class="form-label">Segundo Serviço</label>
-                            <select name="servico2" id="servico2" class="form-control">
-                                <option value="">Selecione um serviço</option>
-                                <?php foreach ($servicosAdicionar as $atributos) : ?>
-                                    <option value="<?= $atributos['id_servico'] ?>"><?= $atributos['nome_servico'] ?></option>
-                                <?php endforeach ?>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label for="combo-value" class="form-label">Valor Total (R$)</label>
-                            <input name="valor" type="text" id="combo-value" class="form-control" placeholder="Ex: 75,00">
-                        </div>
-                    </div>
-
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label for="combo-time" class="form-label">Tempo Total (min)</label>
-                            <input name="tempo" type="text" id="combo-time" class="form-control" placeholder="Ex: 60">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="combo-description" class="form-label">Descrição</label>
-                    <textarea name="descricao" id="combo-description" class="form-control" placeholder="Descreva o que está incluído no combo..."></textarea>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-cancel">Cancelar</button>
-                    <button class="btn btn-save" type="submit" id="addServico">Salvar Combo</button>
-                </div>
-            </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        </div>
-    </div>
-
-
+    <script>
+        document.querySelectorAll('.avaliacaoimg').foreach(valor => [
+            valor.addEventListener('click', function() {
+                const id = this.dataset.id;
+
+                fetch(`<?= URL_BASE ?>cliente/addestrela/${id}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        alert(data)
+                        console.log(data)
+                    })
+                    .catch(error => {
+                        console.error(error)
+                    })
+            })
+        ])
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-
+    <script>
+        document.getElementById('telefone').addEventListener('input', function(e) {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+    </script>
     <script>
         // Abrir modal
         document.getElementById('openModal').onclick = function() {

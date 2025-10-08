@@ -594,7 +594,7 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
         <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
             <ul class="navbar-nav">
                 <li class="nav-item" style="cursor: pointer;">
-                    <a href="<?= URL_BASE ?>dash/listar/agendamento" class="nav-link active text-white bg-gradient-danger">
+                    <a href="<?= URL_BASE ?>dash" class="nav-link active text-white bg-gradient-danger">
                         <span class="nav-link-text ms-1">Reservas</span>
                     </a>
                 </li>
@@ -604,7 +604,7 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white">
+                    <a class="nav-link text-white" href="<?= URL_BASE ?>clientes/listar">
                         <span class="nav-link-text ms-1">Clientes</span>
                     </a>
                 </li>

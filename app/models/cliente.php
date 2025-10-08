@@ -4,6 +4,30 @@ class Cliente extends Database
 {
 
     // GET
+    public function getcliente(){
+        $sql = "SELECT * FROM tbl_cliente ";
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function deletecliente($id){
+
+        $sql = "UPDATE tbl_cliente SET status_cliente = 'Inativo' WHERE id_cliente = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':id' => $id
+        ]);
+
+    }
+
+    public function AtivarCliente($id){
+        $sql = "UPDATE tbl_cliente SET status_cliente = 'Ativo' WHERE id_cliente = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':id' => $id
+        ]);
+    }
+
     public function getEmail(string $email_hash): array|bool
     {
         $sql = "SELECT * FROM tbl_cliente WHERE email_hash = :email AND status_cliente = 'Ativo'";
@@ -15,28 +39,55 @@ class Cliente extends Database
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getEmailAtu(string $email_hash, int $id): array|bool
+    public function getEmailAtu(string $emailHash, int $id): ?int
     {
-        $sql = "SELECT * FROM tbl_cliente WHERE email_hash = :email AND id_cliente != :id AND status_cliente = 'Ativo'";
+        if(empty($emailHash) || $id <= 0){
+            return null;
+        }
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':email' => $email_hash,
-            ':id' => $id
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try{
+            $sql = "SELECT id_cliente FROM tbl_cliente 
+            WHERE email_hash = :emailHash AND id_cliente != :cliente AND status_cliente = 'Ativo'";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':emailHash' => $emailHash,
+                ':cliente' => $id
+            ]);
+
+            $rowCount = $stmt->rowCount();
+
+            return (int)$rowCount ?? null;
+
+        } catch(PDOException $e){
+            return null;
+        }
     }
 
-    public function getWhatsappAtu(string $whatsapp_hash, int $id): array|bool
+    public function getWhatsappAtu(string $whatsappHash, int $id): ?int
     {
-        $sql = "SELECT * FROM tbl_cliente WHERE whatsapp_hash = :whatsapp AND id_cliente != :id AND status_cliente = 'Ativo'";
+        if(empty($whatsappHash) || $id <= 0){
+            return null;
+        }
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':whatsapp' => $whatsapp_hash,
-            ':id' => $id
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+
+        try{
+            $sql = "SELECT id_cliente FROM tbl_cliente
+            WHERE whatsapp_hash = :whatsappHash AND id_cliente != :cliente AND status_cliente";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':whatsappHash' => $whatsappHash,
+                ':cliente' => $id
+            ]);
+
+            $rowCount = $stmt->rowCount();
+
+            return (int)$rowCount ?: null;
+
+        } catch(PDOException $e){
+            return null;
+        }
     }
 
     public function getWhatsapp(string $whatsapp_hash): array|bool
@@ -74,6 +125,44 @@ class Cliente extends Database
         ]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    
+    public function getClienteByid($id){
+        $sql = "SELECT * FROM tbl_cliente WHERE id_cliente = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $id
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getSenhaCliente(int $id): ?bool
+    {
+        if($id <= 0){
+            return null;
+        }
+
+        try{
+            $sql = "SELECT senha_cliente FROM tbl_cliente WHERE id_cliente = :cliente AND status_cliente = 'Ativo' LIMIT 1";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':cliente' => $id
+            ]);
+
+            $senha = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return is_null($senha['senha_cliente']) || empty($senha['senha_cliente']) ? false : true;
+
+        } catch(PDOException $e){
+            return null;
+        }
+    }
+
+
+
+
+
+
 
 
     // ADD
@@ -96,50 +185,104 @@ class Cliente extends Database
         return $this->db->lastInsertId();
     }
 
+    public function addCliente($campos){
+        extract($campos);
+        $sql = "INSERT INTO tbl_cliente (nome_cliente, email_cliente, 
+        email_hash, whatsapp_cliente,whatsapp_hash, senha_cliente) 
+        VALUES (:nome,:email,:email_hash,:whatsapp,:whatsapp_hash, :senha)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':nome' => $nome,
+            ':email'=> $email,
+            ':email_hash'=> $email_hash,
+            ':whatsapp'=> $whatsapp,
+            ':whatsapp_hash' => $whatsapp_hash,
+            ':senha' => $senha
+        ]);
+    }
+
+
+
+
+
 
 
 
     // UPDATE
 
-    public function updateCadastro(array $campos, int $id): bool
+    public function updateCadastro(array $campos, int $id): ?true
     {
-        extract($campos);
-
-        if(is_bool($senha)){
-            $sql = "UPDATE tbl_cliente SET
-            nome_cliente = :nome,
-            email_cliente = :email,
-            email_hash = :email_hash,
-            whatsapp_cliente = :whatsapp,
-            whatsapp_hash = :whatsapp_hash
-            WHERE id_cliente = :cliente";
-        } else {
-            $sql = "UPDATE tbl_cliente SET
-            nome_cliente = :nome,
-            email_cliente = :email,
-            email_hash = :email_hash,
-            whatsapp_cliente = :whatsapp,
-            whatsapp_hash = :whatsapp_hash,
-            senha_cliente = :senha
-            WHERE id_cliente = :cliente";
+        if($id <= 0){
+            return null;
         }
 
-        $stmt = $this->db->prepare($sql);
+        try{
+            extract($campos);
 
-        $stmt->bindValue(':nome', $nome, PDO::PARAM_STR);
-        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-        $stmt->bindValue(':email_hash', $email_hash, PDO::PARAM_STR);
-        $stmt->bindValue(':whatsapp', $whatsapp, PDO::PARAM_STR);
-        $stmt->bindValue(':whatsapp_hash', $whatsapp_hash, PDO::PARAM_STR);
-        
-        if(is_string($senha)){
-            $stmt->bindValue(':senha', $senha, PDO::PARAM_STR);
+            if(!isset($senha)){
+                $sql = "UPDATE tbl_cliente SET
+                nome_cliente = :nome,
+                email_cliente = :email,
+                email_hash = :emailHash,
+                whatsapp_cliente = :whatsapp,
+                whatsapp_hash = :whatsappHash,
+                WHERE id_cliente = :cliente AND status_cliente = 'Ativo'";
+
+            } else {
+                $sql = "UPDATE tbl_cliente SET
+                nome_cliente = :nome,
+                email_cliente = :email,
+                email_hash = :emailHash,
+                whatsapp_cliente = :whatsapp,
+                whatsapp_hash = :whatsappHash,
+                senha_cliente = :senha
+                WHERE id_cliente = :cliente AND status_cliente = 'Ativo'";
+            }
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':cliente', $id, PDO::PARAM_INT);
+            $stmt->bindValue(':nome', (string)$nome, PDO::PARAM_STR);
+            $stmt->bindValue(':email', (string)$email, PDO::PARAM_STR);
+            $stmt->bindValue(':emailHash', (string)$emailHash, PDO::PARAM_STR);
+            $stmt->bindValue(':whatsapp', (string)$whatsapp, PDO::PARAM_STR);
+            $stmt->bindValue(':whatsappHash', (string)$whatsappHash, PDO::PARAM_STR);
+
+            if(isset($senha)){
+                $stmt->bindValue(':senha', (string)$senha, PDO::PARAM_STR);
+            }
+
+            $stmt->execute();
+
+            return true;
+            
+        } catch(PDOException $e){
+            return null;
         }
-
-        $stmt->bindValue(':cliente', $id, PDO::PARAM_INT);
-
-        return $stmt->execute();
     }
+
+    public function updateCliente($cliente){
+        extract($cliente);
+
+        $sql = "UPDATE tbl_cliente SET nome_cliente = :cliente, 
+        whatsapp_cliente = :telefone, email_cliente = :email WHERE id_cliente =  :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':cliente' => $nome,
+            ':telefone' => $telefone,
+            ':email' => $email,
+            ':id' => $id
+        ]);
+    }
+
+    public function addestrela($id){
+        $sql = "UPDATE tbl_cliente SET estrela_cliente = 1 WHERE id_cliente = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $id
+        ]);
+    }
+
+
 
 
 

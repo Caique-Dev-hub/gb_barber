@@ -19,9 +19,26 @@ class Servico extends Database
         ]);
     }
 
+    public function adicionarCombo($dados){
+       extract($dados);
+       $sql = "INSERT INTO tbl_combo_servico(id_servico_1, id_servico_2, nome_combo, valor_combo, descricao_combo, tempo_estimado, imagem_combo, alt_combo)
+       VALUES (:id1,:id2,:nome, :valor, :descricao, :tempo, :imagem, :alt)";
+       $stmt = $this->db->prepare($sql);
+       return $stmt->execute([
+        ':id1' => $id1,
+        ':id2' => $id2,
+        ':nome' => $combo,
+        ':valor' => $valor,
+        ':descricao' => $descricao,
+        ':tempo' => $tempo,
+        ':imagem' => $imagem,
+        ':alt' => $combo,
+    ]);
+    }
+
     public function salvarCombo($dadosAtualizacaoCombo)
     {
-        $sql = "UPDATE tbl_combo SET nome_combo = :nome,
+        $sql = "UPDATE tbl_combo_servico SET nome_combo = :nome,
         valor_combo = :valor,tempo_estimado = :tempo,imagem_combo = :imagem, descricao_combo = :descricao
         WHERE id_combo = :id";
 
@@ -55,6 +72,8 @@ class Servico extends Database
         return $stmt->rowCount();
     }
 
+
+
     public function getServicosByid($id)
     {
         $sql = "SELECT * FROM tbl_servico WHERE id_servico = :id ORDER BY id_servico ASC";
@@ -78,22 +97,20 @@ class Servico extends Database
 
     public function deletarServico($id)
     {
-        $this->db->query("SET FOREIGN_KEY_CHECKS = 0");
-        $sql = "DELETE FROM tbl_servico WHERE id_servico = :id ";
+        $sql = "UPDATE tbl_servico SET status_servico = 'Inativo' WHERE id_servico = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([
+        return $stmt->execute([
             ':id' => $id
         ]);
-        return $this->db->query("SET FOREIGN_KEY_CHECKS = 1");
     }
 
     public function deletarCombo($id)
     {
         $this->db->query("SET FOREIGN_KEY_CHECKS = 0");
 
-        $sql = "DELETE FROM tbl_combo_servico WHERE id_combo = :id ";
+        $sql = "UPDATE tbl_combo_servico SET status_combo = 'Inativo' WHERE id_combo = :id ";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([
+        return $stmt->execute([
             ':id' => $id
         ]);
 
@@ -102,7 +119,7 @@ class Servico extends Database
     
     public function getServicos()
     {
-        $sql = "SELECT * FROM tbl_servico WHERE status_servico = 'Ativo' ORDER BY id_servico ASC";
+        $sql = "SELECT * FROM tbl_servico  ORDER BY id_servico ASC";
 
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -132,7 +149,7 @@ class Servico extends Database
 
     public function getCombos()
     {
-        $sql = "SELECT * FROM tbl_combo_servico WHERE status_combo = 'Ativo' ORDER BY id_combo ASC LIMIT 3";
+        $sql = "SELECT * FROM tbl_combo_servico  ORDER BY id_combo ASC LIMIT 3";
 
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -140,7 +157,7 @@ class Servico extends Database
 
     public function getcombotodos()
     {
-        $sql = "SELECT * FROM tbl_combo_servico WHERE status_combo = 'Ativo' ORDER BY id_combo ASC";
+        $sql = "SELECT * FROM tbl_combo_servico  ORDER BY id_combo ASC";
 
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
@@ -177,6 +194,22 @@ class Servico extends Database
             ':tempo' => (string)$tempo,
             ':imagem' => (string)$imagem,
             ':alt' => (string)$nome
+        ]);
+    }
+
+    public function alterStatusServico($id){
+        $sql = "UPDATE tbl_servico SET status_servico = 'Ativo' WHERE id_servico = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':id' => $id
+        ]);
+    }
+
+    public function alterStatusCombo($id){
+        $sql = "UPDATE tbl_combo_servico SET status_combo = 'Ativo' WHERE id_servico = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':id' => $id
         ]);
     }
 }

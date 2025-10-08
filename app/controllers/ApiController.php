@@ -238,8 +238,8 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id);
 
-        if(is_null($payload)){
-            self::erro('Token expirado ou invalido', 400);
+        if(!$payload){
+            self::erro('Token expirado ou inválido', 400);
             return;
         }
 
@@ -248,113 +248,123 @@ class ApiController extends Controller
 
         $campos = ['nome', 'email', 'whatsapp', 'senha'];
 
+        if(!isset($input['senha'])){
+            unset($campos[3]);
+        }
+
         foreach($campos as $valor){
             if(!isset($input[$valor])){
-                self::erro('Campo obrigatorio nao identificado', 404);
+                self::erro('Campo obrigátorio não identificado', 404);
                 return;
             }
         }
 
         if(count($input) !== count($campos)){
-            self::erro('Envio do formulario corrompido', 400);
+            self::erro('Envio dos dados corrompido', 400);
             return;
         }
 
-        foreach($input as $campo => $valor){
-            if($campo === 'senha'){
-                continue;
-            }
+        $tratato = [];
 
+        foreach($input as $campo => $valor){
             match($campo){
                 'nome' => $tratado['nome'] = self::tratar_nome($valor),
                 'email' => $tratado['email'] = self::tratar_email($valor),
-                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor)
+                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor),
+                'senha' => $tratado['senha'] = self::tratar_senha($valor)
             };
 
             if(!$tratado[$campo]){
                 $erros['erro'] = match($campo){
-                    'nome' => 'Insira seu nome completo e valido',
-                    'email' => 'Insira seu E-mail valido',
-                    'whatsapp' => 'Insira seu numero de Whatsapp no formato (xx) xxxxx-xxxx ou (xx) xxxx-xxxx'
+                    'nome' => 'Insira o seu nome completo',
+                    'email' => 'Insira o seu E-mail válido',
+                    'whatsapp' => 'Insira um numero de whatsapp válido',
+                    'senha' => 'Insira uma senha com no minímo 5 digitos'
                 };
             }
         }
 
-        if(is_string($input['senha'])){
-            $tratado['senha'] = self::tratar_senha($input['senha']);
-
-            if(!$tratado['senha']){
-                $erros['erro'] = 'Sua senha precisa conter 5 digitos ou mais';
-            } else {
-                $tratado['senha'] = password_hash($tratado['senha'], PASSWORD_DEFAULT);
-            }
-        } else {
-            $tratado['senha'] = $input['senha'];
-        }
-
-        if(isset($erros)){
+        if(isset($erros) && count($erros) > 0){
             self::erro($erros);
             return;
         }
 
-        $email_hash = self::hash_email_whatsapp($tratado['email']);
 
-        $getEmail = $this->db_cliente->getEmailAtu($email_hash, $id);
+        $emailHash = self::hash_email_whatsapp($tratado['email']);
 
-        if($getEmail !== false){
-            self::erro('Dados inseridos ja estao sendo utilizados', 409);
+        $getEmailAtu = $this->db_cliente->getEmailAtu($emailHash, $id);
+
+        if(!is_numeric($getEmailAtu)){
+            self::erro('Erro ao consultar E-mails para atualizar', 500);
             return;
         }
 
-        $whatsapp_hash = self::hash_email_whatsapp($tratado['whatsapp']);
-
-        $getWhatsapp = $this->db_cliente->getWhatsappAtu($whatsapp_hash, $id);
-
-        if($getWhatsapp !== false){
-            self::erro('Dados inseridos ja estao sendo utilizados', 409);
+        if($getEmailAtu > 0){
+            self::erro('Dados já estão sendo utilizados', 409);
             return;
         }
+
+        $whatsappHash = self::hash_email_whatsapp($tratado['whatsapp']);
+
+        $getWhatsappAtu = $this->db_cliente->getWhatsappAtu($whatsappHash, $id);
+
+        if(!is_numeric($getWhatsappAtu)){
+            self::erro('Erro ao buscar Whatsapp para atualizar', 500);
+            return;
+        }
+
+        if($getWhatsappAtu > 0){
+            self::erro('Dados já estão sendo utilizados', 409);
+            return;
+        }
+
+        $tratado['emailHash'] = $emailHash;
+        $tratado['whatsappHash'] = $whatsappHash;
 
         $tratado['email'] = Controller::criptografia($tratado['email']);
         $tratado['whatsapp'] = Controller::criptografia($tratado['whatsapp']);
 
-        $tratado['email_hash'] = $email_hash;
-        $tratado['whatsapp_hash'] = $whatsapp_hash;
+        if(isset($tratado['senha'])){
+            $tratado['senha'] = password_hash($tratado['senha'], PASSWORD_DEFAULT);
+        }
 
-        $updateCadastro = $this->db_cliente->updateCadastro($tratado, $id);
+        $atuCadastro = $this->db_cliente->updateCadastro($tratado, $id);
 
-        if(!$updateCadastro){
+        if(is_null($atuCadastro)){
             self::erro('Erro ao atualizar cadastro', 500);
             return;
         }
 
-        self::sucesso('Cadastro atualizado com sucesso');
+        self::sucesso('Cadastro atualizado com sucesso', 200);
         return;
     }
 
     public function listar_login(int $id): void
     {
-        $payload = $this->verificar($id);
-
-        if(is_null($payload)){
-            self::erro('Token invalido', 404);
-            return;
-        }
-
         header('Content-Type: application/json');
 
-        $getLogin = $this->db_cliente->getDetalheCliente((int)$payload['id']);
+        $payload = $this->verificar($id);
 
-        if(!$getLogin){
-            self::erro('Erro ao retornar dados do Login', 500);
+        if(!$payload){
+            self::erro('Token expirado ou inválido', 400);
             return;
         }
 
-        $listarLogin['nome'] = $getLogin['nome_cliente'];
-        $listarLogin['email'] = Controller::descriptografia($getLogin['email_cliente']);
-        $listarLogin['whatsapp'] = Controller::descriptografia($getLogin['whatsapp_cliente']);
+        $getCadastro  = $this->db_cliente->getClienteByid($id);
 
-        self::exibir_dados($listarLogin);
+        if(!$getCadastro){
+            self::erro('Erro ao retornar todos os dados do usuario logado', 500);
+            return;
+        }
+
+        $dataLogin = [
+            'nome' => $getCadastro['nome_cliente'],
+            'email' => Controller::descriptografia($getCadastro['email_cliente']),
+            'whatsapp' => Controller::descriptografia($getCadastro['whatsapp_cliente']),
+            'senha' => empty($getCadastro['senha_cliente']) || is_null($getCadastro['senha_cliente']) ? true : false
+        ];
+
+        self::exibir_dados($dataLogin);
         return;
     }
 

@@ -4,14 +4,37 @@
     class ServicoController extends Controller
     {
         // CRUD
+        public function ativar($tipo, $id)
+        {
+            $dados = [];
+            if ($tipo === "servico") {
+                $ativarStatus = $this->db_servico->alterStatusServico($id);
+                if (!$ativarStatus) {
+                    echo "status Não Ativado, tente novamente";
+                    return;
+                } else {
+                    header('Location:' . URL_BASE . 'servico/listar');
+                    exit;
+                }
+            } else {
+                $ativarStatus = $this->db_servico->alterStatusCombo($id);
+                if (!$ativarStatus) {
+                    echo "status Não Ativado, tente novamente";
+                    return;
+                } else {
+                    header('Location:' . URL_BASE . 'servico/listar');
+                    exit;
+                }
+            }
+        }
         public function excluir($tipo, $id)
         {
             $dados = [];
-
             if ($tipo === "servico") {
                 $deleteservico = $this->db_servico->deletarServico($id);
                 if (!$deleteservico) {
                     echo ("Serviço não encontrado");
+                    return;
                 } else {
                     header('Location:' . URL_BASE . 'servico/listar');
                     exit;
@@ -150,11 +173,14 @@
                     return;
                 }
 
+                $segundo = $tempo * 60;
+                $tempoServico = gmdate('H:i:s', $segundo);
+
                 $dados = [
                     'imagem' => $imagem['name'],
                     'nome' => $nome,
                     'valor' => (float)$valor,
-                    'tempo' => $tempo,
+                    'tempo' => $tempoServico,
                     'descricao' => $descricao,
                 ];
 
@@ -174,6 +200,68 @@
         public function adicionarCombo(): void
         {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $dados = [];
+
+                $imagem = $_FILES['imagem_combo'];
+                $servico1 = filter_input(INPUT_POST, 'servico1', FILTER_SANITIZE_SPECIAL_CHARS);
+                $servico2 = filter_input(INPUT_POST, 'servico2', FILTER_SANITIZE_SPECIAL_CHARS);
+                $valor = filter_input(INPUT_POST, 'valor', FILTER_SANITIZE_NUMBER_FLOAT);
+                $tempo = filter_input(INPUT_POST, 'tempo', FILTER_SANITIZE_NUMBER_INT);
+                $descricao = filter_input(INPUT_POST, 'descricao', FILTER_SANITIZE_SPECIAL_CHARS);
+
+                if (!isset($imagem)) {
+                    echo ("Campo imagem vazio");
+                    return;
+                }
+                if (!$servico1) {
+                    echo ("Campo servico1 vazio");
+                    return;
+                };
+                if (!$servico2) {
+                    echo ("Campo servico2 vazio");
+                    return;
+                };
+                if (!$valor) {
+                    echo ("Campo valor vazio");
+                    return;
+                };
+                if (!$tempo) {
+                    echo ("Campo tempo vazio");
+                    return;
+                };
+                if (!$descricao) {
+                    echo ("Campo descrição vazio");
+                    return;
+                };
+
+                $ser1 = $this->db_servico->getServicosByid($servico1);
+                $ser2 = $this->db_servico->getServicosByid($servico2);
+
+                $segundo = $tempo * 60;
+                $tempoFormado = gmdate('H:i:s', $segundo);
+
+
+                $combo = $ser1['nome_servico'] . ' + ' . $ser2['nome_servico'];
+
+                $dados = [
+                    'id1' => $ser1['id_servico'],
+                    'id2' => $ser2['id_servico'],
+                    'imagem' => $imagem['name'],
+                    'combo' => $combo,
+                    'valor' => (float)$valor,
+                    'tempo' => $tempoFormado,
+                    'descricao' => $descricao,
+                ];
+
+                $respostaCombo = $this->db_servico->adicionarCombo($dados);
+                var_dump($tempo);
+                if (!$respostaCombo) {
+                    echo "erro ao criar combo";
+                    return;
+                } else {
+                    header('Location:' . URL_BASE . 'servico/listar');
+                    exit;
+                }
             }
         }
 
