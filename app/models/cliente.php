@@ -28,6 +28,29 @@ class Cliente extends Database
         ]);
     }
 
+    public function getEmailCadastro(string $emailHash): ?int
+    {
+        if(empty($emailHash)){
+            return null;
+        }
+
+        try{
+            $sql = "SELECT id_cliente FROM tbl_cliente WHERE email_hash = :emailHash AND status_cliente = 'Ativo'";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':emailHash' => $emailHash ?? null
+            ]);
+
+            $rowCount = $stmt->rowCount();
+
+            return (int)$rowCount;
+
+        } catch(PDOException $e){
+            return null;
+        }
+    }
+
     public function getEmail(string $email_hash): array|bool
     {
         $sql = "SELECT * FROM tbl_cliente WHERE email_hash = :email AND status_cliente = 'Ativo'";
@@ -83,7 +106,30 @@ class Cliente extends Database
 
             $rowCount = $stmt->rowCount();
 
-            return (int)$rowCount ?: null;
+            return (int)$rowCount;
+
+        } catch(PDOException $e){
+            return null;
+        }
+    }
+
+    public function getWhatsappCadastro(string $whatsappHash): ?int
+    {
+        if(empty($whatsappHash)){
+            return null;
+        }
+
+        try{
+            $sql = "SELECT id_cliente FROM tbl_cliente WHERE whatsapp_hash = :whatsappHash AND status_cliente = 'Ativo'";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':whatsappHash' => $whatsappHash ?? null
+            ]);
+
+            $rowCount = $stmt->rowCount();
+
+            return (int)$rowCount;
 
         } catch(PDOException $e){
             return null;
@@ -166,23 +212,37 @@ class Cliente extends Database
 
 
     // ADD
-    public function addCadastro(array $campos): int
+    public function addCadastro(array $campos): ?int
     {
-        extract($campos);
+        foreach($campos as $valor){
+            if(empty($valor)){
+                return null;
+            }
+        }
 
-        $sql = "INSERT INTO tbl_cliente (nome_cliente, email_cliente, email_hash, whatsapp_cliente, whatsapp_hash, senha_cliente)
-        VALUES (:nome, :email, :email_hash, :whatsapp, :whatsapp_hash, :senha)";
+        try{
+            extract($campos);
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':nome' => (string)$nome,
-            ':email' => (string)$email,
-            ':email_hash' => (string)$email_hash,
-            ':whatsapp' => (string)$whatsapp,
-            ':whatsapp_hash' => (string)$whatsapp_hash,
-            ':senha' => (string)$senha
-        ]);
-        return $this->db->lastInsertId();
+            $sql = "INSERT INTO tbl_cliente (nome_cliente, email_cliente, email_hash, whatsapp_cliente, whatsapp_hash, senha_cliente)
+            VALUES (:nome, :email, :emailHash, :whatsapp, :whatsappHash, :senha)";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':nome' => (string)$nome ?? null,
+                ':email' => (string)$email ?? null,
+                ':emailHash' => (string)$emailHash ?? null,
+                ':whatsapp' => (string)$whatsapp ?? null,
+                ':whatsappHash' => (string)$whatsappHash ?? null,
+                ':senha' => (string)$senha ?? null
+            ]);
+
+            $id = $this->db->lastInsertId();
+
+            return (int)$id ?: null;
+
+        } catch(PDOException $e){
+            return null;
+        }
     }
 
     public function addCliente($campos){
@@ -225,7 +285,7 @@ class Cliente extends Database
                 email_cliente = :email,
                 email_hash = :emailHash,
                 whatsapp_cliente = :whatsapp,
-                whatsapp_hash = :whatsappHash,
+                whatsapp_hash = :whatsappHash
                 WHERE id_cliente = :cliente AND status_cliente = 'Ativo'";
 
             } else {
@@ -256,6 +316,12 @@ class Cliente extends Database
             return true;
             
         } catch(PDOException $e){
+            
+            echo json_encode([
+                'error' => $e->getMessage()
+            ]);
+            exit;
+
             return null;
         }
     }

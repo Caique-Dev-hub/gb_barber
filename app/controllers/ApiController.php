@@ -5,94 +5,84 @@ class ApiController extends Controller
     // Cliente
     public function add_cadastro(): void
     {
+        header('Content-Type: applcation/json');
+
         $input = file_get_contents('php://input');
         $input = json_decode($input, true);
-
-        header('Content-Type: application/json');
 
         $campos = ['nome', 'email', 'whatsapp', 'senha'];
 
         foreach($campos as $valor){
             if(!isset($input[$valor])){
-                self::erro('Campo obrigatório não identificado, tentar novamente pelo formulário', 400);
+                self::erro('Campo obrigátorio não identificado', 404);
                 return;
             }
         }
 
         if(count($input) !== count($campos)){
-            self::erro('Envio formulário corrompido', 400);
+            self::erro('Envio de dados adicionais', 400);
             return;
         }
 
         foreach($input as $campo => $valor){
             match($campo){
-                'nome' => $tratado['nome'] = self::tratar_nome($valor),
-                'email' => $tratado['email'] = self::tratar_email($valor),
-                'whatsapp' => $tratado['whatsapp'] = self::tratar_whatsapp($valor),
-                'senha' => $tratado['senha'] = self::tratar_senha($valor)
+                'nome' => $input[$campo] = self::tratar_nome($valor),
+                'email' => $input[$campo] = self::tratar_email($valor),
+                'whatsapp' => $input[$campo] = self::tratar_whatsapp($valor),
+                'senha' => $input[$campo] = self::tratar_senha($valor)
             };
 
-            if(!$tratado[$campo]){
-                $erros['erro'] = match($campo){
+            if(is_null($input[$campo])){
+                $erros[] = match($campo){
                     'nome' => 'Insira o seu nome completo',
                     'email' => 'Insira um E-mail válido',
-                    'whatsapp' => 'Insira um numero de Whatsapp no formato (xx) xxxxx-xxxx ou (xx) xxxx-xxxx',
-                    'senha' => 'Sua senha precisa conter 5 dígitos ou mais'
+                    'whatsapp' => 'Insira um numero de Whatsapp válido, no formato (xx) xxxxx-xxxx ou (xx) xxxx-xxxx',
+                    'senha' => 'Insira uma senha com no minímo 5 digítos'
                 };
             }
         }
 
-        if(isset($erros)){
+        if(isset($erros) || !empty($erros)){
             self::erro($erros);
             return;
         }
 
-        $tratado['email_hash'] = self::hash_email_whatsapp($tratado['email']);
+        $input['emailHash'] = self::hash_email_whatsapp($input['email']);
 
-        $getEmail = $this->db_cliente->getEmail($tratado['email_hash']);
+        $getEmailHash = $this->db_cliente->getEmailCadastro($input['emailHash']);
 
-        if($getEmail !== false){
-            self::erro('Dados inseridos já estão sendo utilizados', 409);
+        if(is_null($getEmailHash)){
+            self::erro('Erro ao verificar a existencia do E-mail de cadastro', 500);
             return;
         }
 
-        $tratado['whatsapp_hash'] = self::hash_email_whatsapp($tratado['whatsapp']);
-
-        $getWhatsapp = $this->db_cliente->getWhatsapp($tratado['whatsapp_hash']);
-
-        if($getWhatsapp !== false){
-            self::erro('Dados inseridos já estão sendo utilizados', 409);
+        if($getEmailHash > 0){
+            self::erro('Dados já estão sendo utilizados', 409);
             return;
         }
 
-        $tratado['email'] = Controller::criptografia($tratado['email']);
-        $tratado['whatsapp'] = Controller::criptografia($tratado['whatsapp']);
-        $tratado['senha'] = password_hash($tratado['senha'], PASSWORD_DEFAULT);
+        $input['whatsappHash'] = self::hash_email_whatsapp($input['whatsapp']);
 
-        $addCadastro = $this->db_cliente->addCadastro($tratado);
+        $getWhatsappHash = $this->db_cliente->getWhatsappCadastro($input['whatsappHash']);
 
-        if(!$addCadastro){
-            self::erro('Erro ao realizar cadastro', 500);
+        if(is_null($getWhatsappHash)){
+            self::erro('Erro ao verificar a existencia do Whatsapp de cadastro', 500);
             return;
         }
 
-        $getCliente = $this->db_cliente->getDetalheCliente((int)$addCadastro);
+        $input['email'] = Controller::criptografia($input['email']);
+        $input['whatsapp'] = Controller::criptografia($input['whatsapp']);
 
-        if(!$getCliente){
-            self::erro('Erro ao retornar dados do cadastro', 500);
+        $input['senha'] = password_hash($input['senha'], PASSWORD_DEFAULT);
+
+        $addCadastro = $this->db_cliente->addCadastro($input);
+
+        if(is_null($addCadastro)){
+            self::erro('Erro ao adicionar cadastro', 500);
             return;
         }
 
-        $dadosToken = [
-            'id' => $getCliente['id_cliente'],
-            'nome' => $getCliente['nome_cliente'],
-            'email' => $getCliente['email_cliente'],
-            'exp' => time() + 3600
-        ];
-
-        $token = Token::gerar_token($dadosToken);
-
-        self::sucesso($token, 201);
+        self::sucesso($addCadastro, 201);
         return;
     }
 
@@ -591,19 +581,38 @@ class ApiController extends Controller
 
         $payload = $this->verificar($id);
 
-        if(is_null($payload)){
+        if(!$payload){
             self::erro('Token expirado ou inválido', 400);
             return;
         }
 
-        $getComentario = $this->db_contato->getComentariosCliente($id);
+        $getComentarios = $this->db_contato->getComentariosCliente($id);
 
-        if(!$getComentario){
-            self::erro('Erro ao exibir comentario do cliente', 500);
+        if(!$getComentarios){
+            self::erro('Erro ao puxar comentários do cliente', 500);
             return;
         }
 
-        self::exibir_dados($getComentario);
+        $getCliente = $this->db_cliente->getClienteByid($id);
+
+        if(!$getCliente){
+            self::erro('Erro ao retornar dados do cliente dos comentários', 500);
+            return;
+        }
+
+        foreach($getCliente as $atributo => $valor){
+            if($atributo === 'email_cliente' || $atributo === 'whatsapp_cliente'){
+                $getCliente[$atributo] = Controller::descriptografia($valor);
+            }
+        }
+
+        foreach($getComentarios as $posicao => $valor){
+            if(is_array($valor)){
+                $getComentarios[$posicao] = array_merge($valor, $getCliente);
+            }
+        }
+
+        self::exibir_dados($getComentarios);
         return;
     }
 
@@ -652,6 +661,10 @@ class ApiController extends Controller
         self::exibir_dados($getNotificacao);
         return;
     }
+
+
+
+
 
 
 
@@ -719,61 +732,68 @@ class ApiController extends Controller
 
 
     // Tratamento
-    private static function tratar_nome(string $nome): string|bool
+    private static function tratar_nome(string $nome): ?string
     {
         $nomeTratado = trim($nome);
-        $nomeTratado = filter_var($nomeTratado, FILTER_SANITIZE_SPECIAL_CHARS);
 
         if (str_word_count($nomeTratado) < 2) {
-            return false;
+            return null;
         }
 
         $nomeTratado = str_word_count($nomeTratado, 1);
 
         foreach ($nomeTratado as $valor) {
             if (strlen($valor) < 2) {
-                return false;
+                return null;
             }
         }
 
         $nomeTratado = implode(' ', $nomeTratado);
 
-        return $nomeTratado;
+        return $nomeTratado ?: null;
     }
 
-    private static function tratar_email(string $email): string|bool
+    private static function tratar_email(string $email): ?string
     {
-        $emailTratado = filter_var($email, FILTER_SANITIZE_EMAIL);
-
-        if (!filter_var($emailTratado, FILTER_VALIDATE_EMAIL)) {
-            return false;
+        if(empty(trim($email))){
+            return null;
         }
 
-        return $emailTratado;
+        if(preg_match('/^[a-zA-Z0-9$%&_.-]{2,}\@[a-zA-Z0-9$%&._-]{2,}\.[a-zA-Z0-9]{2,8}$/', $email) !== 1){
+            return null;
+        }
+
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+            return null;
+        }
+
+        return $email ?: null;
     }
 
-    private static function tratar_whatsapp(string $whatsapp): string|bool
+    private static function tratar_whatsapp(string $whatsapp): ?string
     {
-        $whatsappTratado = filter_var($whatsapp, FILTER_SANITIZE_SPECIAL_CHARS);
-
-        if (preg_match('/^\(\d{2}\) \d{5}-\d{4}$/', $whatsappTratado) !== 1) {
-            if(preg_match('/^\(\d{2}\) \d{4}-\d{4}$/', $whatsappTratado) !== 1){
-                return false;
-            }
+        if(empty(trim($whatsapp))){
+            return null;
         }
 
-        return $whatsappTratado;
+        if(preg_match('/^\(\d{2}\)\s\d{4,5}\-\d{4}$/', $whatsapp) !== 1){
+            return null;
+        }
+
+        return $whatsapp ?: null;
     }
 
-    private static function tratar_senha(string $senha): string|bool
+    private static function tratar_senha(string $senha): ?string
     {
-        $senhaTratada = filter_var($senha, FILTER_SANITIZE_SPECIAL_CHARS);
-
-        if (strlen($senhaTratada) < 5) {
-            return false;
+        if(empty($senha)){
+            return null;
         }
 
-        return $senhaTratada;
+        if(strlen($senha) < 5){
+            return null;
+        }
+
+        return $senha ?: null;
     }
 
     private static function hash_email_whatsapp(string $emailWhatsapp): string
