@@ -1,30 +1,31 @@
 <?php
 
-class Contato extends Database{
+class Contato extends Database
+{
 
-    
+
     public function getComentariosCliente(int $id): ?array
     {
-        if($id <= 0){
+        if ($id <= 0) {
             return null;
         }
 
-        try{
-            $sql = "SELECT * FROM tbl_comentario
+        try {
+            $sql = "SELECT tbl_comentario.*, tbl_resposta.id_resposta, tbl_resposta.nome_resposta, tbl_resposta.mensagem_resposta, tbl_resposta.data_resposta FROM tbl_comentario
             LEFT JOIN tbl_resposta ON tbl_comentario.id_comentario = tbl_resposta.id_comentario
             WHERE tbl_comentario.id_cliente = :cliente";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
-                ':cliente' => $id
+                ':cliente' => (int)$id
             ]);
 
             $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             return $fetch ?: null;
 
-        } catch(PDOException $e){
-            return null;
+        } catch (PDOException $e) {
+           return null;
         }
     }
 

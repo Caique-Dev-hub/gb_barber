@@ -28,29 +28,29 @@
             </div>
             <form class="form-contato" id="reserva" method="post" action="">
                 <div style="margin: 0 auto; ">
-                    <h3>FALE CONOSCO</h3>
+                    <h3>Faça sua reserva</h3>
                 </div>
 
                 <div class="container-menu">
                     <div class="input-name">
                         <label for="_name" style="width: 50px;color: white;">Nome:</label>
-                        <input type="text" placeholder="Nome completo" id="name" required>
+                        <input type="text" placeholder="Nome completo" id="name" name="nome_reserva" required>
                     </div>
                     <div class="input-name">
                         <label for="_tel" style="width: 50px;color: white;">Telefone:</label>
-                        <input type="text" id="telefone" placeholder="(11) 99999-9999" maxlength="15" required>
+                        <input type="text" id="telefone" placeholder="(11) 99999-9999" maxlength="15" name="telefone_reserva" required>
                     </div>
                 </div>
                 <div class="container-menu">
                     <div class="input-name">
                         <label style="width: 50px;color: white;" for="">E-mail</label>
-                        <input style="WIDTH:660px;" type="text" id="email" placeholder="@example.com" required>
+                        <input style="WIDTH:660px;" type="text" id="email" placeholder="@example.com" name="email_reserva" required>
                     </div>
                 </div>
                 <div class="container-form">
                     <div class="container-menu" style="display: flex;flex-direction: column; ">
                         <label class="" style="margin-left: 10px;width: 50px;color: white;" for="inputGroupSelect01">Serviços</label>
-                        <select class="" id="inputGroupSelect01" style="width: 658px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;" required>
+                        <select class="" name="servico_reserva" id="inputGroupSelect01" style="width: 658px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;" required>
                             <option value="0" selected></option>
                             <?php foreach ($todosservico as $coluna) : ?>
                                 <option value="<?= isset($coluna['id_servico']) ? $coluna['id_servico'] : $coluna['id_combo'] + 3 ?>"><?= isset($coluna['nome_servico']) ? $coluna['nome_servico'] . ' ' . 'R$' . str_replace('.', ',', $coluna['valor_servico']) : $coluna['nome_combo'] . ' ' . 'R$' . str_replace('.', ',', $coluna['valor_combo'])  ?></option>
@@ -58,10 +58,10 @@
                         </select>
                     </div>
                 </div>
-                <div class="container-menu" style="display: flex;">
+                <div class="container-menu" style="display: flex; margin-top: 26px;">
                     <select class="" id="data" style="width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;" required>
                         <option value="0" selected>Selecione algum Dia</option>
-                        <?php foreach ($datas as $atributo) : ?>
+                        <?php foreach ($datas as $atributo) :?>
                             <?php
                             $nome_data = explode('-', $atributo['nome_data']);
 
@@ -80,21 +80,19 @@
 
                         <?php endforeach ?>
                     </select>
-                    <select class="" id="horario" style=" width: 325px;height: 50px;background-color: #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;" disabled>
+                    <select  class="" name="horario_reserva" id="horario" style=" width: 325px;height: 50px;background-color:  #282626;border: none;border-radius: 10px;color: #fff;padding: 0.8rem; margin-left: 10px;" disabled>
                         <option value="0" selected>Seleciona algum Horário</option>
                     </select>
                 </div>
 
                 <div class="d-grid gap-2 col-6 mx-auto">
-                    <button class="btn btn-primary" type="submit" id="btn-reserva"
-                        style="background: linear-gradient(135deg, #BE4949 0%,rgb(93, 29, 29) 100%); 
-                    background-color: #BE4949;border:none; margin-top: 20px;font-size: 1.3rem;">
-                        Reserva
+                    <button class="btn_btn-primary" type="submit" id="btn-reserva">
+                        ENVIAR
                     </button>
                 </div>
             </form>
         </div>
-    </div>
+    </div>                                                                      
 </section>
 
 
@@ -130,41 +128,34 @@
 
 </script>
 
+
 <script>
-    document.getElementById('reserva').addEventListener('submit', function(e) {
-        e.preventDefault();
+    document.getElementById('reserva').addEventListener('submit', function(event){
+        event.preventDefault();
 
-        const input = {
-            'nome': document.getElementById('name').value,
-            'email': document.getElementById('email').value,
-            'whatsapp': document.getElementById('telefone').value,
-            'servico': document.getElementById('inputGroupSelect01').value,
-            'data': document.getElementById('data').value,
-            'horario': document.getElementById('horario').value
-        };
+        const form = new FormData(event.target);
 
-        fetch(`<?= URL_BASE ?>reserva/adicionar_reserva`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(input)
-            })
+        fetch(`<?= URL_BASE?>reserva/adicionar_reserva`, {
+            method: event.target.method,
+            body: form
+        })
 
-            .then(response => response.json())
-            .then(data => {
-                if (data.erro) {
-                    alert(data.erro);
-                } else {
-                    alert(data.sucesso);
-                }
-            })
+        .then(response => response.json())
+        .then(data => {
+            if(data.error){
+                alert(data.error);
+                console.log(data);
+            } else {
+                alert(data.sucess);
+            }
+        })
 
-            .catch(error => {
-                console.error(error);
-            })
+        .catch(error => {
+            console.error(error);
+        })
     });
 </script>
+
 
 <!-- Horarios -->
 <script>
@@ -178,7 +169,7 @@
             .then(data => {
                 horario.disabled = false;
 
-                horario.innerHTML += data;
+                horario.innerHTML = data;
             })
 
             .catch(error => {

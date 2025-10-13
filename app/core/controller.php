@@ -1,5 +1,7 @@
 <?php
 
+use Random\RandomException;
+
 class Controller
 {
     protected $db_cliente;
@@ -34,35 +36,78 @@ class Controller
         require_once("../app/views/$pag.php");
     }
 
-    public static function criptografia(string|int|float $text): string
+
+
+
+    // ----------------------------------------------------- Criptografia ----------------------------------------------------- //
+
+    public static function criptografia(string|int $dados): ?string
     {
-        $iv = random_bytes(openssl_cipher_iv_length($_ENV['METHOD']));
+        if (empty($dados)) {
+            return null;
+        }
+
+        try {
+            $iv = random_bytes(openssl_cipher_iv_length(METHOD_CRYPTO));
+
+            $tag = '';
+
+            $key = base64_decode($_ENV['CRYPTO_KEY']);
+
+            $crypto = openssl_encrypt($dados, METHOD_CRYPTO, $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+            if (!$crypto || empty($tag)) {
+                return null;
+            }
+
+            $cryptoCompleta = $iv . $tag . $crypto;
+
+            return $cryptoCompleta ?: null;
+        } catch (RandomException $e) {
+            return null;
+        }
+    }
+
+    public static function descriptografia(string $crypto): string|int|null
+    {
+        if (empty($crypto)) {
+            return null;
+        }
+
+        $iv = substr($crypto, 0, openssl_cipher_iv_length(METHOD_CRYPTO));
+
+        if (empty($iv)) {
+            return null;
+        }
+
+        $tag = substr($crypto, strlen($iv), 16);
+
+        if (empty($tag)) {
+            return null;
+        }
+
+        $dados = substr($crypto, (strlen($iv) + strlen($tag)));
+
+        if (empty($dados)) {
+            return null;
+        }
 
         $key = base64_decode($_ENV['CRYPTO_KEY']);
 
-        $tag = '';
+        $normal = openssl_decrypt($dados, METHOD_CRYPTO, $key, OPENSSL_RAW_DATA, $iv, $tag);
 
-        $crypto = openssl_encrypt($text, $_ENV['METHOD'], $key, OPENSSL_RAW_DATA, $iv, $tag);
+        if (!$normal) {
+            return null;
+        }
 
-        return base64_encode($iv . $tag . $crypto);
+        if(is_numeric($normal)){
+            return (int)$normal ?: null;
+        } else {
+            return $normal ?: null;
+        }
     }
 
-    public static function descriptografia(string $crypto): bool|string
-    {
-        $bin = base64_decode($crypto);
 
-        $iv = substr($bin, 0, openssl_cipher_iv_length($_ENV['METHOD']));
-
-        $ivTag = openssl_cipher_iv_length($_ENV['METHOD']) + 16;
-
-        $tag = substr($bin, openssl_cipher_iv_length($_ENV['METHOD']), 16);
-
-        $text = substr($bin, $ivTag);
-
-        $key = base64_decode($_ENV['CRYPTO_KEY']);
-
-        return openssl_decrypt($text, $_ENV['METHOD'], $key, OPENSSL_RAW_DATA, $iv, $tag);
-    }
 
     public static function tratar_url(string $texto): string
     {
@@ -154,7 +199,7 @@ class Controller
 
         $nome = implode('.', $nome);
 
-        if(file_exists("upload/$nome")){
+        if (file_exists("upload/$nome")) {
             return false;
         }
 

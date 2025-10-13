@@ -3,45 +3,33 @@
 class Agendamento extends Database
 {
     // ADD
-    public function addAgendamento(array $campos, int $id_cliente): int|bool
+    public function addAgendamento(array $campos): ?int
     {
-        extract($campos);
+        try{
+            extract($campos);
 
-        if (isset($servico)) {
-            $sql = "INSERT INTO tbl_agendamento (id_cliente, id_servico, id_data_horario)
-            SELECT id_cliente, :servico, :data_horario FROM tbl_cliente WHERE id_cliente = :cliente";
-        } else{
-            $sql = "INSERT INTO tbl_agendamento (id_cliente, id_combo, id_data_horario)
-            SELECT id_cliente, :combo, :data_horario FROM tbl_cliente WHERE id_cliente = :cliente";
+            $sql = "INSERT INTO tbl_agendamento (id_cliente, id_servico, id_combo, id_data_horario)
+            SELECT id_cliente, :servico, :combo, :data_horario FROM tbl_cliente WHERE id_cliente = :cliente";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':cliente' => (int)$cliente,
+                ':servico' => isset($servico) ? (int)$servico : null,
+                ':combo' => isset($combo) ? (int)$combo : null,
+                ':data_horario' => (int)$data_horario
+            ]);
+
+            $id = $this->db->lastInsertId();
+
+            return $id ?: null;
+
+        } catch(PDOException $e){
+            return null;
         }
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':cliente', $id_cliente, PDO::PARAM_INT);
-        $stmt->bindValue(':data_horario', $data_horario, PDO::PARAM_STR);
-        if(isset($servico)){
-            $stmt->bindValue(':servico', (int)$servico, PDO::PARAM_INT);
-        } else{
-            $stmt->bindValue(':combo', (int)$combo, PDO::PARAM_INT);
-        }
-        $stmt->execute();
-
-        $id = $this->db->lastInsertId();
-        return (int)$id;
     }
 
 
     // GET
-    public function getAgendamentoDetalhes(int $id): array|bool
-    {
-        $sql = "SELECT * FROM tbl_agendamento WHERE id_agendamento = :agendamento";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':agendamento' => $id
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
     public function getDataAgendamento(int $id_data, string $horaMaxima): array|bool
     {
         $sql = "SELECT * FROM tbl_agendamento
@@ -58,20 +46,30 @@ class Agendamento extends Database
         return $stmt->fetchAll();
     }
 
-
-    // UPDATE 
-    public function updateAgendamentoHorario(int $id_data, string $tempoMinino, string $tempoMaximo): bool
+    public function getAgendamentosHorario(string $tempoMinimo, string $tempoMaximo, int $data): ?bool
     {
-        $sql = "UPDATE tbl_data_horario INNER JOIN tbl_horario ON tbl_horario.id_horario = tbl_data_horario.id_horario
-        SET status_data_horario = 'Indisponivel' 
-        WHERE tbl_horario.hora_inicio BETWEEN :tempoMinimo AND :tempoMaximo 
-        AND id_data = :data_agendamento AND status_data_horario = 'Disponivel'";
+        try{
+            $sql = "SELECT * FROM tbl_agendamento
+            INNER JOIN tbl_data_horario ON tbl_agendamento.id_data_horario = tbl_data_horario.id_data_horario
+            INNER JOIN tbl_horario ON tbl_data_horario.id_horario = tbl_horario.id_horario
+            WHERE tbl_horario.hora_inicio BETWEEN :tempoMinimo AND :tempoMaximo AND tbl_data_horario.id_data = :id_data
+            AND status_agendamento = 'Aguardando' LIMIT 1";
 
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':data_agendamento' => $id_data,
-            ':tempoMinimo' => $tempoMinino,
-            ':tempoMaximo' => $tempoMaximo
-        ]);
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':tempoMinimo' => $tempoMinimo,
+                ':tempoMaximo' => $tempoMaximo,
+                ':id_data' => $data
+            ]);
+
+            if((int)$stmt->rowCount() === 0){
+                return false;
+            } else {
+                return true;
+            }
+        } catch(PDOException $e){
+            return null;
+        }
     }
+
 }

@@ -1,6 +1,7 @@
 <?php
-
  define('URL_BASE', 'http://localhost/gb_barber/public/');
+
+ define('METHOD_CRYPTO', 'AES-256-GCM');
 
 spl_autoload_register(function($class){
     $caminhos = [

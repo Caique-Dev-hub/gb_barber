@@ -3,15 +3,15 @@
 
         <div class="menu" id="main-header">
 
-            <div class="conteudo-menu-1 ">
-                <a href="#">GB-BARBEARIA</a>
+            <div class="conteudo-menu-1">
+                <a href="#"><img style="width: 70px;" src="<?= URL_BASE ?>assets/img/logo-gb.png" alt=""></a>
             </div>
             <div class="conteudo-menu-2">
                 <ul>
-                    <li ><a class="session-menu" data-destiny="header">HOME</a></li>
-                    <li ><a class="session-menu" data-destiny="servico">SERVIÇO</a></li>
-                    <li ><a class="session-menu" data-destiny="sobre">SOBRE</a></li>
-                    <li ><a class="session-menu" data-destiny="contato">RESERVA</a></li>
+                    <li ><a class="session-menu" data-destiny="header">Inicio</a></li>
+                    <li ><a class="session-menu" data-destiny="servico">Serviços</a></li>
+                    <li ><a class="session-menu" data-destiny="sobre">Sobre</a></li>
+                    <li ><a class="session-menu" data-destiny="contato">Contato</a></li>
                 </ul>
             </div>
         </div>

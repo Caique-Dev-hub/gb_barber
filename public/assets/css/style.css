@@ -1,16 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@100..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 html {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
 
     body {
-        background-color: #010103;
+        background: #000;
+
 
         .site {
             max-width: 1600px;
             margin: 0 auto;
-            min-width: 100%;
+            min-width: 94%;
             height: 100%;
-            background-color: #010103;
+            background: #000;
         }
 
         p,
@@ -29,6 +34,10 @@ html {
         }
     }
 }
+
+
+
+
 
 
 #main-header {
@@ -76,10 +85,11 @@ html {
 
             }
 
-            li:hover {
-                transform: scale(1.2);
+            ul:hover {
+                transform: translateY(-5px) scale(1.1);
             }
         }
+
 
         img {
             align-content: center;
@@ -124,7 +134,7 @@ html {
         left: 0;
         height: 100vh;
         width: 100%;
-        background: linear-gradient(to right, rgba(0, 0, 0, 0.450) 0%, rgba(0, 0, 0, 0.450) 100%);
+        background: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0.1) 100%);
         z-index: 1;
 
     }
@@ -133,9 +143,10 @@ html {
         position: absolute;
         background-image: url(../img/banner.webp);
         height: 100vh;
-        width: 100%;
+        width: 80%;
         background-position: center;
         background-size: cover;
+        margin-left: 381px;
     }
 
     .btn-agendar {
@@ -201,11 +212,12 @@ html {
         span {
             border: none;
             height: 8px;
-            width: 108px;
+            width: 728px;
             background-color: #BE4949;
             margin: 14px 0;
             position: absolute;
             left: 182px;
+            border-radius: 13px;
         }
 
         h5 {
@@ -233,11 +245,8 @@ html {
     width: 100%;
     height: 450px;
     min-height: 450px;
-    background: linear-gradient(to bottom, #010103, #010103);
 
-    .site {
-        height: 91%;
-    }
+
 
     .carrossel-wrapper {
         width: 100%;
@@ -250,7 +259,7 @@ html {
         overflow: hidden;
         position: relative;
         height: 185px;
-        background-color: #010103;
+        background-color: #000;
         display: flex;
         align-items: center;
     }
@@ -291,7 +300,7 @@ html {
 
     .tt-servico h2 {
         margin: 0;
-        font-size: 5.5rem;
+        font-size: 4.5rem;
         text-shadow: 0 2px 4px black(0, 0, 0, 0.3);
     }
 
@@ -384,7 +393,8 @@ html {
 }
 
 .geral-servico1 {
-    height: 73vh;
+    height: 50vh;
+
 }
 
 .containe {
@@ -591,77 +601,7 @@ html {
     }
 }
 
-.sobre {
-    height: 70vh;
-    width: 100%;
-    background-color: #010103;
-}
 
-.container-box {
-    display: flex;
-    justify-content: center;
-}
-
-.container-box img {
-    width: 600px;
-}
-
-.tt-sobre {
-    color: #BE4949;
-    margin: auto;
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.tt-sobre h3 {
-    font-size: 3rem;
-}
-
-
-.box2 {
-    padding: 2rem 2rem;
-    width: 600px;
-    height: 500px;
-    background-color: #13131a;
-}
-
-.box2 h3 {
-    color: #fff;
-    margin-bottom: 30px;
-    font-size: 2rem;
-}
-
-.box2 p {
-    color: #fff;
-    line-height: 27px;
-    margin-bottom: 30px;
-}
-
-.box2 a {
-    border-radius: 5px;
-    background-color: #BE4949;
-    width: 200px;
-    height: 200px;
-    color: #fff;
-    text-align: center;
-    text-decoration: none;
-    padding: 5rem;
-    width: 200px;
-    height: 200px;
-    color: #fff;
-    text-align: center;
-    text-decoration: none;
-    padding: 0.5rem 2.5rem;
-    background: linear-gradient(135deg, #BE4949 0%, #8C2D2D 100%);
-    transition: all 0.5s ease;
-}
-
-.box2 a:hover {
-    background: none;
-    background-color: #fff;
-    color: #BE4949;
-    letter-spacing: 0.7px;
-}
 
 .form {
     width: 100%;
@@ -674,7 +614,6 @@ html {
     font-size: 3rem;
     margin-bottom: 50px;
 }
-
 
 .containers {
     margin: 0 auto;
@@ -708,9 +647,7 @@ html {
 }
 
 .box1-contact:hover {
-    background: linear-gradient(180deg, #92929296 0%, #4a4a4ab4 100%);
-    border-color: aliceblue;
-    transform: scale(1.05)
+    transform: scale(0.7)
 }
 
 .box2-contact {
@@ -728,34 +665,26 @@ html {
 }
 
 .box2-contact:hover {
-    background: linear-gradient(180deg, #92929296 0%, #4a4a4ab4 100%);
-    border-color: aliceblue;
-    color: #BE4949;
     transform: scale(1.05);
 }
-
-
 
 .box1-contact p {
     font-size: 1rem;
     color: #fff;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .box2-contact p {
     font-size: 1rem;
     color: #fff;
-    font-weight: 600;
-
+    font-weight: 500;
 }
 
 .box2-contact h3 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     color: #fff;
     text-transform: uppercase;
-    font-weight: 300;
-    font-family: "Roboto", sans-serif;
-    letter-spacing: 0.1rem;
+    font-weight: 400;
     color: #BE4949;
 }
 
@@ -763,9 +692,7 @@ html {
     font-size: 1.8rem;
     color: #BE4949;
     text-transform: uppercase;
-    font-weight: 300;
-    font-family: "Roboto", sans-serif;
-    letter-spacing: 0.1rem;
+    font-weight: 400;
 }
 
 .text1 img {
@@ -843,10 +770,10 @@ html {
 }
 
 .footer {
-    height: 40vh;
+    height: 25vh;
     width: 1600px;
     display: grid;
-    grid-template-columns: 33% 25% 33%;
+    grid-template-columns: 35% 31% 33%;
     margin: auto;
     margin-top: 280px;
     margin-right: 70px;
@@ -855,13 +782,13 @@ html {
 
 .footer h3 {
     text-align: center;
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: #BE4949;
     margin-bottom: 20px;
 }
 
 .footer p {
-    font-size: 1.2rem;
+    font-size: 20px;
 }
 
 .footer ul {
@@ -870,17 +797,15 @@ html {
 
 .share img {
     gap: 10px;
-    height: 40px;
-    width: 40px;
+    width: 35px;
     padding: 3px;
+    border-radius: 15px;
     transition: all 0.1s ease;
 }
 
 .share img:hover {
     border-radius: 50%;
     background-color: #BE4949;
-    width: 70px;
-    height: 70px;
 }
 
 .share {
@@ -899,12 +824,14 @@ html {
 .footer .box a {
     text-decoration: none;
     color: #fff;
-    font-size: 2rem;
-    transition: all 0.1s ease;
+    font-size: 20px;
+    transition: all 0.2s ease;
+    font-weight: 400;
 }
 
-.footer .box a:hover{
-    border-bottom:  0.1rem solid;
+.footer .box a:hover {
+    border-radius: 2px;
+    border-bottom: 2px solid;
     border-color: #BE4949;
     border-spacing: 2px;
     padding-bottom: 1px;
@@ -916,14 +843,16 @@ html {
 }
 
 .local li {
+    font-weight: 400;
     line-height: 2;
+    font-size: 17px;
 }
 
 .creditos {
     width: 100%;
     height: 100px;
     text-align: center;
-    background-color: #0e0e0e;
+    background-color: #000;
 }
 
 .creditos ul {
@@ -954,6 +883,8 @@ html {
 .container-menu {
     display: flex;
     width: 670px;
+    height: 65px;
+
 }
 
 .input-name {
@@ -976,15 +907,160 @@ html {
     display: flex;
 }
 
-#btn-reserva {
-    background: linear-gradient(135deg, #BE4949 0%, rgb(93, 29, 29) 100%);
-    background-color: #BE4949;
-    order: none;
-    margin-top: 40px;
-    font-size: 1.3rem;
-    transition: all 0.8s ease;
+.site {
+    min-width: 94%;
 }
 
-#btn-reserva:hover {
-    transform: scale(1.1);
+.btn_btn-primary {
+    background: linear-gradient(135deg, #BE4949 0%, rgb(93, 29, 29) 100%);
+    background-color: #BE4949;
+    border: none;
+    margin-top: 8px;
+    font-size: 16px;
+    color: #fff;
+    width: 250px;
+    border-radius: 20px;
+    height: 40px;
+    margin-left: 41px;
+    font-weight: 500;
+}
+
+.btn_btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(190, 73, 73, 0.4);
+}
+
+.conteudo-menu-1 {
+    transition: all 0.5s ease;
+}
+
+.conteudo-menu-1:hover {
+    transform: scale(1.2);
+}
+
+.box1-contact {
+    border: solid 2px;
+    border-color: #BE4949;
+    width: 100%;
+    height: 180px;
+    border-radius: 15px;
+    padding: 3rem 2.5rem;
+    text-align: left;
+    margin-top: 50px;
+    background-color: #000;
+    transition: all 0.2s ease;
+}
+
+.box1-contact:hover {
+    transform: translateY(-10px);
+    box-shadow: 0px 8px 10px #BE4949;
+}
+
+.box2-contact {
+    border: solid 2px;
+    border-color: #BE4949;
+    width: 100%;
+    height: 180px;
+    border-radius: 15px;
+    padding: 3rem 2.5rem;
+    text-align: left;
+    margin-top: 50px;
+    background-color: #000;
+    transition: all 0.2s ease;
+    color: #fff;
+}
+
+.box2-contact:hover {
+    transform: translateY(-10px);
+    box-shadow: 0px 8px 10px #BE4949;
+}
+
+.sobre {
+    width: 100%;
+    background-color: #0b0b0d;
+    padding: 4rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tt-sobre {
+    color: #BE4949;
+    text-align: center;
+    margin-bottom: 3rem;
+    letter-spacing: 2px;
+    width: 100%;
+    text-align: center;
+}
+
+.tt-sobre h3 {
+    font-size: 4rem;
+    font-weight: 700;
+}
+
+.sobre {}
+
+.container-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.container-box img {
+    width: 100%;
+    max-width: 550px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.5s ease;
+}
+
+.container-box img:hover {
+    transform: scale(1.02);
+}
+
+.box2 {
+    background-color: #13131a;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    max-width: 600px;
+    transition: all 0.3s ease;
+}
+
+.box2 h3 {
+    color: #fff;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.box2 p {
+    color: #ccc;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    font-size: 15px;
+}
+
+.box2 a {
+    display: inline-block;
+    background: linear-gradient(135deg, #BE4949 0%, #8C2D2D 100%);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(190, 73, 73, 0.3);
+}
+
+.box2 a:hover {
+    background: #fff;
+    color: #BE4949;
+    transform: scale(1.05);
+    letter-spacing: 0.7px;
+    box-shadow: 0 6px 20px rgba(190, 73, 73, 0.5);
 }
