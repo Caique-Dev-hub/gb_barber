@@ -1,5 +1,13 @@
 <?php
- define('URL_BASE', 'http://localhost/gb_barber/public/');
+ define('URL_BASE', 'https://agenciatipi03.smpsistema.com.br/codexdev/gb_barber/public/');
+ // define('URL_BASE', 'https://localhost/gb_barber/public/');
+
+ define('DB_HOST', 'br61-cp.valueserver.com.br');
+ define('DB_NAME', 'alve6465_gbbarbearia');
+ define('DB_PASSWORD', 'Tipi03@123');
+ define('DB_USER', 'alve6465_codexdev');
+
+ define('CRYPTO_KEY', 'P5SubK2ZRnnbpFxPHxNns+oR43jolVwI');
 
  define('METHOD_CRYPTO', 'AES-256-GCM');
 
@@ -17,21 +25,6 @@ spl_autoload_register(function($class){
         }
     }
 });
- 
-function env(): void
-{
-    $arquivo = file("../.env", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
- 
-    foreach($arquivo as $valor){
-        if(str_contains($valor, '#')){
-            continue;
-        }
- 
-        $env = explode('=', $valor, 2);
- 
-        $_ENV[$env[0]] = $env[1];
-    }
-}
  
 if(session_status() !== PHP_SESSION_ACTIVE){
     session_start();

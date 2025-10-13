@@ -7,7 +7,7 @@ class Database{
     public function __construct()
     {
         if(is_null($this->db)){
-            $this->conection($_ENV['DB_HOST'], $_ENV['DB_NAME'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD']);
+            $this->conection(DB_HOST, DB_NAME, DB_USER, DB_PASSWORD);
         }
     }
  
