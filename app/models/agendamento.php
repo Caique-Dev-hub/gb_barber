@@ -72,4 +72,25 @@ class Agendamento extends Database
         }
     }
 
+    public function getAgendamentos(): ?array
+    {
+        try{
+            $sql = "SELECT * FROM tbl_agendamento
+            INNER JOIN tbl_cliente ON tbl_agendamento.id_cliente = tbl_cliente.id_cliente
+            LEFT JOIN tbl_servico ON tbl_agendamento.id_servico = tbl_servico.id_servico
+            LEFT JOIN tbl_combo_servico ON tbl_agendamento.id_combo = tbl_combo_servico.id_combo
+            INNER JOIN tbl_data_horario ON tbl_agendamento.id_data_horario = tbl_data_horario.id_data_horario
+            INNER JOIN tbl_data ON tbl_data.id_data = tbl_data_horario.id_data";
+
+            $stmt = $this->db->query($sql);
+
+            $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $fetch ?: null;
+
+        } catch(PDOException $e){
+            return null;
+        }
+    }
+
 }

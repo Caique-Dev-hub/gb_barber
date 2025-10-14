@@ -575,6 +575,113 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
     }
 </style>
 
+
+<style>
+    .cartao {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        padding: 24px 32px;
+        width: 680px;
+        border-left: 5px solid #ff4d4d;
+    }
+
+    .lado-esquerdo {
+        flex: 1;
+    }
+
+    .lado-direito {
+        flex: 1;
+        border-left: 1px solid #e5e5e5;
+        padding-left: 32px;
+    }
+
+    h2 {
+        margin: 0;
+        color: #222;
+        font-size: 20px;
+    }
+
+    .status {
+        display: inline-block;
+        background: #fff7e8;
+        color: #b8860b;
+        border: 1px solid #b8860b;
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 13px;
+        margin-left: 10px;
+        font-weight: 600;
+    }
+
+    .informacoes {
+        margin-top: 12px;
+    }
+
+    .item-informacao {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        color: #555;
+    }
+
+    .item-informacao i {
+        background: #f3f3f3;
+        padding: 8px;
+        border-radius: 6px;
+        margin-right: 10px;
+    }
+
+    .rotulo {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .valor {
+        font-size: 14px;
+        color: #222;
+        font-weight: 600;
+    }
+
+    .acoes {
+        margin-top: 16px;
+    }
+
+    button {
+        border: none;
+        border-radius: 6px;
+        padding: 8px 14px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .botao-agendar {
+        background: #06d6a0;
+        color: #fff;
+        margin-right: 8px;
+    }
+
+    .botao-agendar:hover {
+        background: #05b98a;
+    }
+
+    .botao-cancelar {
+        background: #ef476f;
+        color: #fff;
+    }
+
+    .botao-cancelar:hover {
+        background: #d93d63;
+    }
+</style>
+
 <body class="g-sidenav-show  bg-gray-100">
 
     <!-- Loading -->

@@ -5,7 +5,7 @@ class ApiController extends Controller
     // Cliente
     public function add_cadastro(): void
     {
-        header('Content-Type: applcation/json');
+        header('Content-Type: application/json');
 
         $input = file_get_contents('php://input');
         $input = json_decode($input, true);
@@ -937,7 +937,7 @@ class ApiController extends Controller
             return null;
         }
 
-        $key = base64_decode($_ENV['CRYPTO_KEY']);
+        $key = base64_decode(CRYPTO_KEY);
 
         $hash = hash_hmac('sha256', $emailWhatsapp, $key, true);
 

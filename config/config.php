@@ -1,11 +1,16 @@
 <?php
- define('URL_BASE', 'https://agenciatipi03.smpsistema.com.br/codexdev/gb_barber/public/');
+ define('URL_BASE', 'https://localhost/gb_barber/public/');
  // define('URL_BASE', 'https://localhost/gb_barber/public/');
 
- define('DB_HOST', 'br61-cp.valueserver.com.br');
- define('DB_NAME', 'alve6465_gbbarbearia');
- define('DB_PASSWORD', 'Tipi03@123');
- define('DB_USER', 'alve6465_codexdev');
+// define('DB_HOST', 'br61-cp.valueserver.com.br');
+// define('DB_NAME', 'alve6465_gbbarbearia');
+// define('DB_PASSWORD', 'Tipi03@123');
+// define('DB_USER', 'alve6465_codexdev');
+
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'db_barbearia');
+define('DB_PASSWORD', '');
+define('DB_USER', 'root');
 
  define('CRYPTO_KEY', 'P5SubK2ZRnnbpFxPHxNns+oR43jolVwI');
 

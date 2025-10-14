@@ -15,7 +15,7 @@ class Token
 
 
 
-        $key = base64_decode($_ENV['CRYPTO_KEY']);
+        $key = base64_decode(CRYPTO_KEY);
 
         $hashSigne = hash_hmac('sha256', "$header.$payload", $key);
 
@@ -36,7 +36,7 @@ class Token
         list($header, $payload, $signe) = $partesToken;
 
         
-        $key = base64_decode($_ENV['CRYPTO_KEY']);
+        $key = base64_decode(CRYPTO_KEY);
 
         $signeNovo = hash_hmac('sha256', "$header.$payload", $key);
 

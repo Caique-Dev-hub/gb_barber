@@ -3,8 +3,7 @@ RewriteEngine On
 RewriteCond %{HTTP:Authorization} .
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-RewriteBase /codexdev/gb_barber/public/
-#RewriteBase /gb_barber/public/
+RewriteBase /gb_barber/public/
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
