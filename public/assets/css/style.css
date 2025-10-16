@@ -41,204 +41,273 @@ html {
 
 
 #main-header {
-    display: grid;
-    grid-template-columns: 10% 40%;
-    height: 120px;
+    display: flex;
     justify-content: space-between;
+    align-items: center;
+    height: 95px;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    padding: 0 20px;
+    padding: 0 100px;
     z-index: 1000;
-    background-color: transparent;
-    transition: all 0.3s ease;
-
-    .conteudo-menu-1 {
-        margin: auto;
-        position: relative;
-        left: 123px;
-
-
-        a {
-            color: white;
-            text-decoration: none;
-            color: #BE4949;
-            font-size: 25.4px;
-        }
-    }
-
-    .conteudo-menu-2 {
-        display: flex;
-        height: 120px;
-        position: relative;
-        top: 14px;
-
-        ul {
-            display: flex;
-            color: white;
-
-            li {
-                align-content: center;
-                margin-right: 85px;
-                transition: all 0.5s ease;
-
-            }
-
-            ul:hover {
-                transform: translateY(-5px) scale(1.1);
-            }
-        }
-
-
-        img {
-            align-content: center;
-            height: 50px;
-            width: 60px;
-            margin: auto;
-            margin-bottom: 42px;
-        }
-    }
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    transition: all 0.4s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* ====== SCROLL EFFECT ====== */
 #main-header.scrolled {
-    background-color: black;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    padding: 15px 0;
+    background: rgba(0, 0, 0, 0.95);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.6);
+    height: 85px;
+}
 
+/* ====== LOGO ====== */
+.logo-header {
+    width: 80px;
+    height: auto;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.15));
+}
 
-    .conteudo-menu-1 {
-        margin: auto;
-        position: relative;
-        left: 123px;
-        bottom: 14px;
+#main-header.scrolled .logo-header {
+    transform: scale(0.9);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
+}
+
+/* ====== MENU ====== */
+.conteudo-menu-2 ul {
+    display: flex;
+    gap: 60px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.conteudo-menu-2 li a {
+    position: relative;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+/* Linha animada no hover */
+.conteudo-menu-2 li a::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(90deg, #be4949, #ff7878);
+    transition: width 0.4s ease;
+    border-radius: 10px;
+}
+
+.conteudo-menu-2 li a:hover::after,
+.conteudo-menu-2 li a.active::after {
+    width: 100%;
+}
+
+/* Brilho leve no hover */
+.conteudo-menu-2 li a:hover {
+    color: #ffbebe;
+    text-shadow: 0 0 8px rgba(190, 73, 73, 0.6);
+}
+
+/* ====== SCROLL HEADER FIX ====== */
+#main-header.scrolled .conteudo-menu-2 li a {
+    font-size: 1rem;
+}
+
+/* ====== EFEITO DE ENTRADA ====== */
+#main-header {
+    animation: slideDown 1s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-80px);
+        opacity: 0;
     }
 
-    .conteudo-menu-2 {
-        display: flex;
-        height: 120px;
-        position: relative;
-        bottom: 8px;
-        top: -3px;
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
 .banner-home {
+    position: relative;
     display: flex;
-    width: 100%;
-    height: 87.3dvh;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.95) 40%, rgba(0, 0, 0, 0.6) 100%),
+        url('../img/banner.webp') center/cover no-repeat;
+    color: #fff;
+    overflow: hidden;
+    animation: fadeIn 1.5s ease-in-out;
+}
 
-    .overflow-banner {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        width: 100%;
-        background: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0.1) 100%);
-        z-index: 1;
+.banner-content {
+    padding-left: 10%;
+    z-index: 2;
+    animation: slideInLeft 1.3s ease forwards;
+}
 
+.banner-title {
+    font-size: 4em;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 15px;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.banner-line {
+    width: 160px;
+    height: 6px;
+    background-color: #be4949;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    animation: expand 1.4s ease forwards;
+}
+
+.banner-subtitle {
+    font-size: 1.5em;
+    max-width: 500px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 1.5s ease 0.6s forwards;
+}
+
+.banner-btn {
+    display: inline-block;
+    background-color: #be4949;
+    color: #fff;
+    padding: 14px 35px;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.banner-btn:hover {
+    background-color: #e25555;
+    transform: translateY(-3px);
+}
+
+/* ===== Keyframes ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
     }
 
-    .ini-banner {
-        position: absolute;
-        background-image: url(../img/banner.webp);
-        height: 100vh;
-        width: 80%;
-        background-position: center;
-        background-size: cover;
-        margin-left: 381px;
-    }
-
-    .btn-agendar {
-
-        z-index: 1000;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #BE4949;
-        color: #000;
-        border: none;
-        padding: 12px 25px;
-        font-size: 13px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        height: 30px;
-        width: 110px;
-        position: fixed;
-        top: 430px;
-        left: 1809px;
-        transition: all 0.5 ease;
-
-        img {
-            width: 20px;
-            height: 17px;
-            padding: 0px 4px 0px 0px;
-        }
-
-
-    }
-
-    .banner {
-        display: grid;
-        width: 1600px;
-        max-width: 100%;
-        height: 825px;
-        margin: auto;
-
-        .banner-t2 {
-            top: 100px;
-            position: relative;
-            height: 720px;
-            color: white;
-            text-align: center;
-            width: 1902px;
-            padding: 70px 0px 0px 0px;
-            z-index: 2;
-            right: 150px;
-            text-align: left;
-        }
-
-
-        h4 {
-            padding: 25px 0px 0px 0px;
-            font-size: 4em;
-            width: 790px;
-            margin-top: 170px;
-            margin-left: 179px;
-        }
-
-        span {
-            border: none;
-            height: 8px;
-            width: 728px;
-            background-color: #BE4949;
-            margin: 14px 0;
-            position: absolute;
-            left: 182px;
-            border-radius: 13px;
-        }
-
-        h5 {
-            margin-left: 183px;
-            margin-top: 50px;
-            font-size: 1.6em;
-        }
-
-    }
-
-    .banner-t3 {
-        margin: auto;
-        width: 300px;
-        height: 400px;
-
-        img {
-            width: 281.3px;
-            height: 382px;
-        }
+    to {
+        opacity: 1;
     }
 }
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-80px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes expand {
+    from {
+        width: 0;
+        opacity: 0;
+    }
+
+    to {
+        width: 160px;
+        opacity: 1;
+    }
+}
+
+@keyframes fadeUp {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ===== WhatsApp Float ===== */
+.whatsapp-float {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 1000;
+}
+
+.whatsapp-float img {
+    width: 55px;
+    height: 55px;
+    transition: 0.3s ease;
+}
+
+.whatsapp-float img:hover {
+    transform: scale(1.1);
+}
+
+.banner-btn {
+    display: inline-block;
+    background: linear-gradient(90deg, #be4949, #8b2b2b);
+    color: #fff;
+    padding: 16px 42px;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 40px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    box-shadow: 0 6px 20px rgba(190, 73, 73, 0.3);
+}
+
+.banner-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.3), transparent);
+    transition: all 0.6s ease;
+}
+
+.banner-btn:hover::before {
+    left: 100%;
+}
+
+.banner-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(190, 73, 73, 0.5);
+    background: linear-gradient(90deg, #e25555, #a13232);
+}
+
 
 .geral-servico {
     margin: 0 auto;
@@ -258,8 +327,7 @@ html {
         width: 100%;
         overflow: hidden;
         position: relative;
-        height: 185px;
-        background-color: #000;
+        height: 145px;
         display: flex;
         align-items: center;
     }
@@ -528,7 +596,7 @@ html {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(29rem, 0fr));
     justify-content: center;
-    margin-left: 100px;
+    margin-left: -10px;
     row-gap: 30px;
 }
 
@@ -600,8 +668,6 @@ html {
         display: none;
     }
 }
-
-
 
 .form {
     width: 100%;
@@ -1063,4 +1129,718 @@ html {
     transform: scale(1.05);
     letter-spacing: 0.7px;
     box-shadow: 0 6px 20px rgba(190, 73, 73, 0.5);
+}
+
+/* ====== TÍTULO DO CARROSSEL ====== */
+.tt-servico h2 {
+    font-size: 4.2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.15;
+    animation: slideText 20s linear infinite;
+    text-shadow: 0 0 25px rgba(190, 73, 73, 0.1);
+}
+
+.white {
+    color: #fff;
+}
+
+.red {
+    color: #be4949;
+}
+
+/* ====== EFEITO SUAVE DE MOVIMENTO ====== */
+@keyframes slideText {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+/* ====== CONTAINER DOS SERVIÇOS ====== */
+.lista-servico {
+    margin-top: 4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 35px;
+    justify-content: center;
+    align-items: stretch;
+}
+
+/* ====== CARD DE SERVIÇO ====== */
+.container1 {
+    height: 300px;
+    width: 380px;
+    border: 1px solid rgba(190, 73, 73, 0.4);
+    border-radius: 18px;
+    display: flex;
+    align-items: flex-end;
+    background-color: rgba(0, 0, 0, 0.4);
+    background-blend-mode: multiply;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+}
+
+.container1::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent 60%);
+    z-index: 1;
+    transition: opacity 0.4s ease;
+    opacity: 1;
+}
+
+.container1:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 10px 35px rgba(190, 73, 73, 0.35);
+    border-color: #be4949;
+}
+
+.container1:hover::before {
+    background: linear-gradient(to top, rgba(190, 73, 73, 0.6), transparent 70%);
+}
+
+/* ====== CONTEÚDO INTERNO ====== */
+.container-content {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    padding: 1rem;
+}
+
+.container-content h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.container-content p {
+    font-size: 1rem;
+    line-height: 1.5;
+    opacity: 0.95;
+    margin-bottom: 1rem;
+    
+}
+
+.container-content h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffbebe;
+}
+
+/* ====== SETAS DO CARROSSEL ====== */
+.custom-arrow {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(190, 73, 73, 0.3);
+    color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.custom-arrow svg {
+    stroke: #fff;
+    transition: all 0.3s ease;
+}
+
+.custom-arrow:hover {
+    background: rgba(190, 73, 73, 0.8);
+    transform: translateY(-50%) scale(1.15);
+}
+
+.custom-arrow:hover svg {
+    stroke: #fff;
+}
+
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 1024px) {
+    .container1 {
+        width: 90%;
+        height: 280px;
+    }
+
+    .container-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .container-content p {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .tt-servico h2 {
+        font-size: 2.5rem;
+    }
+}
+
+/* ====== FAIXA PRINCIPAL ====== */
+.carrossel-container {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: linear-gradient(90deg, #000 0%, #0a0a0a 50%, #000 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 0 40px rgba(190, 73, 73, 0.08);
+}
+
+/* Vinheta nas bordas (efeito de fade lateral) */
+.carrossel-container::before,
+.carrossel-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 180px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.carrossel-container::before {
+    left: 0;
+    background: linear-gradient(to right, #000 0%, transparent 100%);
+}
+
+.carrossel-container::after {
+    right: 0;
+    background: linear-gradient(to left, #000 0%, transparent 100%);
+}
+
+/* ====== TEXTO DO CARROSSEL ====== */
+.carrossel {
+    display: flex;
+    white-space: nowrap;
+    animation: scrollText 25s linear infinite;
+    gap: 120px;
+}
+
+.tt-servico {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.tt-servico h2 {
+    font-size: 4.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+    transform: perspective(500px) translateZ(20px);
+    transition: all 0.4s ease;
+}
+
+/* ====== CORES DAS LETRAS ====== */
+.tt-servico .white {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.tt-servico .red {
+    background: linear-gradient(90deg, #be4949 0%, #ff7b7b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 15px rgba(190, 73, 73, 0.4);
+}
+
+/* ====== ANIMAÇÃO DO TEXTO ====== */
+@keyframes scrollText {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+/* ====== EFEITO DE PULSO SUAVE NAS LETRAS VERMELHAS ====== */
+@keyframes glow {
+
+    0%,
+    100% {
+        text-shadow: 0 0 8px rgba(190, 73, 73, 0.4);
+    }
+
+    50% {
+        text-shadow: 0 0 16px rgba(190, 73, 73, 0.8);
+    }
+}
+
+.red {
+    animation: glow 2.8s ease-in-out infinite;
+}
+
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 1024px) {
+    .tt-servico h2 {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .tt-servico h2 {
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+
+    .carrossel-container::before,
+    .carrossel-container::after {
+        width: 60px;
+    }
+}
+
+
+/* ====== FAIXA DE SERVIÇOS DISPONÍVEIS ====== */
+.carrossel-container {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: radial-gradient(circle at center, #0f0f0f 0%, #000 90%);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 60px rgba(190, 73, 73, 0.15);
+}
+
+/* Efeito de fade nas bordas */
+.carrossel-container::before,
+.carrossel-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 160px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.carrossel-container::before {
+    left: 0;
+    background: linear-gradient(to right, #000 0%, transparent 100%);
+}
+
+.carrossel-container::after {
+    right: 0;
+    background: linear-gradient(to left, #000 0%, transparent 100%);
+}
+
+/* ====== TEXTO SCROLL ====== */
+.carrossel {
+    display: flex;
+    white-space: nowrap;
+    animation: scrollText 20s linear infinite;
+    gap: 100px;
+}
+
+.tt-servico {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.tt-servico h2 {
+    font-size: 4rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    opacity: 1;
+    transform: perspective(600px) translateZ(30px);
+    transition: all 0.4s ease;
+}
+
+/* ====== CORES MELHORADAS ====== */
+.tt-servico .white {
+    color: rgba(255, 255, 255, 0.95);
+    animation: glow 2.5s ease-in-out infinite;
+}
+
+.tt-servico .red {
+    background: linear-gradient(90deg, #be4949 0%, #ff7b7b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 25px rgba(190, 73, 73, 0.6);
+    animation: glow 2.5s ease-in-out infinite;
+}
+
+/* ====== ANIMAÇÃO ====== */
+@keyframes scrollText {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes glow {
+
+    0%,
+    100% {
+        text-shadow: 0 0 10px rgba(190, 73, 73, 0.4),
+            0 0 20px rgba(190, 73, 73, 0.3);
+    }
+
+    50% {
+        text-shadow: 0 0 25px rgba(190, 73, 73, 0.8),
+            0 0 40px rgba(190, 73, 73, 0.4);
+    }
+}
+
+/* ====== RESPONSIVO ====== */
+@media (max-width: 1024px) {
+    .tt-servico h2 {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .tt-servico h2 {
+        font-size: 2.2rem;
+        letter-spacing: 1.5px;
+    }
+
+    .carrossel-container::before,
+    .carrossel-container::after {
+        width: 60px;
+    }
+}
+
+/* ====== FAIXA DE SERVIÇOS DISPONÍVEIS RESPONSIVA ====== */
+.carrossel-container {
+    width: 100%;
+    height: clamp(120px, 15vh, 180px);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: radial-gradient(circle at center, #111 0%, #000 90%);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 40px rgba(190, 73, 73, 0.1);
+}
+
+.carrossel-container::before,
+.carrossel-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: clamp(60px, 10vw, 150px);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.carrossel-container::before {
+    left: 0;
+    background: linear-gradient(to right, #000 0%, transparent 100%);
+}
+
+.carrossel-container::after {
+    right: 0;
+    background: linear-gradient(to left, #000 0%, transparent 100%);
+}
+
+/* ====== TEXTO DO CARROSSEL ====== */
+.carrossel {
+    display: flex;
+    align-items: center;
+    gap: clamp(100px, 15vw, 280px);
+    white-space: nowrap;
+    animation: scrollText 30s linear infinite;
+}
+
+.tt-servico {
+    flex-shrink: 0;
+}
+
+.tt-servico h2 {
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    transition: all 0.4s ease;
+}
+
+.tt-servico .white {
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 0 18px rgba(255, 255, 255, 0.1);
+}
+
+.tt-servico .red {
+    background: linear-gradient(90deg, #be4949 0%, #ff7b7b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 14px rgba(190, 73, 73, 0.45);
+    animation: glow 3.5s ease-in-out infinite;
+}
+
+/* ====== ANIMAÇÕES ====== */
+@keyframes scrollText {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes glow {
+
+    0%,
+    100% {
+        text-shadow: 0 0 10px rgba(190, 73, 73, 0.3);
+    }
+
+    50% {
+        text-shadow: 0 0 22px rgba(190, 73, 73, 0.8);
+    }
+}
+
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 1024px) {
+    #main-header {
+        padding: 0 5%;
+    }
+
+    .conteudo-menu-2 ul {
+        gap: 35px;
+    }
+
+    .banner-title {
+        font-size: clamp(2.5rem, 5vw, 3.8rem);
+    }
+
+    .banner-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .banner-btn {
+        padding: 12px 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    #main-header {
+        padding: 0 25px;
+    }
+
+    .conteudo-menu-2 ul {
+        gap: 25px;
+    }
+
+    .banner-home {
+        justify-content: center;
+        text-align: center;
+        background-position: center;
+    }
+
+    .banner-content {
+        padding: 0 1.5rem;
+    }
+
+    .banner-title {
+        font-size: clamp(1.8rem, 6vw, 2.6rem);
+    }
+
+    .banner-subtitle {
+        font-size: 1.1rem;
+        max-width: 90%;
+        margin: 0 auto 25px auto;
+    }
+
+    .banner-btn {
+        padding: 10px 24px;
+        font-size: 0.9rem;
+    }
+
+    .geral-servico {
+        height: auto;
+        padding: 2rem 0;
+    }
+
+    .carrossel {
+        gap: 120px;
+        animation-duration: 25s;
+    }
+
+    .tt-servico h2 {
+        font-size: 2rem;
+    }
+
+    .lista-servico {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+    }
+
+    .container1 {
+        width: 90%;
+        height: auto;
+    }
+
+    .form-contato {
+        flex-direction: column;
+        width: 90%;
+        height: auto;
+        margin: 3rem auto;
+    }
+
+    .footer {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 2rem;
+        width: 100%;
+    }
+
+    .footer .box {
+        width: 100%;
+    }
+
+    .creditos {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .tt-servico h2 {
+        font-size: 1.6rem;
+        letter-spacing: 2px;
+    }
+
+    .banner-btn {
+        padding: 10px 22px;
+        font-size: 0.85rem;
+    }
+
+    .banner-line {
+        width: 100px;
+        height: 4px;
+    }
+
+    .logo-header {
+        width: 60px;
+    }
+
+    .whatsapp-float {
+        width: 55px;
+        height: 55px;
+        bottom: 15px;
+        right: 15px;
+    }
+}
+/* ====== MENU MOBILE PREMIUM ====== */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 22px;
+  cursor: pointer;
+  z-index: 2001;
+}
+
+.menu-toggle span {
+  display: block;
+  height: 3px;
+  background: #fff;
+  border-radius: 3px;
+  transition: all 0.4s ease;
+}
+
+/* ====== ANIMAÇÃO PARA O “X” ====== */
+.menu-toggle.active span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+/* ====== MENU LATERAL ====== */
+.menu-mobile {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 75%;
+  height: 100vh;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(8px);
+  box-shadow: -5px 0 25px rgba(190, 73, 73, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: right 0.5s ease;
+  z-index: 2000;
+}
+
+.menu-mobile.active {
+  right: 0;
+}
+
+.menu-mobile ul {
+  list-style: none;
+  text-align: center;
+  padding: 0;
+}
+
+.menu-mobile ul li {
+  margin: 25px 0;
+}
+
+.menu-mobile ul li a {
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.menu-mobile ul li a:hover {
+  color: #be4949;
+  text-shadow: 0 0 10px rgba(190, 73, 73, 0.6);
+}
+
+/* ====== EXIBIÇÃO EM MOBILE ====== */
+@media (max-width: 900px) {
+  .conteudo-menu-2 {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  #main-header {
+    padding: 0 2rem;
+  }
 }

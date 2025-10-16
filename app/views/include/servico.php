@@ -13,15 +13,10 @@
             <div class="tt-servico">
                 <h2 class="red">Serviços Disponíveis</h2>
             </div>
-            <div class="tt-servico">
-                <h2 class="white">Serviços Disponíveis</h2>
-            </div>
-            <div class="tt-servico">
-                <h2 class="red">Serviços Disponíveis</h2>
-            </div>
         </div>
     </div>
 </section>
+
 
 <section class="geral-servico1" id="servico">
     <div class="site">
@@ -30,7 +25,14 @@
                 <div class="containe servicos" data-id="<?= isset($coluna['id_servico']) ? $coluna['id_servico'] : $coluna['id_combo'] + 3 ?>">
                     <div class="container1" style="background-image: url(<?= URL_BASE ?>upload/<?= $coluna['imagem_combo'] ?? $coluna['imagem_servico'] ?>);background-size: cover; background-position: center;">
                         <div class="container-content">
-                            <h2><?= isset($coluna['nome_servico']) ? $coluna['nome_servico'] : $coluna['nome_combo'] ?></h2>
+                            <div style="display: flex;">
+                                <h2><?= isset($coluna['nome_servico']) ? $coluna['nome_servico'] : $coluna['nome_combo'] ?></h2>
+                                <P style="   margin-top: 10px; margin-left: 30px;
+    /* margin-bottom: 60px; */
+    border-radius: 5px;
+    font-size: 17px;
+    height: 28px;"><?= ($coluna['tempo_estimado']) ?></P>
+                            </div>
                             <P><?= isset($coluna['descricao_servico']) ? $coluna['descricao_servico'] : $coluna['descricao_combo'] ?></P>
                             <h3><?= isset($coluna['valor_servico']) ? 'R$' . str_replace('.', ',', $coluna['valor_servico']) : 'R$' . str_replace('.', ',', $coluna['valor_combo']) ?></h3>
                         </div>
@@ -44,8 +46,8 @@
 <script>
     $('.multiple-items').slick({
         infinite: true,
-        slidesToShow: 3,
-        slidesToScroll: 3,
+        slidesToShow: 4,
+        slidesToScroll: 4,
         arrows: true,
         prevArrow: `
         <button class="custom-arrow custom-prev">
@@ -223,7 +225,7 @@
     }
 
     .custom-prev {
-        left: -65px;
+        left: -5px;
     }
 
     .custom-next {

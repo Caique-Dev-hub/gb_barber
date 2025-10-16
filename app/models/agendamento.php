@@ -5,7 +5,7 @@ class Agendamento extends Database
     // ADD
     public function addAgendamento(array $campos): ?int
     {
-        try{
+        try {
             extract($campos);
 
             $sql = "INSERT INTO tbl_agendamento (id_cliente, id_servico, id_combo, id_data_horario)
@@ -22,8 +22,7 @@ class Agendamento extends Database
             $id = $this->db->lastInsertId();
 
             return $id ?: null;
-
-        } catch(PDOException $e){
+        } catch (PDOException $e) {
             return null;
         }
     }
@@ -48,7 +47,7 @@ class Agendamento extends Database
 
     public function getAgendamentosHorario(string $tempoMinimo, string $tempoMaximo, int $data): ?bool
     {
-        try{
+        try {
             $sql = "SELECT * FROM tbl_agendamento
             INNER JOIN tbl_data_horario ON tbl_agendamento.id_data_horario = tbl_data_horario.id_data_horario
             INNER JOIN tbl_horario ON tbl_data_horario.id_horario = tbl_horario.id_horario
@@ -62,19 +61,19 @@ class Agendamento extends Database
                 ':id_data' => $data
             ]);
 
-            if((int)$stmt->rowCount() === 0){
+            if ((int)$stmt->rowCount() === 0) {
                 return false;
             } else {
                 return true;
             }
-        } catch(PDOException $e){
+        } catch (PDOException $e) {
             return null;
         }
     }
 
     public function getAgendamentos(): ?array
     {
-        try{
+        try {
             $sql = "SELECT 
                     *
                 FROM 
@@ -92,13 +91,13 @@ class Agendamento extends Database
                 tbl_combo_servico cb ON a.id_combo = cb.id_combo
                 ORDER BY d.nome_data ASC";
 
-                $stmt = $this->db->query($sql);
+            $stmt = $this->db->query($sql);
 
-                $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                return $fetch ?: null;
-
-        } catch(PDOException $e){
+            return $fetch ?: null;
+            
+        } catch (PDOException $e) {
             return null;
         }
     }
@@ -110,5 +109,4 @@ class Agendamento extends Database
         $stmt = $this->db->query($sql);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
 }
