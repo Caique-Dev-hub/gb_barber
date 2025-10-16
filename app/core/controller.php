@@ -52,7 +52,7 @@ class Controller
 
             $tag = '';
 
-            $key = base64_decode(CRYPTO_KEY);
+            $key = base64_decode($_ENV['CRYPTO_KEY']);
 
             $crypto = openssl_encrypt($dados, METHOD_CRYPTO, $key, OPENSSL_RAW_DATA, $iv, $tag);
 
@@ -92,7 +92,7 @@ class Controller
             return null;
         }
 
-        $key = base64_decode(CRYPTO_KEY);
+        $key = base64_decode($_ENV['CRYPTO_KEY']);
 
         $normal = openssl_decrypt($dados, METHOD_CRYPTO, $key, OPENSSL_RAW_DATA, $iv, $tag);
 

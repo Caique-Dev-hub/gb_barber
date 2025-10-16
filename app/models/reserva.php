@@ -3,7 +3,8 @@
 class Reserva extends Database
 {
 
-    public function getReservas(){
+    public function getReservas()
+    {
         $sql = "SELECT * FROM tbl_reserva
         INNER JOIN tbl_data_horario ON tbl_data_horario.id_data_horario = tbl_reserva.id_data_horario
         INNER JOIN tbl_data ON tbl_data_horario.id_data = tbl_data.id_data
@@ -14,10 +15,18 @@ class Reserva extends Database
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getCountReservas()
+    {
+        $sql = "SELECT COUNT(*) AS total_reserva FROM tbl_reserva";
+
+        $stmt = $this->db->query($sql);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function addCombo($campos)
     {
         extract($campos);
-        
+
         $sql = "INSERT INTO tbl_reserva (nome_reserva, email_reserva, whatsapp_reserva, id_combo, id_data_horario)
         VALUES (:nome, :email, :whatsapp, :combo, :data_horario)";
 

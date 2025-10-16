@@ -17,6 +17,8 @@ class InicioController extends Controller{
     }
 
     public function listar_horarios($id){
+        echo 'teste';
+
         $getHorarios = $this->db_data->getHorarios($id);
 
         foreach($getHorarios as $atributo){

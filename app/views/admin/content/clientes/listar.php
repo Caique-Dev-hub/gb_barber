@@ -700,9 +700,9 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="search-box">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="form-control" placeholder="Pesquisar serviços...">
+                    <input type="text" class="form-control" placeholder="Pesquisar clientes...">
                 </div>
-                <button class="btn-open" id="openModal">+ Adicionar Serviço/Combo</button>
+                <button class="btn-open" id="openModal">+ Adicionar Cliente</button>
             </div>
         </div>
 
@@ -733,11 +733,11 @@
                             <td data-label="Avaliações">
                                 <?php if ($atributo['estrela_cliente'] == 0) :  ?>
                                     <div class="service-description">
-                                        <img class="avaliacaoimg" id="avaliacao" data-id="<?= $atributo['id_cliente'] ?>" style="width: 20px; height: 20px;margin-left: 39px; cursor: pointer;" src="<?= URL_BASE ?>assets/img/star.png" alt="">
+                                        <img class="avaliacaoimg" id="avaliacao" data-id="<?= $atributo['id_cliente'] ?>" style="width: 40px; height: 40px;margin-left: 39px; cursor: pointer;" src="<?= URL_BASE ?>assets/img/estrela.png" alt="">
                                     </div>
                                 <?php else: ?>
                                     <div class="service-description">
-                                        <img class="avaliacaoimg" style="width: 20px; height: 20px;margin-left: 39px;" src="<?= URL_BASE ?>assets/img/star2.png" alt="">
+                                        <img class="avaliacaoimg" style="width: 20px; height: 20px;margin-left: 39px;" src="<?= URL_BASE ?>assets/img/estrela.png" alt="">
                                     </div>
                                 <?php endif ?>
                             </td>

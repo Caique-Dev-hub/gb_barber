@@ -1,366 +1,83 @@
     <style>
-        :root {
-            --primary-color: #3a86ff;
-            --secondary-color: #8338ec;
-            --success-color: #06d6a0;
-            --danger-color: #ef476f;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s ease;
-        }
-
-        .container {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 2rem;
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.5rem;
             margin-top: 2rem;
-            width: 96%;
+        }
+
+        .service-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             overflow: hidden;
-        }
-
-        .header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            flex-direction: column;
+            transition: all 0.3s ease;
         }
 
-        .title {
-            font-weight: 600;
-            color: var(--dark-color);
-            margin: 0;
-            font-size: 1.75rem;
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
         }
 
-        .img-thumbnail {
-            width: 120px;
-            height: 77px;
-            border-radius: 4px;
+        .service-image {
+            width: 100%;
+            height: 160px;
             object-fit: cover;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            transition: var(--transition);
         }
 
-        .img-thumbnail:hover {
-            transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .table {
-            --bs-table-bg: transparent;
-            --bs-table-striped-bg: rgba(58, 134, 255, 0.02);
-            --bs-table-hover-bg: rgba(58, 134, 255, 0.05);
-            margin-bottom: 0;
-        }
-
-        .table thead th {
-            background-color: var(--light-color);
-            border-bottom-width: 2px;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-            color: #6c757d;
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .table tbody td {
-            padding: 0.5rem;
-            vertical-align: middle;
-            border-color: rgba(0, 0, 0, 0.03);
+        .service-content {
+            padding: 1rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
         .service-name {
+            font-size: 1.1rem;
             font-weight: 600;
             color: var(--dark-color);
-            transition: var(--transition);
-        }
-
-        .service-name:hover {
-            color: var(--primary-color);
+            margin-bottom: 0.5rem;
         }
 
         .service-description {
-            color: #6c757d;
             font-size: 0.9rem;
-            white-space: normal;
-            /* Alterado de pre-wrap para normal */
-            overflow: visible;
-            /* Remove o overflow hidden */
-            text-overflow: unset;
-            /* Remove o ellipsis */
-            display: block;
-            /* Muda de -webkit-box para block */
-            -webkit-line-clamp: unset;
-            /* Remove a limitação de linhas */
-            -webkit-box-orient: unset;
-            /* Remove a orientação do box */
-            line-height: 1.5;
-            /* Espaçamento entre linhas melhorado */
+            color: #6c757d;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .service-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
         }
 
         .service-price {
             font-weight: 600;
-            color: var(--dark-color);
+            color: var(--primary-color);
         }
 
         .service-duration {
             background-color: rgba(58, 134, 255, 0.1);
             color: var(--primary-color);
-            padding: 0.25rem 0.5rem;
+            padding: 0.25rem 0.75rem;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 500;
-            display: inline-block;
         }
 
-        .status-badge {
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-active {
-            background-color: rgba(6, 214, 160, 0.1);
-            color: var(--success-color);
-        }
-
-        .status-inactive {
-            background-color: rgba(239, 71, 111, 0.1);
-            color: var(--danger-color);
+        .service-status {
+            margin-bottom: 1rem;
         }
 
         .action-buttons {
             display: flex;
             gap: 0.5rem;
-        }
-
-        .btn-icon {
-            width: 36px;
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: var(--transition);
-        }
-
-        .btn-edit {
-            background-color: rgba(58, 134, 255, 0.1);
-            color: var(--primary-color);
-            border: none;
-        }
-
-        .btn-edit:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-delete {
-            background-color: rgba(239, 71, 111, 0.1);
-            color: var(--danger-color);
-            border: none;
-        }
-
-        .btn-delete:hover {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        .btn-delete1 {
-            background-color: rgba(78, 255, 58, 0.27);
-            color: green;
-            border: none;
-        }
-
-        .btn-delete1:hover {
-            background-color: green;
-            color: white;
-        }
-
-        .btn-add {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
-            font-weight: 500;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-add:hover {
-            background-color: #2a75e6;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.2);
-        }
-
-        .search-box {
-            position: relative;
-            width: 300px;
-        }
-
-        .search-box input {
-            padding-left: 2.5rem;
-            border-radius: var(--border-radius);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-        }
-
-        .search-box input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c757d;
-            z-index: 10;
-        }
-
-        /* Modal styles */
-        .modal-content {
-            border-radius: var(--border-radius);
-            border: none;
-            box-shadow: var(--box-shadow);
-        }
-
-        .modal-header {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 1.5rem;
-        }
-
-        .modal-title {
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .modal-footer {
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 1.5rem;
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: var(--dark-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .form-control,
-        .form-select {
-            border-radius: var(--border-radius);
-            padding: 0.75rem 1rem;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.1);
-        }
-
-        .btn-save {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .btn-save:hover {
-            background-color: #2a75e6;
-        }
-
-        .btn-cancel {
-            background-color: transparent;
-            color: #6c757d;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .btn-cancel:hover {
-            background-color: rgba(0, 0, 0, 0.02);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .search-box {
-                width: 100%;
-            }
-
-            .table thead {
-                display: none;
-            }
-
-            .table,
-            .table tbody,
-            .table tr,
-            .table td {
-                display: block;
-                width: 100%;
-            }
-
-            .table tr {
-                margin-bottom: 1rem;
-                border-radius: var(--border-radius);
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                overflow: hidden;
-            }
-
-            .table td {
-                padding: 0.75rem;
-                border: none;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-                position: relative;
-                padding-left: 50%;
-            }
-
-            .table td::before {
-                content: attr(data-label);
-                position: absolute;
-                left: 1rem;
-                top: 50%;
-                transform: translateY(-50%);
-                font-weight: 600;
-                color: var(--dark-color);
-                font-size: 0.8rem;
-            }
-
-            .action-buttons {
-                justify-content: flex-end;
-            }
+            justify-content: flex-end;
         }
     </style>
 
@@ -705,164 +422,132 @@
         }
     </style>
 
-    <div class="container">
-        <div class="header">
-            <h1 class="title">Gestão de Serviços</h1>
-            <div class="d-flex align-items-center gap-3">
-                <div class="search-box">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="form-control" placeholder="Pesquisar serviços...">
-                </div>
-                <button class="btn-open" id="openModal">+ Adicionar Serviço/Combo</button>
-            </div>
-        </div>
+    <div class="cards-container">
+        <?php foreach ($servicosListar as $atributo) : ?>
+            <div class="service-card">
+                <img src="<?= URL_BASE?>upload/<?= $atributo['imagem_servico'] ?? $atributo['imagem_combo']?>"
+                    alt="Corte de Cabelo" class="service-image">
 
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="width: 100px;">Imagem</th>
-                        <th>Serviço</th>
-                        <th>Descrição</th>
-                        <th style="width: 120px;">Valor</th>
-                        <th style="width: 120px;">Duração</th>
-                        <th style="width: 120px;">Status</th>
-                        <th style="width: 120px;">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($servicosListar as $atributo) : ?>
-                        <tr>
-                            <td data-label="Imagem">
-                                <img src="<?= URL_BASE ?>assets/img/<?= $atributo['imagem_combo'] ?? $atributo['imagem_servico'] ?>" alt="Corte de Cabelo" class="img-thumbnail">
-                            </td>
-                            <td data-label="Serviço">
-                                <div class="service-name"><?= $atributo['nome_combo'] ?? $atributo['nome_servico'] ?></div>
-                            </td>
-                            <td data-label="Descrição">
-                                <div class="service-description"><?= $atributo['descricao_combo'] ?? $atributo['descricao_servico'] ?></div>
-                            </td>
-                            <td data-label="Valor">
-                                <div class="service-price">R$ <?= isset($atributo['valor_servico']) ? str_replace('.', ',', $atributo['valor_servico']) : str_replace('.', ',', $atributo['valor_combo']) ?></div>
-                            </td>
-                            <td data-label="Duração">
-                                <div class="service-duration">
-                                    <?php
+                <div class="service-content">
+                    <h3 class="service-name"><?= $atributo['nome_combo'] ?? $atributo['nome_servico'] ?></h3>
+                    <p class="service-description"><?= $atributo['descricao_combo'] ?? $atributo['descricao_servico'] ?></p>
 
+                    <div class="service-info">
+                        <span class="service-price">💰 R$
+                            <?= isset($atributo['valor_servico']) ? str_replace('.', ',', $atributo['valor_servico']) : str_replace('.', ',', $atributo['valor_combo']) ?>
+                        </span>
 
-                                    $horario = explode(':', $atributo['tempo_estimado']);
-
-                                    if ((int)$horario[0] > 0) {
-                                        if ((int)$horario[1] > 0) {
-                                            echo "$horario[0]h e $horario[1]min";
-                                        } else {
-                                            echo "$horario[0]h";
-                                        }
-                                    } else {
-                                        if ((int)$horario[1] > 0) {
-                                            echo "$horario[1]min";
-                                        }
-                                    }
-
-                                    ?>
-                                </div>
-                            </td>
-                            <td data-label="Status">
-                                <?php
-
-                                if (isset($atributo['status_servico'])) {
-                                    if ($atributo['status_servico'] === 'Ativo') {
-                                        echo "<span class=\"status-badge status-active\">Ativo</span>";
-                                    } else {
-                                        echo "<span class=\"status-badge status-inactive\">Inativo</span>";
-                                    }
+                        <span class="service-duration">
+                            <?php
+                            $horario = explode(':', $atributo['tempo_estimado']);
+                            if ((int)$horario[0] > 0) {
+                                if ((int)$horario[1] > 0) {
+                                    echo "$horario[0]h e $horario[1]min";
                                 } else {
-                                    if ($atributo['status_combo'] === 'Ativo') {
-                                        echo "<span class=\"status-badge status-active\">Ativo</span>";
-                                    } else {
-                                        echo "<span class=\"status-badge status-inactive\">Inativo</span>";
-                                    }
+                                    echo "$horario[0]h";
                                 }
+                            } else {
+                                if ((int)$horario[1] > 0) {
+                                    echo "$horario[1]min";
+                                }
+                            }
+                            ?>
+                        </span>
+                    </div>
 
+                    <div class="service-status">
+                        <?php
+                        if (isset($atributo['status_servico'])) {
+                            if ($atributo['status_servico'] === 'Ativo') {
+                                echo "<span class='status-badge status-active'>Ativo</span>";
+                            } else {
+                                echo "<span class='status-badge status-inactive'>Inativo</span>";
+                            }
+                        } else {
+                            if ($atributo['status_combo'] === 'Ativo') {
+                                echo "<span class='status-badge status-active'>Ativo</span>";
+                            } else {
+                                echo "<span class='status-badge status-inactive'>Inativo</span>";
+                            }
+                        }
+                        ?>
+                    </div>
 
-                                ?>
-                            </td>
-                            <td data-label="Ações">
-                                <div class="action-buttons">
-                                    <?php if (isset($atributo['id_servico'])): ?>
-                                        <a href="<?= URL_BASE ?>servico/editar/servico/<?= $atributo['id_servico'] ?>">
-                                            <button class="btn btn-icon btn-edit" title="Editar">
-                                                <i class="fas fa-pen"></i>
-                                            </button>
-                                        </a>
-                                    <?php else: ?>
-                                        <a href="<?= URL_BASE ?>servico/editar/combo/<?= $atributo['id_combo'] ?>">
-                                            <button class="btn btn-icon btn-edit" title="Editar">
-                                                <i class="fas fa-pen"></i>
-                                            </button>
+                    <div class="action-buttons">
+                        <?php if (isset($atributo['id_servico'])): ?>
+                            <a href="<?= URL_BASE ?>servico/editar/servico/<?= $atributo['id_servico'] ?>">
+                                <button class="btn btn-icon btn-edit" title="Editar">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                            </a>
+                        <?php else: ?>
+                            <a href="<?= URL_BASE ?>servico/editar/combo/<?= $atributo['id_combo'] ?>">
+                                <button class="btn btn-icon btn-edit" title="Editar">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                            </a>
+                        <?php endif; ?>
 
-                                        </a>
-                                    <?php endif; ?>
+                        <?php if (isset($atributo['id_servico'])): ?>
+                            <?php if ($atributo['status_servico'] == 'Ativo') : ?>
+                                <button class="btn btn-icon btn-delete" data-bs-toggle="modal" data-bs-target="#servico<?= $atributo['id_servico'] ?>" title="Remover">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            <?php else: ?>
+                                <button class="btn btn-icon btn-delete1" data-bs-toggle="modal" data-bs-target="#servico<?= $atributo['id_servico'] ?>" title="Ativar">
+                                    <i>✔</i>
+                                </button>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <?php if ($atributo['status_combo'] == 'Ativo') : ?>
+                                <button class="btn btn-icon btn-delete" data-bs-toggle="modal" data-bs-target="#combo<?= $atributo['id_combo'] ?>" title="Remover">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            <?php else: ?>
+                                <button class="btn btn-icon btn-delete1" data-bs-toggle="modal" data-bs-target="#combo<?= $atributo['id_combo'] ?>" title="Ativar">
+                                    <i>✔</i>
+                                </button>
+                            <?php endif; ?>
+                        <?php endif ?>
+                    </div>
+                </div>
+            </div>
 
-                                    <?php if (isset($atributo['id_servico'])): ?>
-                                        <?php if ($atributo['status_servico'] == 'Ativo') : ?>
-                                            <button class="btn btn-icon btn-delete" data-bs-toggle="modal" data-bs-target="#servico<?= $atributo['id_servico'] ?>" data-id="" title="Remover">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        <?php else: ?>
-                                            <button class="btn btn-icon btn-delete1" data-bs-toggle="modal" data-bs-target="#servico<?= $atributo['id_servico'] ?>" data-id="" title="Remover">
-                                                <i class="">✔</i>
-                                            </button>
-                                        <?php endif; ?>
-                                    <?php else: ?>
-                                        <?php if ($atributo['status_combo'] == 'Ativo') : ?>
-                                            <button class="btn btn-icon btn-delete " data-bs-toggle="modal" data-bs-target="#combo<?= $atributo['id_combo'] ?>" data-id="" title="Remover">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        <?php else: ?>
-                                            <button class="btn btn-icon btn-delete1 " data-bs-toggle="modal" data-bs-target="#combo<?= $atributo['id_combo'] ?>" data-id="" title="Remover">
-                                                <i class="">✔</i>
-                                            </button>
-                                        <?php endif; ?>
-                                    <?php endif ?>
-                                </div>
-                            </td>
-                        </tr>
-                        <div class="modal fade" id="<?= isset($atributo['id_servico']) ? "servico" . $atributo['id_servico'] : "combo" . $atributo['id_combo'] ?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <?php if ($atributo['status_servico'] ?? $atributo['status_combo'] === 'Ativo') : ?>
-                                        <div class="modal-body">
-                                            Voçê deseja realmente Desativar este item "<?= $atributo['nome_servico'] ?? $atributo['nome_combo'] ?>" ?
-                                        </div>
-                                    <?php else: ?>
-                                        <div class="modal-body">
-                                            Voçê deseja realmente Ativar este item " <?= $atributo['nome_servico'] ?? $atributo['nome_combo'] ?>" ?
-                                            </div>
-                                        <?php endif; ?>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <?php if ($atributo['status_servico'] ?? $atributo['status_combo'] == 'Ativo') : ?>
-                                                <a href="<?= URL_BASE ?>servico/excluir/<?= isset($atributo['id_servico']) ? "servico" : "combo" ?>/<?= $atributo['id_servico'] ?? $atributo['id_combo'] ?>">
-                                                    <button class="btn btn-primary" id="addServico">Desativar</button>
-                                                </a>
-                                            <?php else : ?>
-                                                <a href="<?= URL_BASE ?>servico/ativar/<?= isset($atributo['id_servico']) ? "servico" : "combo" ?>/<?= $atributo['id_servico'] ?? $atributo['id_combo'] ?>">
-                                                    <button class="btn btn-primary" id="addServico">Ativar</button>
-                                                </a>
-                                            <?php endif; ?>
-                                        </div>
-                                </div>
+            <!-- Modal permanece o mesmo -->
+            <div class="modal fade" id="<?= isset($atributo['id_servico']) ? "servico" . $atributo['id_servico'] : "combo" . $atributo['id_combo'] ?>" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5">Confirmação</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <?php if ($atributo['status_servico'] ?? $atributo['status_combo'] === 'Ativo') : ?>
+                            <div class="modal-body">
+                                Deseja realmente desativar o item "<b><?= $atributo['nome_servico'] ?? $atributo['nome_combo'] ?></b>"?
                             </div>
-                        <?php endforeach ?>
-                </tbody>
-            </table>
-        </div>
+                        <?php else: ?>
+                            <div class="modal-body">
+                                Deseja realmente ativar o item "<b><?= $atributo['nome_servico'] ?? $atributo['nome_combo'] ?></b>"?
+                            </div>
+                        <?php endif; ?>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                            <?php if ($atributo['status_servico'] ?? $atributo['status_combo'] == 'Ativo') : ?>
+                                <a href="<?= URL_BASE ?>servico/excluir/<?= isset($atributo['id_servico']) ? "servico" : "combo" ?>/<?= $atributo['id_servico'] ?? $atributo['id_combo'] ?>">
+                                    <button class="btn btn-primary">Desativar</button>
+                                </a>
+                            <?php else : ?>
+                                <a href="<?= URL_BASE ?>servico/ativar/<?= isset($atributo['id_servico']) ? "servico" : "combo" ?>/<?= $atributo['id_servico'] ?? $atributo['id_combo'] ?>">
+                                    <button class="btn btn-primary">Ativar</button>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
+
 
     <div id="serviceModal" class="modal">
         <div class="modal-content">

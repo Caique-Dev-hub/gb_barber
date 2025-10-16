@@ -10,6 +10,9 @@ $combos = $this->db_servico->getCountCombo();
 
 $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
 
+$agendamento = $this->db_agendamento->getCountAgendamentos();
+$reservas = $this->db_reserva->getCountReservas();
+
 ?>
 
 
@@ -575,6 +578,203 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
     }
 </style>
 
+<style>
+    :root {
+        --primary: #000080;
+        --success: #06d6a0;
+        --warning: #f4a261;
+        --light: #f9f9f9;
+        --text-dark: #222;
+        --border-radius: 12px;
+    }
+
+    .card-agendamento {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 24px 28px;
+        max-width: 700px;
+        margin: 0 auto;
+        border-left: 6px solid var(--primary);
+    }
+
+    .info-cliente {
+        flex: 1;
+    }
+
+    .info-cliente h2 {
+        font-size: 1.3rem;
+        margin: 0;
+        color: var(--text-dark);
+    }
+
+    .info-cliente p {
+        margin: 6px 0;
+        font-size: 0.95rem;
+        color: #555;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .info-cliente i {
+        color: var(--primary);
+    }
+
+    .info-servico {
+        border-left: 1px solid #ddd;
+        padding-left: 20px;
+        margin-left: 20px;
+    }
+
+    .info-servico p {
+        margin: 8px 0;
+        font-size: 0.95rem;
+    }
+
+    .label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #888;
+        margin-bottom: 2px;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status.aguardando {
+        background: var(--warning);
+        color: white;
+    }
+
+    .status.realizado {
+        background: var(--success);
+        color: white;
+    }
+</style>
+
+<style>
+    :root {
+        --cor-principal: #000080;
+        --cor-sucesso: #06d6a0;
+        --cor-cancelar: #ef476f;
+        --cor-fundo: #f9f9f9;
+        --cor-texto: #222;
+        --borda-arredondada: 12px;
+    }
+
+    body {
+        font-family: "Poppins", sans-serif;
+        background: #f3f4f6;
+        padding: 40px;
+    }
+
+    .cartao-reserva {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: white;
+        border-radius: var(--borda-arredondada);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 24px 28px;
+        max-width: 750px;
+        margin: 0 auto;
+        border-left: 6px solid var(--cor-principal);
+    }
+
+    .info-cliente-reserva {
+        flex: 1;
+    }
+
+    .info-cliente-reserva h2 {
+        font-size: 1.3rem;
+        margin: 0;
+        color: var(--cor-texto);
+    }
+
+    .info-cliente-reserva p {
+        margin: 6px 0;
+        font-size: 0.95rem;
+        color: #555;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .info-cliente-reserva i {
+        color: var(--cor-principal);
+    }
+
+    .info-servico-reserva {
+        border-left: 1px solid #ddd;
+        padding-left: 20px;
+        margin-left: 20px;
+    }
+
+    .info-servico-reserva p {
+        margin: 8px 0;
+        font-size: 0.95rem;
+    }
+
+    .rotulo {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #888;
+        margin-bottom: 2px;
+    }
+
+    .status-reserva {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: var(--cor-sucesso);
+        color: white;
+    }
+
+    .botoes-reserva {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .botao-reserva {
+        border: none;
+        cursor: pointer;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        border-radius: 30px;
+        transition: 0.3s ease;
+    }
+
+    .botao-agendar {
+        background: var(--cor-sucesso);
+        color: white;
+    }
+
+    .botao-agendar:hover {
+        background: #05b686;
+    }
+
+    .botao-cancelar {
+        background: var(--cor-cancelar);
+        color: white;
+    }
+
+    .botao-cancelar:hover {
+        background: #d73659;
+    }
+</style>
+
 <body class="g-sidenav-show  bg-gray-100">
 
     <!-- Loading -->
@@ -599,7 +799,7 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= URL_BASE?>servico/listar" class="nav-link text-white" id="listar_clientes">
+                    <a href="<?= URL_BASE ?>servico/listar" class="nav-link text-white" id="listar_clientes">
                         <span class="nav-link-text ms-1">Serviços</span>
                     </a>
                 </li>
@@ -621,27 +821,6 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
                 <li class="nav-item">
                     <a href="<?= URL_BASE ?>dash" class="nav-link text-white">
                         <span class="nav-link-text ms-1">Retornar</span>
-                    </a>
-                </li>
-                <li class="nav-item mt-3">
-                    <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-5 text-white">Aplicativo</h6>
-                </li>
-                <li class="nav-item">
-                    <p class="nav-link text-white" href="<?= URL_BASE ?>dashboard/pages/profile.html">
-                        <i class="material-symbols-rounded opacity-5">person</i>
-                        <span class="nav-link-text ms-1">Profile</span>
-                    </p>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="<?= URL_BASE ?>dashboard/pages/sign-in.html">
-                        <i class="material-symbols-rounded opacity-5">login</i>
-                        <span class="nav-link-text ms-1">Sign In</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="<?= URL_BASE ?>dashboard/pages/sign-up.html">
-                        <i class="material-symbols-rounded opacity-5">assignment</i>
-                        <span class="nav-link-text ms-1">Sign Up</span>
                     </a>
                 </li>
             </ul>
@@ -768,7 +947,7 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
                         </div>
                         <div class="card-content">
                             <h3 class="card-title" style="font-size: 20px;">Agendamentos</h3>
-                            <p class="card-value">0</p>
+                            <p class="card-value"><?= $agendamento['total_agendamento'] ?></p>
                         </div>
                     </div>
 
@@ -781,7 +960,7 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
                         </div>
                         <div class="card-content">
                             <h3 class="card-title" style="font-size: 20px;">Reservas</h3>
-                            <p class="card-value">2,300</p>
+                            <p class="card-value"><?= $reservas['total_reserva'] ?></p>
                         </div>
                     </div>
 
@@ -807,29 +986,29 @@ $totalServicos = (int)$servicos['total'] + (int)$combos['total'];
                         </div>
                         <div class="card-content">
                             <h3 class="card-title" style="font-size: 20px;">Faturamento</h3>
-                            <p class="card-value">$103,430</p>
+                            <p class="card-value">R$0</p>
                         </div>
                     </div>
                 </div>
             </div>
-                <div class="buttons" style="display: <?= $hidden ?? 'flex'?>; justify-content: center; gap: 10px;">
-                    <button class="agendamento-button active-button" id="agendamento" onclick="agendamento()">
-                        <span class="button-text">Agendamento</span>
-                        <span class="button-icon">
-                            <svg viewBox="0 0 24 24" width="20" height="20">
-                                <path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
-                            </svg>
-                        </span>
-                    </button>
-                    <button class="reserva-button not-active" id="reserva" onclick="reserva()">
-                        <span class="button-text">Reservas</span>
-                        <span class="button-icon">
-                            <svg viewBox="0 0 24 24" width="20" height="20">
-                                <path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
-                            </svg>
-                        </span>
-                    </button>
-                </div>
+            <div class="buttons" style="display: <?= $hidden ?? 'flex' ?>; justify-content: center; gap: 10px;">
+                <button class="agendamento-button active-button" id="agendamento" onclick="agendamento()">
+                    <span class="button-text">Agendamento</span>
+                    <span class="button-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
+                        </svg>
+                    </span>
+                </button>
+                <button class="reserva-button not-active" id="reserva" onclick="reserva()">
+                    <span class="button-text">Reservas</span>
+                    <span class="button-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
+                        </svg>
+                    </span>
+                </button>
+            </div>
 
             <script>
                 document.getElementById('reserva').addEventListener('click', function() {
